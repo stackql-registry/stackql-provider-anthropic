@@ -1,0 +1,1 @@
+SELECT id, name, type FROM anthropic_admin.organization.organization;

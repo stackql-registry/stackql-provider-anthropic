@@ -1,0 +1,2 @@
+SELECT group_type, limits FROM anthropic_admin.workspaces.rate_limits
+WHERE workspace_id = 'wrkspc_01';

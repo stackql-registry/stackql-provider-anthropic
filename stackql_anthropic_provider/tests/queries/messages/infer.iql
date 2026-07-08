@@ -1,0 +1,5 @@
+SELECT id, model, role, JSON_EXTRACT(content, '$[0].text') AS text
+FROM anthropic.messages.messages
+WHERE model = '{{ model }}'
+  AND max_tokens = 64
+  AND messages = '[{"role":"user","content":"say hi"}]';

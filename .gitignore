@@ -141,3 +141,9 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# website artifacts
+stackql_anthropic_provider/website/build
+stackql_anthropic_admin_provider/website/build
+stackql_anthropic_provider/website/.docusaurus
+stackql_anthropic_admin_provider/website/.docusaurus

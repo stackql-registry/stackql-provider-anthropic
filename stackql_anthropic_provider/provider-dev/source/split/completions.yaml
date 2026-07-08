@@ -1,0 +1,508 @@
+openapi: 3.0.3
+info:
+  title: completions API
+  description: anthropic completions API
+  version: 1.0.0
+paths:
+  /v1/complete:
+    post:
+      summary: Create a Text Completion
+      description: |-
+        [Legacy] Create a Text Completion.
+
+        The Text Completions API is a legacy API. We recommend using the [Messages API](https://platform.claude.com/docs/en/api/messages) going forward.
+
+        Future models and features will not be compatible with Text Completions. See our [migration guide](https://platform.claude.com/docs/en/build-with-claude/working-with-messages) for guidance in migrating from Text Completions to Messages.
+      operationId: complete_post
+      parameters:
+        - name: anthropic-version
+          in: header
+          required: false
+          schema:
+            type: string
+            description: |-
+              The version of the Claude API you want to use.
+
+              Read more about versioning and our version history [here](https://platform.claude.com/docs/en/api/versioning).
+            title: Anthropic-Version
+            default: '2023-06-01'
+          description: |-
+            The version of the Claude API you want to use.
+
+            Read more about versioning and our version history [here](https://platform.claude.com/docs/en/api/versioning).
+        - name: anthropic-beta
+          in: header
+          required: false
+          schema:
+            type: string
+            items:
+              type: string
+            description: |-
+              Optional header to specify the beta version(s) you want to use.
+
+              To use multiple betas, use a comma separated list like `beta1,beta2` or specify the header multiple times for each beta.
+            title: Anthropic-Beta
+            x-stainless-override-schema:
+              x-stainless-param: betas
+              x-stainless-extend-default: true
+              type: array
+              description: Optional header to specify the beta version(s) you want to use.
+              items:
+                $ref: '#/components/schemas/AnthropicBeta'
+          description: |-
+            Optional header to specify the beta version(s) you want to use.
+
+            To use multiple betas, use a comma separated list like `beta1,beta2` or specify the header multiple times for each beta.
+      responses:
+        '200':
+          description: Text Completion object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompletionResponse'
+        4XX:
+          description: |-
+            Error response.
+
+            See our [errors documentation](https://platform.claude.com/docs/en/api/errors) for more details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompletionRequest'
+        required: true
+components:
+  schemas:
+    AnthropicBeta:
+      type: string
+      enum:
+        - message-batches-2024-09-24
+        - prompt-caching-2024-07-31
+        - computer-use-2024-10-22
+        - computer-use-2025-01-24
+        - pdfs-2024-09-25
+        - token-counting-2024-11-01
+        - token-efficient-tools-2025-02-19
+        - output-128k-2025-02-19
+        - files-api-2025-04-14
+        - mcp-client-2025-04-04
+        - mcp-client-2025-11-20
+        - dev-full-thinking-2025-05-14
+        - interleaved-thinking-2025-05-14
+        - code-execution-2025-05-22
+        - extended-cache-ttl-2025-04-11
+        - context-1m-2025-08-07
+        - context-management-2025-06-27
+        - model-context-window-exceeded-2025-08-26
+        - skills-2025-10-02
+        - fast-mode-2026-02-01
+        - output-300k-2026-03-24
+        - user-profiles-2026-03-24
+        - advisor-tool-2026-03-01
+        - managed-agents-2026-04-01
+        - cache-diagnosis-2026-04-07
+        - thinking-token-count-2026-05-13
+        - server-side-fallback-2026-06-01
+        - fallback-credit-2026-06-01
+        - agent-memory-2026-07-22
+      x-stainless-nominal: false
+    CompletionResponse:
+      properties:
+        completion:
+          type: string
+          title: Completion
+          description: The resulting completion up to and excluding the stop sequences.
+          examples:
+            - ' Hello! My name is Claude.'
+        id:
+          type: string
+          title: Id
+          description: |-
+            Unique object identifier.
+
+            The format and length of IDs may change over time.
+        model:
+          $ref: '#/components/schemas/Model'
+        stop_reason:
+          title: Stop Reason
+          description: |-
+            The reason that we stopped.
+
+            This may be one the following values:
+            * `"stop_sequence"`: we reached a stop sequence — either provided by you via the `stop_sequences` parameter, or a stop sequence built into the model
+            * `"max_tokens"`: we exceeded `max_tokens_to_sample` or the model's maximum
+          examples:
+            - stop_sequence
+          nullable: true
+          type: string
+        type:
+          type: string
+          title: Type
+          description: |-
+            Object type.
+
+            For Text Completions, this is always `"completion"`.
+          default: completion
+          enum:
+            - completion
+      type: object
+      required:
+        - completion
+        - id
+        - model
+        - stop_reason
+        - type
+      title: CompletionResponse
+      example:
+        completion: ' Hello! My name is Claude.'
+        id: compl_018CKm6gsux7P8yMcwZbeCPw
+        model: claude-2.1
+        stop_reason: stop_sequence
+        type: completion
+    ErrorResponse:
+      properties:
+        error:
+          discriminator:
+            mapping:
+              api_error: '#/components/schemas/APIError'
+              authentication_error: '#/components/schemas/AuthenticationError'
+              billing_error: '#/components/schemas/BillingError'
+              invalid_request_error: '#/components/schemas/InvalidRequestError'
+              not_found_error: '#/components/schemas/NotFoundError'
+              overloaded_error: '#/components/schemas/OverloadedError'
+              permission_error: '#/components/schemas/PermissionError'
+              rate_limit_error: '#/components/schemas/RateLimitError'
+              timeout_error: '#/components/schemas/GatewayTimeoutError'
+            propertyName: type
+          title: Error
+          properties:
+            message:
+              default: Invalid request
+              title: Message
+              type: string
+            type:
+              default: invalid_request_error
+              title: Type
+              type: string
+              enum:
+                - invalid_request_error
+          required:
+            - message
+            - type
+          type: object
+        request_id:
+          default: null
+          title: Request Id
+          nullable: true
+          type: string
+        type:
+          default: error
+          title: Type
+          type: string
+          enum:
+            - error
+      required:
+        - error
+        - request_id
+        - type
+      title: ErrorResponse
+      type: object
+    CompletionRequest:
+      examples:
+        - max_tokens_to_sample: 256
+          model: claude-2.1
+          prompt: |-
+
+
+            Human: Hello, world!
+
+            Assistant:
+      properties:
+        model:
+          $ref: '#/components/schemas/Model'
+        prompt:
+          description: |-
+            The prompt that you want Claude to complete.
+
+            For proper response generation you will need to format your prompt using alternating `\n\nHuman:` and `\n\nAssistant:` conversational turns. For example:
+
+            ```
+            "\n\nHuman: {userQuestion}\n\nAssistant:"
+            ```
+
+            See [prompt validation](https://platform.claude.com/docs/en/build-with-claude/working-with-messages) and our guide to [prompt design](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview) for more details.
+          examples:
+            - |-
+
+
+              Human: Hello, world!
+
+              Assistant:
+          minLength: 1
+          title: Prompt
+          type: string
+        max_tokens_to_sample:
+          description: |-
+            The maximum number of tokens to generate before stopping.
+
+            Note that our models may stop _before_ reaching this maximum. This parameter only specifies the absolute maximum number of tokens to generate.
+          examples:
+            - 256
+          minimum: 1
+          title: Max Tokens To Sample
+          type: integer
+        stop_sequences:
+          description: |-
+            Sequences that will cause the model to stop generating.
+
+            Our models stop on `"\n\nHuman:"`, and may include additional built-in stop sequences in the future. By providing the stop_sequences parameter, you may include additional strings that will cause the model to stop generating.
+          items:
+            type: string
+          title: Stop Sequences
+          type: array
+        temperature:
+          deprecated: true
+          description: |-
+            Amount of randomness injected into the response.
+
+            Defaults to `1.0`. Ranges from `0.0` to `1.0`. Use `temperature` closer to `0.0` for analytical / multiple choice, and closer to `1.0` for creative and generative tasks.
+
+            Note that even with `temperature` of `0.0`, the results will not be fully deterministic.
+          examples:
+            - 1
+          maximum: 1
+          minimum: 0
+          title: Temperature
+          type: number
+          x-stainless-deprecation-message: Deprecated. Models released after Claude Opus 4.6 do not support setting temperature. A value of 1.0 of will be accepted for backwards compatibility, all other values will be rejected with a 400 error.
+        top_p:
+          deprecated: true
+          description: |-
+            Use nucleus sampling.
+
+            In nucleus sampling, we compute the cumulative distribution over all the options for each subsequent token in decreasing probability order and cut it off once it reaches a particular probability specified by `top_p`.
+
+            Recommended for advanced use cases only.
+          examples:
+            - 0.7
+          maximum: 1
+          minimum: 0
+          title: Top P
+          type: number
+          x-stainless-deprecation-message: Deprecated. Models released after Claude Opus 4.6 do not support setting top_p. A value >= 0.99 will be accepted for backwards compatibility, all other values will be rejected with a 400 error.
+        top_k:
+          deprecated: true
+          description: |-
+            Only sample from the top K options for each subsequent token.
+
+            Used to remove "long tail" low probability responses. [Learn more technical details here](https://towardsdatascience.com/how-to-sample-from-language-models-682bceb97277).
+
+            Recommended for advanced use cases only.
+          examples:
+            - 5
+          minimum: 0
+          title: Top K
+          type: integer
+          x-stainless-deprecation-message: Deprecated. Models released after Claude Opus 4.6 do not accept top_k; any value will be rejected with a 400 error.
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+          description: An object describing metadata about the request.
+        stream:
+          description: |-
+            Whether to incrementally stream the response using server-sent events.
+
+            See [streaming](https://platform.claude.com/docs/en/build-with-claude/streaming) for details.
+          title: Stream
+          type: boolean
+      required:
+        - max_tokens_to_sample
+        - model
+        - prompt
+      title: CompletionRequest
+      type: object
+    Model:
+      title: Model
+      description: |-
+        The model that will complete your prompt.
+
+        See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.
+      type: string
+      x-stainless-nominal: false
+      enum:
+        - claude-sonnet-5
+      deprecated: true
+      x-stainless-deprecation-message: Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.
+    InvalidRequestError:
+      properties:
+        message:
+          default: Invalid request
+          title: Message
+          type: string
+        type:
+          default: invalid_request_error
+          title: Type
+          type: string
+          enum:
+            - invalid_request_error
+      required:
+        - message
+        - type
+      title: InvalidRequestError
+      type: object
+    AuthenticationError:
+      properties:
+        message:
+          default: Authentication error
+          title: Message
+          type: string
+        type:
+          default: authentication_error
+          title: Type
+          type: string
+          enum:
+            - authentication_error
+      required:
+        - message
+        - type
+      title: AuthenticationError
+      type: object
+    BillingError:
+      properties:
+        message:
+          default: Billing error
+          title: Message
+          type: string
+        type:
+          default: billing_error
+          title: Type
+          type: string
+          enum:
+            - billing_error
+      required:
+        - message
+        - type
+      title: BillingError
+      type: object
+    PermissionError:
+      properties:
+        message:
+          default: Permission denied
+          title: Message
+          type: string
+        type:
+          default: permission_error
+          title: Type
+          type: string
+          enum:
+            - permission_error
+      required:
+        - message
+        - type
+      title: PermissionError
+      type: object
+    NotFoundError:
+      properties:
+        message:
+          default: Not found
+          title: Message
+          type: string
+        type:
+          default: not_found_error
+          title: Type
+          type: string
+          enum:
+            - not_found_error
+      required:
+        - message
+        - type
+      title: NotFoundError
+      type: object
+    RateLimitError:
+      properties:
+        message:
+          default: Rate limited
+          title: Message
+          type: string
+        type:
+          default: rate_limit_error
+          title: Type
+          type: string
+          enum:
+            - rate_limit_error
+      required:
+        - message
+        - type
+      title: RateLimitError
+      type: object
+    GatewayTimeoutError:
+      properties:
+        message:
+          default: Request timeout
+          title: Message
+          type: string
+        type:
+          default: timeout_error
+          title: Type
+          type: string
+          enum:
+            - timeout_error
+      required:
+        - message
+        - type
+      title: GatewayTimeoutError
+      type: object
+    APIError:
+      properties:
+        message:
+          default: Internal server error
+          title: Message
+          type: string
+        type:
+          default: api_error
+          title: Type
+          type: string
+          enum:
+            - api_error
+      required:
+        - message
+        - type
+      title: APIError
+      type: object
+    OverloadedError:
+      properties:
+        message:
+          default: Overloaded
+          title: Message
+          type: string
+        type:
+          default: overloaded_error
+          title: Type
+          type: string
+          enum:
+            - overloaded_error
+      required:
+        - message
+        - type
+      title: OverloadedError
+      type: object
+    Metadata:
+      properties:
+        user_id:
+          description: |-
+            An external identifier for the user who is associated with the request.
+
+            This should be a uuid, hash value, or other opaque identifier. Anthropic may use this id to help detect abuse. Do not include any identifying information such as name, email address, or phone number.
+          examples:
+            - 13803d75-b4b5-4c3e-b2a2-6f21399b021b
+          title: User Id
+          nullable: true
+          maxLength: 512
+          type: string
+      title: Metadata
+      type: object
+servers:
+  - url: https://api.anthropic.com

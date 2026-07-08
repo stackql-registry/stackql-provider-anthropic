@@ -1,0 +1,17 @@
+# Netlify monorepo configuration — TWO sites are deployed from this repo
+# (NOT GitHub Pages: Pages allows one site per repo).
+#
+# Create two Netlify sites pointed at this repository, each with its own
+# base directory (Netlify reads the netlify.toml in the base directory):
+#
+#   anthropic-provider.stackql.io        base = stackql_anthropic_provider/website
+#   anthropic-admin-provider.stackql.io  base = stackql_anthropic_admin_provider/website
+#
+# Each site's netlify.toml carries its build command, publish dir, and an
+# `ignore` command for selective builds (skip when the site's provider tree
+# and website are untouched). This root file exists for documentation and
+# safe fallback only.
+
+[build]
+  command = "echo 'Set the Netlify site base directory to stackql_anthropic_provider/website or stackql_anthropic_admin_provider/website'"
+  publish = "."

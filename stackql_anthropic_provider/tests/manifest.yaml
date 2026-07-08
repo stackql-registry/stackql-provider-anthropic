@@ -1,0 +1,146 @@
+# Smoke-test manifest for the stackql `anthropic` provider.
+#
+# Mock mode (default): tests/mock/mock-server.cjs enforces the wire
+# contract (401 without x-api-key, 400 without anthropic-version, 400 on
+# beta paths without the right anthropic-beta flag) — every green test
+# below therefore proves header/auth behaviour, not just row plumbing.
+# The agents list is served in 2 cursor pages (page/next_page, page size 3)
+# so `agents_list_paginated` proves auto-pagination walks; the batches and
+# models lists are after_id-style (last_id populated on the final page) so
+# a wrongly-stamped pagination config would hang/loop them.
+#
+# Live mode (--live, gated on ANTHROPIC_API_KEY): read-only + one tiny
+# inference; only tests tagged `live: true` run.
+
+config:
+  registry_path: ../provider-dev/openapi
+  queries_dir: queries
+  live_env_var: ANTHROPIC_API_KEY
+  mock_key: sk-ant-mock-key
+  mock_port: 8990
+  query_timeout_seconds: 120
+
+vars:
+  model: claude-sonnet-5
+  agent_name: stackql-smoke-agent
+
+tests:
+  # ---- credential handling ---------------------------------------------------
+  - name: auth_env_required
+    description: empty credentials env var must fail client-side, never hit the wire
+    file: auth/missing_key.iql
+    env:
+      ANTHROPIC_API_KEY: ""
+    expect_error: "credentials error"
+
+  # ---- inference as result sets (GA surface) ---------------------------------
+  - name: messages_infer
+    description: POST-as-SELECT; naive body translate fans messages out to a JSON array
+    file: messages/infer.iql
+    expect:
+      min_rows: 1
+      contains: ["mock completion", "assistant"]
+
+  - name: token_counts
+    description: divergent-shape resource split (few-shot 1) — {input_tokens} row
+    file: messages/count_tokens.iql
+    expect:
+      min_rows: 1
+      contains: ["37"]
+
+  # ---- after_id lists: NO pagination config (would loop on last_id) ----------
+  - name: batches_list
+    description: after_id-style list returns one page and terminates
+    file: messages/batches_list.iql
+    expect:
+      equals_rows: 2
+      contains: ["msgbatch_01", "msgbatch_02"]
+
+  - name: models_list
+    description: GA models list (after_id style)
+    file: models/models_list.iql
+    expect:
+      equals_rows: 2
+      contains: ["claude-sonnet-5", "claude-opus-4-8"]
+
+  - name: models_get
+    description: single model by path param
+    file: models/models_get.iql
+    expect:
+      equals_rows: 1
+      contains: ["claude-sonnet-5"]
+
+  # ---- cursor pagination + beta headers (agents lifecycle) -------------------
+  # Any request here without anthropic-beta: managed-agents-2026-04-01 is
+  # rejected by the mock, so green == the per-endpoint default was injected.
+  - name: agents_list_paginated
+    description: 5 seeded agents over 2 cursor pages (3+2) — proves the walk
+    file: agents/agents_list.iql
+    expect:
+      equals_rows: 5
+      contains: ["seed-agent-1", "seed-agent-5"]
+
+  - name: agents_insert
+    description: INSERT with eager id capture via RETURNING
+    file: agents/agents_insert.iql
+    expect:
+      min_rows: 1
+      contains: ["{{ agent_name }}"]
+    exports:
+      - name: agent_id
+        column: id
+
+  - name: agents_get
+    description: point SELECT by exported id
+    file: agents/agents_get.iql
+    expect:
+      equals_rows: 1
+      contains: ["{{ agent_name }}", "{{ agents_insert.agent_id }}"]
+
+  - name: agents_update
+    description: UPDATE (POST) with required body field `version`
+    file: agents/agents_update.iql
+
+  - name: agents_update_verify
+    description: re-read confirms the description changed and version bumped
+    file: agents/agents_get.iql
+    expect:
+      contains: ["updated by smoke suite"]
+
+  - name: agents_archive
+    description: lifecycle op on the EXEC surface
+    file: agents/agents_archive.iql
+    always_run: true
+
+  - name: agents_list_after_archive
+    description: archived agent drops out of the list (back to 5)
+    file: agents/agents_list.iql
+    expect:
+      equals_rows: 5
+      not_contains: ["{{ agent_name }}"]
+
+  # ---- live subset (READ-heavy; one tiny inference) ---------------------------
+  - name: live_models_list
+    description: real models list
+    file: models/models_list.iql
+    live: true
+    skip_mock: true
+    expect:
+      min_rows: 1
+      contains: ["claude"]
+
+  - name: live_token_count
+    description: token counting is free of charge
+    file: messages/count_tokens.iql
+    live: true
+    skip_mock: true
+    expect:
+      min_rows: 1
+
+  - name: live_messages_infer
+    description: minimal paid inference (haiku, 16 output tokens)
+    file: messages/infer_live.iql
+    live: true
+    skip_mock: true
+    expect:
+      min_rows: 1

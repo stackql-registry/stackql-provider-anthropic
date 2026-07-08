@@ -1,0 +1,3 @@
+UPDATE anthropic_admin.workspaces.workspaces
+SET name = 'smoke-workspace-renamed'
+WHERE workspace_id = '{{ workspaces_create.workspace_id }}';

@@ -10,7 +10,8 @@ This repo masters TWO StackQL providers from one pipeline ("the factory"):
 The two key types are disjoint (neither can call the other's endpoints) but the wire auth
 structure is identical: `x-api-key` + `anthropic-version` headers.
 
-Default branch: `stackql-provider`. This is a PLAIN repo (not a fork). Rules marked
+Default branch: `main` (this is a PLAIN repo, not a fork — the `stackql-provider`
+default-branch convention applies only to forked SDK repos). Rules marked
 **(verified)** were empirically confirmed on the wire against stackql v0.10.542 during a
 prior build — do not re-litigate them.
 
@@ -65,6 +66,52 @@ Hand-authored per-service specs in `stackql_anthropic_admin_provider/provider-de
 (transcribed from the reference pages listed below), entering the SAME chain at
 normalize → analyze → generate → post-pass. ~24 operations; stable surface.
 
+## Spike findings (Phase 0, 2026-07-08, spec hash d272f069e15d096063103c857fb8e2a7)
+
+Messages service walked end-to-end (locate → download → pre-pass → split → normalize →
+scrub → analyze → CSV review → generate → post-pass → stackql v0.10.542 load →
+meta routes → mock SELECTs). All findings empirical:
+
+- **(a) 3.1 constructs**: the spec has NO `type: [...]` arrays; the 3.1-isms are 478
+  `{type: 'null'}` anyOf/oneOf members, 476 `const`, 23 numeric
+  exclusiveMinimum/Maximum. `factory/pre-pass.mjs` downlevels all three (null members
+  stripped + `nullable: true`, const→enum, exclusive→min/max) and stamps
+  `openapi: 3.0.3`; the stackql loader accepts the result cleanly.
+- **(b) Message-class schemas ARE SQL-shaped** after shallow normalize: `Message`
+  projects id/type/role/content(array→JSON)/model/stop_reason/…/usage(object→JSON);
+  `MessageTokensCount` projects `input_tokens`. POST-as-SELECT verified on a mock:
+  WHERE keys pass into the JSON body via naive translate (`messages` string fans out
+  to a real JSON array), the Message row comes back as a result set.
+- **normalize is NOT sufficient for guard 4**: it leaves nested unions (48 oneOf in
+  messages alone) and ~700 `additionalProperties` across services.
+  `factory/scrub-unions.mjs` (new pipeline step, runs after normalize) collapses
+  residual nested unions to opaque JSON-blob schemas and deletes every
+  `additionalProperties` — all 12 services then scan clean.
+- **Pagination classification** (from the spec, mechanical): 19 cursor lists
+  (`page` query param + `$.next_page` in response — ALL beta lists) get pagination
+  config; 3 after_id lists (models, GA batches, files) get none. `factory/post-pass.mjs`
+  detects the cursor pattern structurally, no hand list.
+- **Wire quirk**: stackql appends a bare `?` to request URLs when no query params are
+  supplied (`POST /v1/messages?`). Harmless on real servers; mocks must parse the URL
+  rather than string-match it.
+- provider-utils@0.7.6 needs `@jsr:registry=https://npm.jsr.io` in `.npmrc`
+  (dependency `@jsr/stackql__deno-openapi-dereferencer`).
+- split's "Operations processed" log undercounts (prints 100, emits all 104 ops);
+  count ops in the split output, not from the log.
+- **stackql v0.10.542 EXEC panic (upstream bug, worked around)**: EXEC prepare
+  SIGSEGVs (`wrappedSchema.GetType` on a nil inner schema, via
+  `drm.GenerateSelectDML`) whenever the exec method's resolved response schema has NO
+  array-typed property (MessageBatch, Workspace, BetaEnrollmentUrl, ...; schemas WITH an
+  array property — Agent.tools, SendSessionEvents.data — are fine). Bare-scalar
+  responses (binary downloads, `type: string`) fail differently:
+  "no schema found for method", no dispatch. BOTH are fixed by stamping
+  `response.schema_override` → a synthetic `StackqlExecResult` envelope (object with an
+  array property) on exec-only methods matching either shape; `factory/post-pass.mjs`
+  step 3 does this mechanically (18 methods in `anthropic`, 1 in `anthropic_admin`).
+  All 23 anthropic EXEC methods + admin archive dispatch-verified. Report upstream.
+- EXEC invocation syntax: multiple params need commas —
+  `EXEC t.r.m @a = 'x', @b = 'y'` (space-separated @params is a parser error).
+
 ## Output rules (both providers)
 
 ### 1. Auth — `type: custom`, NOT `api_key` **(verified)**
@@ -101,10 +148,12 @@ The spec declares the `anthropic-beta` header but NOT the per-endpoint flag cons
 (that's Stainless config). Maintain a small checked-in table
 (`factory/beta-flags.yaml`), extracted at build time from the published PyPI `anthropic`
 package (`pip download anthropic` → grep resource modules for
-`extra_headers = {"anthropic-beta": "<flag>"`). Known at audit time:
-`managed-agents-2026-04-01` (agents/deployments/environments/sessions/skills/
-user_profiles/vaults/files et al.), `agent-memory-2026-07-22` (memory stores). Verify,
-don't trust this list.
+`extra_headers = {"anthropic-beta": "<flag>"`). **Verified against anthropic==0.116.0
+(2026-07-08)** — the audit-time list was wrong for three services. Actual table
+(checked into `factory/beta-flags.yaml`): `managed-agents-2026-04-01`
+(agents/deployments/deployment_runs/environments/sessions/vaults),
+`agent-memory-2026-07-22` (memory_stores), `files-api-2025-04-14` (files),
+`skills-2025-10-02` (skills), `user-profiles-2026-03-24` (user_profiles).
 
 ### 5. No polymorphism; flat SQL-result-set rows
 
@@ -242,12 +291,27 @@ reject admin keys, need `org:admin` OAuth); Compliance / Spend Limits / Enterpri
 Analytics (third key type `sk-ant-api01-...` → future `anthropic_enterprise`). Note in
 docs: on Claude Platform on AWS only workspace CRUD works.
 
-Admin open questions — resolve on the mock BEFORE shipping, then pin the answers here:
-(a) report row shape: does objectKey support `$.data[*].results[*]` (row per
-bucket×group)? fallback `$.data` + JSON_EACH; (b) array query param serialisation
-(`group_by[]=model&group_by[]=x`) and the literal `[]` in param names; (c) `ending_at`
-requiredness on usage/cost (affects routing signatures); (d) `speeds[]`/`speed` grouping
-needs beta header `fast-mode-2026-02-01` — optional header param or defer.
+Admin open questions — RESOLVED empirically on the mock (2026-07-08), pinned:
+(a) **Report row shape: ship `$.data`.** stackql's objectKey DOES support
+`$.data[*].results[*]` (row per bucket×group, auto-pagination still walks), but those
+rows lose the bucket's `starting_at`/`ending_at` (absent from result items), which are
+the x-axis of any usage report. So usage/cost/claude_code use `$.data` (row per bucket:
+starting_at, ending_at, results as a JSON column; JSON_EACH for group breakdowns).
+(b) **Array query params take ONE scalar value per query.** `WHERE "group_by[]" =
+'model'` reaches the wire as `group_by%5B%5D=model` (URL-encoded brackets, accepted).
+A JSON-array value does NOT fan out — it arrives as the literal string (unlike request
+bodies under naive translate). Quote bracketed identifiers with DOUBLE QUOTES in SQL:
+backtick-quoting `` `group_by[]` `` is a stackql parser error (note: this corrects the
+"backtick-quoted in SQL samples" instruction in few-shot 5 — backticks only work for
+bracket-free identifiers).
+(c) **`ending_at` is optional** on both usage_report/messages and cost_report (canonical
+reference pages) — routing signatures are `[starting_at]` only; no clash.
+(d) **fast-mode: optional header, NO default.** `anthropic-beta` is declared on
+usage/cost ops as an optional header param without a default; users grouping/filtering
+by `speed` supply `anthropic-beta = 'fast-mode-2026-02-01'` in the WHERE clause.
+Also: usage/cost/claude_code reports and both rate_limits endpoints are CURSOR-paginated
+(`page` + `next_page`) and get pagination config — the after_id policy applies only to
+the admin ENTITY lists (users/invites/workspaces/members/api_keys).
 
 ## Build guards (CI hard-fails)
 
@@ -288,10 +352,22 @@ stackql-registry/stackql-provider-databricks (`stackql-provider` branch) — per
 directories, selective builds. Admin site auth docs: Admin key, admin-role-created,
 org accounts only; cross-link the `anthropic` site (and vice versa).
 
-Known docgen bug: provider-utils builds "Required Params" from `parameters` only,
-missing `requestBody.schema.required` (which naive translate surfaces at runtime —
-`SHOW METHODS` is correct, docs are not). Fix upstream in provider-utils (preferred,
-stackql-owned) and/or a local post-docgen patch until it lands.
+Known docgen bug — PATCHED LOCALLY (2026-07-08): provider-utils includes
+`requestBody.required` in "Required Params" only for insert/update/replace/exec access
+types, so SELECT-routed body methods (inference ops) rendered empty Required Params and
+unroutable samples. `factory/patch-provider-utils.mjs` (npm postinstall) adds `select`
+to the allowlist in `docgen/resource/methods.js` and appends body-required fields to
+SELECT example WHERE clauses; the upstream diff is prepared at
+`factory/upstream/provider-utils-select-required-params.patch`. Delete the local patch
+once a provider-utils release contains the fix.
+
+More website findings (2026-07-08): Docusaurus 3.10 with `future: {v4: true}` requires
+the `@docusaurus/faster` package (build hard-fails without it); the preset's default
+blog plugin must be `blog: false`'d (the vendored src/pages/blog.js redirect stub
+otherwise duplicates the /blog route). `factory/scrub-docs.mjs` post-processes docgen
+SQL samples: auto-injected header params removed, hyphenated/bracketed identifiers
+DOUBLE-quoted (backticks are a stackql v0.10.542 parser error for both shapes —
+supersedes the backtick advice in few-shot 5 and the MDX-safe rule).
 
 ## Things NOT to do
 

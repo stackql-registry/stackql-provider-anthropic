@@ -1,0 +1,1 @@
+SELECT group_type, models, limits FROM anthropic_admin.rate_limits.rate_limits;

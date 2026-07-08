@@ -1,0 +1,2 @@
+SELECT id, name, archived_at FROM anthropic_admin.workspaces.workspaces
+WHERE workspace_id = '{{ workspaces_create.workspace_id }}';

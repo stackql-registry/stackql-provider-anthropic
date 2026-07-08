@@ -1,0 +1,2 @@
+SELECT date, organization_id, terminal_type, core_metrics FROM anthropic_admin.usage.claude_code_reports
+WHERE starting_at = '2026-07-01';

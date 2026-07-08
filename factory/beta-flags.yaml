@@ -1,0 +1,33 @@
+# Per-endpoint `anthropic-beta` header defaults, keyed by path prefix.
+#
+# The spec declares the anthropic-beta header param but NOT the per-endpoint
+# flag constants (those live in Stainless config). This table is extracted
+# from the published PyPI `anthropic` package:
+#
+#   pip download anthropic --no-deps -d <dir> && unzip the wheel &&
+#   grep -rn '"anthropic-beta": "' anthropic/resources/
+#
+# Re-verify whenever the vendored spec is bumped (factory/locate.mjs --pin).
+# Extracted from: anthropic 0.116.0 (2026-07-08).
+#
+# NOTE this table CORRECTS the earlier audit list in CLAUDE.md:
+#   - files        → files-api-2025-04-14      (not managed-agents)
+#   - skills       → skills-2025-10-02         (not managed-agents)
+#   - user_profiles→ user-profiles-2026-03-24  (not managed-agents)
+
+extracted_from: anthropic==0.116.0
+flags:
+  /v1/agents: managed-agents-2026-04-01
+  /v1/deployment_runs: managed-agents-2026-04-01
+  /v1/deployments: managed-agents-2026-04-01
+  /v1/environments: managed-agents-2026-04-01
+  /v1/sessions: managed-agents-2026-04-01
+  /v1/vaults: managed-agents-2026-04-01
+  /v1/files: files-api-2025-04-14
+  /v1/memory_stores: agent-memory-2026-07-22
+  /v1/skills: skills-2025-10-02
+  /v1/user_profiles: user-profiles-2026-03-24
+  # Beta twins of GA messages/batches/models are excluded (see
+  # exclusions.yaml) so need no default here:
+  #   /v1/messages?beta=true            token-counting-2024-11-01
+  #   /v1/messages/batches?beta=true    message-batches-2024-09-24

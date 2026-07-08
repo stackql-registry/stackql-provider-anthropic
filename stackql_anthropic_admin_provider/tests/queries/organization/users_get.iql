@@ -1,0 +1,1 @@
+SELECT id, email, role FROM anthropic_admin.organization.users WHERE user_id = 'user_01';

@@ -1,0 +1,1 @@
+SELECT id, display_name FROM anthropic.models.models WHERE model_id = 'claude-sonnet-5';

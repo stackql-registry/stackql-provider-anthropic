@@ -1,0 +1,17 @@
+# Netlify site: anthropic-provider.stackql.io
+# Base directory (set in Netlify UI): stackql_anthropic_provider/website
+
+[build]
+  command = "yarn build"
+  publish = "build"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Selective builds: skip when neither this provider's tree nor this site
+# changed since the last deploy.
+[build.processing]
+  skip_processing = false
+
+[context.production]
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ../../stackql_anthropic_provider ../../factory"

@@ -1,0 +1,2 @@
+SELECT starting_at, ending_at, results FROM anthropic_admin.usage.usage_reports
+WHERE starting_at = '2026-07-01T00:00:00Z';

@@ -1,0 +1,28 @@
+filename,path,operationId,formatted_op_id,verb,response_object,tags,formatted_tags,stackql_resource_name,stackql_method_name,stackql_verb,stackql_object_key,op_description
+api_keys.yaml,/v1/organizations/api_keys,api_keys_list,api_keys_list,get,ApiKeyList,,,api_keys,list,select,$.data,List API Keys
+api_keys.yaml,/v1/organizations/api_keys/{api_key_id},api_keys_get,api_keys_get,get,ApiKey,,,api_keys,get,select,,Get API Key
+api_keys.yaml,/v1/organizations/api_keys/{api_key_id},api_keys_update,api_keys_update,post,ApiKey,,,api_keys,update,update,,Update API Key
+cost.yaml,/v1/organizations/cost_report,cost_report,cost_report,get,CostReport,,,cost_reports,list,select,$.data,Get Cost Report
+organization.yaml,/v1/organizations/me,organization_me,organization_me,get,Organization,,,organization,get,select,,Get Current Organization
+organization.yaml,/v1/organizations/users,users_list,users_list,get,UserList,,,users,list,select,$.data,List Users
+organization.yaml,/v1/organizations/users/{user_id},users_get,users_get,get,User,,,users,get,select,,Get User
+organization.yaml,/v1/organizations/users/{user_id},users_update,users_update,post,User,,,users,update,update,,Update User
+organization.yaml,/v1/organizations/users/{user_id},users_delete,users_delete,delete,,,,users,delete,delete,,Remove User
+organization.yaml,/v1/organizations/invites,invites_list,invites_list,get,InviteList,,,invites,list,select,$.data,List Invites
+organization.yaml,/v1/organizations/invites,invites_create,invites_create,post,Invite,,,invites,create,insert,,Create Invite
+organization.yaml,/v1/organizations/invites/{invite_id},invites_get,invites_get,get,Invite,,,invites,get,select,,Get Invite
+organization.yaml,/v1/organizations/invites/{invite_id},invites_delete,invites_delete,delete,,,,invites,delete,delete,,Delete Invite
+rate_limits.yaml,/v1/organizations/rate_limits,rate_limits_list,rate_limits_list,get,RateLimitList,,,rate_limits,list,select,$.data,List Organization Rate Limits
+usage.yaml,/v1/organizations/usage_report/messages,usage_report_messages,usage_report_messages,get,MessagesUsageReport,,,usage_reports,list,select,$.data,Get Messages Usage Report
+usage.yaml,/v1/organizations/usage_report/claude_code,usage_report_claude_code,usage_report_claude_code,get,ClaudeCodeUsageReport,,,claude_code_reports,list,select,$.data,Get Claude Code Usage Report
+workspaces.yaml,/v1/organizations/workspaces,workspaces_list,workspaces_list,get,WorkspaceList,,,workspaces,list,select,$.data,List Workspaces
+workspaces.yaml,/v1/organizations/workspaces,workspaces_create,workspaces_create,post,Workspace,,,workspaces,create,insert,,Create Workspace
+workspaces.yaml,/v1/organizations/workspaces/{workspace_id},workspaces_get,workspaces_get,get,Workspace,,,workspaces,get,select,,Get Workspace
+workspaces.yaml,/v1/organizations/workspaces/{workspace_id},workspaces_update,workspaces_update,post,Workspace,,,workspaces,update,update,,Update Workspace
+workspaces.yaml,/v1/organizations/workspaces/{workspace_id}/archive,workspaces_archive,workspaces_archive,post,Workspace,,,workspaces,archive,exec,,Archive Workspace
+workspaces.yaml,/v1/organizations/workspaces/{workspace_id}/members,workspace_members_list,workspace_members_list,get,WorkspaceMemberList,,,members,list,select,$.data,List Workspace Members
+workspaces.yaml,/v1/organizations/workspaces/{workspace_id}/members,workspace_members_create,workspace_members_create,post,WorkspaceMember,,,members,create,insert,,Create Workspace Member
+workspaces.yaml,/v1/organizations/workspaces/{workspace_id}/members/{user_id},workspace_members_get,workspace_members_get,get,WorkspaceMember,,,members,get,select,,Get Workspace Member
+workspaces.yaml,/v1/organizations/workspaces/{workspace_id}/members/{user_id},workspace_members_update,workspace_members_update,post,WorkspaceMember,,,members,update,update,,Update Workspace Member
+workspaces.yaml,/v1/organizations/workspaces/{workspace_id}/members/{user_id},workspace_members_delete,workspace_members_delete,delete,,,,members,delete,delete,,Delete Workspace Member
+workspaces.yaml,/v1/organizations/workspaces/{workspace_id}/rate_limits,workspace_rate_limits_list,workspace_rate_limits_list,get,WorkspaceRateLimitList,,,rate_limits,list,select,$.data,List Workspace Rate Limits

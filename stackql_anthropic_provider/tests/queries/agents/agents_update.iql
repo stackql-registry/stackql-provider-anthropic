@@ -1,0 +1,3 @@
+UPDATE anthropic.agents.agents
+SET version = 1, description = 'updated by smoke suite'
+WHERE agent_id = '{{ agents_insert.agent_id }}';

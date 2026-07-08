@@ -1,0 +1,2 @@
+SELECT id, name, version, description FROM anthropic.agents.agents
+WHERE agent_id = '{{ agents_insert.agent_id }}';
