@@ -362,12 +362,33 @@ SELECT example WHERE clauses; the upstream diff is prepared at
 once a provider-utils release contains the fix.
 
 More website findings (2026-07-08): Docusaurus 3.10 with `future: {v4: true}` requires
-the `@docusaurus/faster` package (build hard-fails without it); the preset's default
-blog plugin must be `blog: false`'d (the vendored src/pages/blog.js redirect stub
-otherwise duplicates the /blog route). `factory/scrub-docs.mjs` post-processes docgen
-SQL samples: auto-injected header params removed, hyphenated/bracketed identifiers
-DOUBLE-quoted (backticks are a stackql v0.10.542 parser error for both shapes —
-supersedes the backtick advice in few-shot 5 and the MDX-safe rule).
+the `@docusaurus/faster` package (build hard-fails without it). `factory/scrub-docs.mjs`
+post-processes docgen SQL samples: auto-injected header params removed,
+hyphenated/bracketed identifiers DOUBLE-quoted (backticks are a stackql v0.10.542
+parser error for both shapes — supersedes the backtick advice in few-shot 5 and the
+MDX-safe rule).
+
+Websites re-platformed (2026-07-08, post-merge) onto the NEW archetype from
+stackql-registry/stackql-provider-aws (`stackql_aws_provider/website`, branch
+`stackql-provider`; deployment vector excluded — this repo stays on Netlify):
+- `provider.js` (providerName/providerTitle) + THIN `docusaurus.config.js` calling
+  `createConfig` from `./.shared-config/index.js`; the shared config is VENDORED AT
+  BUILD TIME (`yarn vendor-config` = rimraf + shallow-clone of
+  stackql/docusaurus-config@main, wired as prestart/prebuild; `.shared-config/` is
+  gitignored, never committed).
+- Docusaurus ^3.10.1 with faster/plugin-ideal-image/theme-mermaid + the archetype's
+  overrides/resolutions block. plugin-ideal-image pulls sharp 0.32 → binary download
+  breaks here; sharp pinned `^0.33` in BOTH overrides and resolutions (kept on top of
+  the archetype, which doesn't pin it).
+- MONOREPO exception: createConfig derives projectName/editUrl as
+  `stackql-provider-<name-sans-underscores>` — wrong for this repo. Both site configs
+  post-mutate `config.projectName = 'stackql-provider-anthropic'` and the per-site
+  `presets[0][1].docs.editUrl`. The providerSlug-derived url
+  (anthropic-admin-provider.stackql.io from `anthropic_admin`) IS correct as-is.
+- The shared config supplies blog:false, markdown hooks, redirects plugin
+  (/providers/*, /install, ... route to the main site client-side), gtag, sitemap.
+  docgen frontmatter references `/img/stackql-<providerName>-provider-featured-image.png`
+  — alias it from stackql-cover.png in each site's static/img.
 
 ## Things NOT to do
 
