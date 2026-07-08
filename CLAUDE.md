@@ -351,10 +351,22 @@ stackql-registry/stackql-provider-databricks (`stackql-provider` branch) — per
 directories, selective builds. Admin site auth docs: Admin key, admin-role-created,
 org accounts only; cross-link the `anthropic` site (and vice versa).
 
-Known docgen bug: provider-utils builds "Required Params" from `parameters` only,
-missing `requestBody.schema.required` (which naive translate surfaces at runtime —
-`SHOW METHODS` is correct, docs are not). Fix upstream in provider-utils (preferred,
-stackql-owned) and/or a local post-docgen patch until it lands.
+Known docgen bug — PATCHED LOCALLY (2026-07-08): provider-utils includes
+`requestBody.required` in "Required Params" only for insert/update/replace/exec access
+types, so SELECT-routed body methods (inference ops) rendered empty Required Params and
+unroutable samples. `factory/patch-provider-utils.mjs` (npm postinstall) adds `select`
+to the allowlist in `docgen/resource/methods.js` and appends body-required fields to
+SELECT example WHERE clauses; the upstream diff is prepared at
+`factory/upstream/provider-utils-select-required-params.patch`. Delete the local patch
+once a provider-utils release contains the fix.
+
+More website findings (2026-07-08): Docusaurus 3.10 with `future: {v4: true}` requires
+the `@docusaurus/faster` package (build hard-fails without it); the preset's default
+blog plugin must be `blog: false`'d (the vendored src/pages/blog.js redirect stub
+otherwise duplicates the /blog route). `factory/scrub-docs.mjs` post-processes docgen
+SQL samples: auto-injected header params removed, hyphenated/bracketed identifiers
+DOUBLE-quoted (backticks are a stackql v0.10.542 parser error for both shapes —
+supersedes the backtick advice in few-shot 5 and the MDX-safe rule).
 
 ## Things NOT to do
 
