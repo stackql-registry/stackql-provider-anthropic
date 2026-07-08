@@ -4095,6 +4095,17 @@ components:
           minLength: 1
           maxLength: 512
           nullable: true
+    StackqlExecResult:
+      type: object
+      description: Synthetic dispatch-result envelope for EXEC-only methods (see post-pass step 3).
+      properties:
+        result:
+          type: string
+          description: Raw response payload.
+        items:
+          type: array
+          items:
+            type: string
   x-stackQL-resources:
     vaults:
       id: anthropic.vaults.vaults
@@ -4156,6 +4167,8 @@ components:
           response:
             mediaType: application/json
             openAPIDocKey: "200"
+            schema_override:
+              $ref: "#/components/schemas/StackqlExecResult"
       sqlVerbs:
         select:
           - $ref: "#/components/x-stackQL-resources/vaults/methods/get"
@@ -4227,12 +4240,16 @@ components:
           response:
             mediaType: application/json
             openAPIDocKey: "200"
+            schema_override:
+              $ref: "#/components/schemas/StackqlExecResult"
         mcp_oauth_validate:
           operation:
             $ref: "#/paths/~1v1~1vaults~1{vault_id}~1credentials~1{credential_id}~1mcp_oauth_validate?beta=true/post"
           response:
             mediaType: application/json
             openAPIDocKey: "200"
+            schema_override:
+              $ref: "#/components/schemas/StackqlExecResult"
       sqlVerbs:
         select:
           - $ref: "#/components/x-stackQL-resources/credentials/methods/get"

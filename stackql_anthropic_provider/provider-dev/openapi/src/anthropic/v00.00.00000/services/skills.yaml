@@ -1682,6 +1682,17 @@ components:
         - type
         - version
       title: SkillVersion
+    StackqlExecResult:
+      type: object
+      description: Synthetic dispatch-result envelope for EXEC-only methods (see post-pass step 3).
+      properties:
+        result:
+          type: string
+          description: Raw response payload.
+        items:
+          type: array
+          items:
+            type: string
   x-stackQL-resources:
     skills:
       id: anthropic.skills.skills
@@ -1785,6 +1796,8 @@ components:
           response:
             mediaType: application/zip
             openAPIDocKey: "200"
+            schema_override:
+              $ref: "#/components/schemas/StackqlExecResult"
       sqlVerbs:
         select:
           - $ref: "#/components/x-stackQL-resources/versions/methods/get"

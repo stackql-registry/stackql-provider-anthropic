@@ -2452,6 +2452,17 @@ components:
         - pip
       title: Packages
       description: Packages (and their versions) available in this environment.
+    StackqlExecResult:
+      type: object
+      description: Synthetic dispatch-result envelope for EXEC-only methods (see post-pass step 3).
+      properties:
+        result:
+          type: string
+          description: Raw response payload.
+        items:
+          type: array
+          items:
+            type: string
   x-stackQL-resources:
     environments:
       id: anthropic.environments.environments
@@ -2513,6 +2524,8 @@ components:
           response:
             mediaType: application/json
             openAPIDocKey: "200"
+            schema_override:
+              $ref: "#/components/schemas/StackqlExecResult"
       sqlVerbs:
         select:
           - $ref: "#/components/x-stackQL-resources/environments/methods/get"
@@ -2553,18 +2566,24 @@ components:
           response:
             mediaType: application/json
             openAPIDocKey: "200"
+            schema_override:
+              $ref: "#/components/schemas/StackqlExecResult"
         ack:
           operation:
             $ref: "#/paths/~1v1~1environments~1{environment_id}~1work~1{work_id}~1ack?beta=true/post"
           response:
             mediaType: application/json
             openAPIDocKey: "200"
+            schema_override:
+              $ref: "#/components/schemas/StackqlExecResult"
         heartbeat:
           operation:
             $ref: "#/paths/~1v1~1environments~1{environment_id}~1work~1{work_id}~1heartbeat?beta=true/post"
           response:
             mediaType: application/json
             openAPIDocKey: "200"
+            schema_override:
+              $ref: "#/components/schemas/StackqlExecResult"
         stop:
           config:
             requestBodyTranslate:
@@ -2574,6 +2593,8 @@ components:
           response:
             mediaType: application/json
             openAPIDocKey: "200"
+            schema_override:
+              $ref: "#/components/schemas/StackqlExecResult"
           request:
             mediaType: application/json
         get:

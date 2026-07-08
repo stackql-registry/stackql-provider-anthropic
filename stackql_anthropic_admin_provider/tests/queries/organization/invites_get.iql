@@ -1,0 +1,2 @@
+SELECT id, email, role, status FROM anthropic_admin.organization.invites
+WHERE invite_id = '{{ invites_create.invite_id }}';

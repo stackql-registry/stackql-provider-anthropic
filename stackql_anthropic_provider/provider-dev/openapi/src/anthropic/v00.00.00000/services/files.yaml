@@ -817,6 +817,17 @@ components:
         - type
       title: OverloadedError
       type: object
+    StackqlExecResult:
+      type: object
+      description: Synthetic dispatch-result envelope for EXEC-only methods (see post-pass step 3).
+      properties:
+        result:
+          type: string
+          description: Raw response payload.
+        items:
+          type: array
+          items:
+            type: string
   x-stackQL-resources:
     files:
       id: anthropic.files.files
@@ -832,6 +843,8 @@ components:
           response:
             mediaType: application/json
             openAPIDocKey: "200"
+            schema_override:
+              $ref: "#/components/schemas/StackqlExecResult"
           request:
             mediaType: multipart/form-data
         list:
@@ -859,6 +872,8 @@ components:
           response:
             mediaType: application/octet-stream
             openAPIDocKey: "200"
+            schema_override:
+              $ref: "#/components/schemas/StackqlExecResult"
       sqlVerbs:
         select:
           - $ref: "#/components/x-stackQL-resources/files/methods/get"

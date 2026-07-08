@@ -4440,6 +4440,17 @@ components:
           description: ID of a previously uploaded file.
           type: string
           minLength: 1
+    StackqlExecResult:
+      type: object
+      description: Synthetic dispatch-result envelope for EXEC-only methods (see post-pass step 3).
+      properties:
+        result:
+          type: string
+          description: Raw response payload.
+        items:
+          type: array
+          items:
+            type: string
   x-stackQL-resources:
     deployments:
       id: anthropic.deployments.deployments
@@ -4513,6 +4524,8 @@ components:
           response:
             mediaType: application/json
             openAPIDocKey: "200"
+            schema_override:
+              $ref: "#/components/schemas/StackqlExecResult"
       sqlVerbs:
         select:
           - $ref: "#/components/x-stackQL-resources/deployments/methods/get"

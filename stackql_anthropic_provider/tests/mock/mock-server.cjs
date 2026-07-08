@@ -353,23 +353,47 @@ function handleAdmin(req, res, u, pathname, parsed) {
       ]));
     }
     if (reportMatch && reportMatch[1] === 'claude_code') {
-      return ok(res, mk(page ? '2026-07-02T00:00:00Z' : '2026-07-01T00:00:00Z', [
-        { actor: { email_address: 'jo@example.com', type: 'user_actor' }, organization_id: 'org_01', customer_type: 'api', terminal_type: 'vscode', core_metrics: { num_sessions: 3, lines_of_code: { added: 100, removed: 20 }, commits_by_claude_code: 2, pull_requests_by_claude_code: 1 }, tool_actions: {}, model_breakdown: [] },
-      ]));
+      // claude_code records are FLAT under data (no bucket/results nesting)
+      return ok(res, {
+        data: [
+          { date: page ? '2026-07-02T00:00:00Z' : '2026-07-01T00:00:00Z', actor: { email_address: 'jo@example.com', type: 'user_actor' }, organization_id: 'org_01', customer_type: 'api', terminal_type: 'vscode', core_metrics: { num_sessions: 3, lines_of_code: { added: 100, removed: 20 }, commits_by_claude_code: 2, pull_requests_by_claude_code: 1 }, tool_actions: { edit_tool: { accepted: 5, rejected: 1 } }, model_breakdown: [{ model: 'claude-sonnet-5', tokens: { input: 1000, output: 200, cache_read: 0, cache_creation: 0 }, estimated_cost: { currency: 'USD', amount: 42 } }] },
+        ],
+        has_more: !page,
+        next_page: page ? null : 'page_02',
+      });
     }
     return ok(res, mk(page ? '2026-07-02T00:00:00Z' : '2026-07-01T00:00:00Z', [
       { currency: 'USD', amount: '12.34', workspace_id: null, description: 'Claude Sonnet 5 Usage', cost_type: 'tokens', context_window: '0-200k', model: 'claude-sonnet-5', service_tier: 'standard', token_type: 'uncached_input_tokens' },
     ]));
   }
 
-  // ---- rate limits ----
+  // ---- rate limits (org-level; entries per group, limits as {type,value}) ----
   if (req.method === 'GET' && pathname === '/v1/organizations/rate_limits') {
     const model = u.searchParams.get('model');
-    const data = [
-      { id: 'ratelimit_01', type: 'rate_limit', model: 'claude-sonnet-5', requests_per_minute: 4000, input_tokens_per_minute: 400000, output_tokens_per_minute: 80000 },
-      { id: 'ratelimit_02', type: 'rate_limit', model: 'claude-opus-4-8', requests_per_minute: 4000, input_tokens_per_minute: 400000, output_tokens_per_minute: 80000 },
-    ].filter((r) => !model || r.model === model);
-    return ok(res, { data, has_more: false, first_id: data[0]?.id || null, last_id: data[data.length - 1]?.id || null });
+    const groupType = u.searchParams.get('group_type');
+    let data = [
+      { type: 'rate_limit', group_type: 'model_group', models: ['claude-sonnet-5', 'claude-sonnet-5-20260115'], limits: [{ type: 'requests_per_minute', value: 4000 }, { type: 'input_tokens_per_minute', value: 2000000 }, { type: 'output_tokens_per_minute', value: 400000 }] },
+      { type: 'rate_limit', group_type: 'model_group', models: ['claude-opus-4-8', 'claude-opus-4-8-20260210'], limits: [{ type: 'requests_per_minute', value: 4000 }, { type: 'input_tokens_per_minute', value: 2000000 }, { type: 'output_tokens_per_minute', value: 400000 }] },
+      { type: 'rate_limit', group_type: 'batch', models: null, limits: [{ type: 'enqueued_batch_requests', value: 500000 }] },
+    ];
+    if (model) {
+      data = data.filter((r) => (r.models || []).includes(model));
+      if (!data.length) return err(res, 404, 'not_found_error', `no rate limit group contains model ${model}`);
+    }
+    if (groupType) data = data.filter((r) => r.group_type === groupType);
+    return ok(res, { data, next_page: null });
+  }
+
+  // ---- workspace rate limits (overrides only; limits carry org_limit) ----
+  const wsRl = pathname.match(/^\/v1\/organizations\/workspaces\/([^/]+)\/rate_limits$/);
+  if (wsRl && req.method === 'GET') {
+    if (!workspaces.get(wsRl[1])) return err(res, 404, 'not_found_error', 'no such workspace');
+    return ok(res, {
+      data: [
+        { type: 'workspace_rate_limit', group_type: 'model_group', models: ['claude-sonnet-5', 'claude-sonnet-5-20260115'], limits: [{ type: 'requests_per_minute', value: 1000, org_limit: 4000 }] },
+      ],
+      next_page: null,
+    });
   }
 
   // ---- organization info ----

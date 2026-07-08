@@ -1,0 +1,1 @@
+EXEC anthropic_admin.workspaces.workspaces.archive @workspace_id = '{{ workspaces_create.workspace_id }}';

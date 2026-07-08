@@ -97,6 +97,19 @@ meta routes → mock SELECTs). All findings empirical:
   (dependency `@jsr/stackql__deno-openapi-dereferencer`).
 - split's "Operations processed" log undercounts (prints 100, emits all 104 ops);
   count ops in the split output, not from the log.
+- **stackql v0.10.542 EXEC panic (upstream bug, worked around)**: EXEC prepare
+  SIGSEGVs (`wrappedSchema.GetType` on a nil inner schema, via
+  `drm.GenerateSelectDML`) whenever the exec method's resolved response schema has NO
+  array-typed property (MessageBatch, Workspace, BetaEnrollmentUrl, ...; schemas WITH an
+  array property — Agent.tools, SendSessionEvents.data — are fine). Bare-scalar
+  responses (binary downloads, `type: string`) fail differently:
+  "no schema found for method", no dispatch. BOTH are fixed by stamping
+  `response.schema_override` → a synthetic `StackqlExecResult` envelope (object with an
+  array property) on exec-only methods matching either shape; `factory/post-pass.mjs`
+  step 3 does this mechanically (18 methods in `anthropic`, 1 in `anthropic_admin`).
+  All 23 anthropic EXEC methods + admin archive dispatch-verified. Report upstream.
+- EXEC invocation syntax: multiple params need commas —
+  `EXEC t.r.m @a = 'x', @b = 'y'` (space-separated @params is a parser error).
 
 ## Output rules (both providers)
 
@@ -277,12 +290,27 @@ reject admin keys, need `org:admin` OAuth); Compliance / Spend Limits / Enterpri
 Analytics (third key type `sk-ant-api01-...` → future `anthropic_enterprise`). Note in
 docs: on Claude Platform on AWS only workspace CRUD works.
 
-Admin open questions — resolve on the mock BEFORE shipping, then pin the answers here:
-(a) report row shape: does objectKey support `$.data[*].results[*]` (row per
-bucket×group)? fallback `$.data` + JSON_EACH; (b) array query param serialisation
-(`group_by[]=model&group_by[]=x`) and the literal `[]` in param names; (c) `ending_at`
-requiredness on usage/cost (affects routing signatures); (d) `speeds[]`/`speed` grouping
-needs beta header `fast-mode-2026-02-01` — optional header param or defer.
+Admin open questions — RESOLVED empirically on the mock (2026-07-08), pinned:
+(a) **Report row shape: ship `$.data`.** stackql's objectKey DOES support
+`$.data[*].results[*]` (row per bucket×group, auto-pagination still walks), but those
+rows lose the bucket's `starting_at`/`ending_at` (absent from result items), which are
+the x-axis of any usage report. So usage/cost/claude_code use `$.data` (row per bucket:
+starting_at, ending_at, results as a JSON column; JSON_EACH for group breakdowns).
+(b) **Array query params take ONE scalar value per query.** `WHERE "group_by[]" =
+'model'` reaches the wire as `group_by%5B%5D=model` (URL-encoded brackets, accepted).
+A JSON-array value does NOT fan out — it arrives as the literal string (unlike request
+bodies under naive translate). Quote bracketed identifiers with DOUBLE QUOTES in SQL:
+backtick-quoting `` `group_by[]` `` is a stackql parser error (note: this corrects the
+"backtick-quoted in SQL samples" instruction in few-shot 5 — backticks only work for
+bracket-free identifiers).
+(c) **`ending_at` is optional** on both usage_report/messages and cost_report (canonical
+reference pages) — routing signatures are `[starting_at]` only; no clash.
+(d) **fast-mode: optional header, NO default.** `anthropic-beta` is declared on
+usage/cost ops as an optional header param without a default; users grouping/filtering
+by `speed` supply `anthropic-beta = 'fast-mode-2026-02-01'` in the WHERE clause.
+Also: usage/cost/claude_code reports and both rate_limits endpoints are CURSOR-paginated
+(`page` + `next_page`) and get pagination config — the after_id policy applies only to
+the admin ENTITY lists (users/invites/workspaces/members/api_keys).
 
 ## Build guards (CI hard-fails)
 

@@ -1,0 +1,2 @@
+SELECT user_id, workspace_role FROM anthropic_admin.workspaces.members
+WHERE workspace_id = 'wrkspc_01';
