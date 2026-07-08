@@ -49,7 +49,7 @@ stackql_anthropic_admin_provider/    docs-driven provider: provider-dev/{source,
 npm install                 # patches provider-utils docgen via postinstall
 npm run build               # anthropic:   prepass → split → normalize+scrub → analyze → generate → post-pass → guards
 npm run build-admin         # anthropic_admin: same chain from normalize onward
-npm run test-meta-routes    # SHOW/DESCRIBE walk, zero errors required   (STACKQL=/path/to/stackql)
+npm run test-meta-routes    # SHOW/DESCRIBE walk, zero errors required (auto-downloads stackql if absent)
 npm run smoke               # wire-contract-enforcing mock suite
 npm run smoke-admin
 npm run docgen && npm run docgen-admin   # regenerate website docs

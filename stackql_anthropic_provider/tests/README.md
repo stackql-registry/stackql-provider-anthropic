@@ -8,14 +8,14 @@ hard-fails on any error, duplicate (resource, verb) signature, or
 zero-column selectable resource:
 
 ```bash
-STACKQL=/path/to/stackql node bin/test-meta-routes.cjs anthropic
+node bin/test-meta-routes.cjs anthropic   # STACKQL=/path/to/stackql to override
 ```
 
 ## Smoke (manifest-driven)
 
 ```bash
-STACKQL=/path/to/stackql node tests/smoke.cjs                 # mock mode
-STACKQL=/path/to/stackql node tests/smoke.cjs --live          # live subset
+node tests/smoke.cjs                                      # mock mode
+node tests/smoke.cjs --live                               # live subset
 node tests/smoke.cjs --only agents_insert,agents_archive      # cherry-pick
 ```
 

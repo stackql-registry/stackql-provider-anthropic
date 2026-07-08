@@ -170,12 +170,74 @@ async function stopExistingServer() {
   process.exit(1);
 }
 
-async function startServer() {
-  const bin = process.env.STACKQL || path.join(baseDir, 'stackql');
-  if (!fs.existsSync(bin)) {
-    console.error(`[server] ERROR: stackql binary not found at ${bin} (set STACKQL to override)`);
+// Resolve the stackql binary to an ABSOLUTE path. fs.existsSync resolves
+// bare names against the CWD while spawn() resolves them against PATH, so
+// a relative candidate must be absolutized before spawning (a bare
+// `STACKQL=stackql` once passed the exists-check via a repo-root file and
+// then died in spawn with an unhandled ENOENT).
+//
+// Order: $STACKQL (path or PATH-resolved command) → <provider>/stackql →
+// ./stackql → `stackql` on PATH → download the latest release into the
+// provider dir (same fallback bin/start-server.sh has always had).
+function resolveStackql() {
+  const tryPath = (p) => {
+    if (!p) return null;
+    const abs = path.resolve(p);
+    return fs.existsSync(abs) && fs.statSync(abs).isFile() ? abs : null;
+  };
+  const fromPathLookup = (cmd) => {
+    try {
+      const found = execSync(
+        process.platform === 'win32' ? `where ${cmd}` : `command -v ${cmd}`,
+        { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] },
+      ).split('\n')[0].trim();
+      return found ? found : null;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const envBin = process.env.STACKQL;
+  if (envBin) {
+    const resolved = envBin.includes(path.sep) || envBin.includes('/')
+      ? tryPath(envBin)
+      : (tryPath(envBin) || fromPathLookup(envBin));
+    if (resolved) return resolved;
+    console.warn(`[server] STACKQL='${envBin}' does not resolve to a binary - falling back`);
+  }
+  const local = tryPath(path.join(baseDir, 'stackql')) || tryPath(path.join(process.cwd(), 'stackql'));
+  if (local) return local;
+  const onPath = fromPathLookup('stackql');
+  if (onPath) return onPath;
+
+  // Last resort: download the latest release (linux/darwin, amd64/arm64).
+  if (process.platform !== 'linux' && process.platform !== 'darwin') {
+    console.error('[server] ERROR: stackql binary not found (set STACKQL, or place ./stackql in the provider dir)');
     process.exit(1);
   }
+  const arch = process.arch === 'arm64' ? 'arm64' : 'amd64';
+  const url = `https://releases.stackql.io/stackql/latest/stackql_${process.platform}_${arch}.zip`;
+  slog(`stackql binary not found - downloading ${url}`);
+  try {
+    execSync(
+      `curl -sSL -o stackql.zip "${url}" && unzip -o stackql.zip stackql && rm -f stackql.zip && chmod +x stackql`,
+      { cwd: baseDir, stdio: ['ignore', 'inherit', 'inherit'] },
+    );
+  } catch (e) {
+    console.error(`[server] ERROR: stackql download failed: ${e.message}`);
+    process.exit(1);
+  }
+  const downloaded = tryPath(path.join(baseDir, 'stackql'));
+  if (!downloaded) {
+    console.error('[server] ERROR: stackql download did not produce a usable binary');
+    process.exit(1);
+  }
+  slog(`downloaded stackql to ${downloaded}`);
+  return downloaded;
+}
+
+async function startServer() {
+  const bin = resolveStackql();
   const regPath = path.join(baseDir, 'provider-dev', 'openapi');
   const reg = JSON.stringify({
     url: `file://${regPath}`,
@@ -189,6 +251,12 @@ async function startServer() {
   slog(`server log: ${serverLogPath}`);
   serverChild = spawn(bin, [`--registry=${reg}`, `--pgsrv.port=${port}`, 'srv'], {
     stdio: ['ignore', out, out],
+  });
+  // Without this handler a failed spawn (ENOENT, EACCES) is an unhandled
+  // 'error' event that crashes node with a raw stack trace.
+  serverChild.on('error', (err) => {
+    console.error(`[server] ERROR: failed to start '${bin}': ${err.message}`);
+    process.exit(1);
   });
   serverChild.on('exit', (code, signal) => {
     if (!serverShuttingDown) {
@@ -209,6 +277,7 @@ async function startServer() {
 function stopServer() {
   if (!serverChild || serverShuttingDown) return;
   serverShuttingDown = true;
+  if (serverChild.pid === undefined) return; // spawn never succeeded
   slog(`stopping server (pid ${serverChild.pid})`);
   try {
     serverChild.kill('SIGTERM');
