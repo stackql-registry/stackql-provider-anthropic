@@ -86,7 +86,7 @@ meta routes → mock SELECTs). All findings empirical:
   `factory/scrub-unions.mjs` (new pipeline step, runs after normalize) collapses
   residual nested unions to opaque JSON-blob schemas and deletes every
   `additionalProperties` — all 12 services then scan clean.
-- **Pagination classification** (from the spec, mechanical): 20 cursor lists
+- **Pagination classification** (from the spec, mechanical): 19 cursor lists
   (`page` query param + `$.next_page` in response — ALL beta lists) get pagination
   config; 3 after_id lists (models, GA batches, files) get none. `factory/post-pass.mjs`
   detects the cursor pattern structurally, no hand list.

@@ -1,21 +1,32 @@
 {
   "name": "stackql-provider-anthropic",
-  "version": "1.0.0",
-  "description": "Generates stackql providers for Anthropic",
-  "main": "index.js",
+  "version": "0.1.0",
+  "description": "StackQL providers for the Anthropic API surface: anthropic (user/inference) + anthropic_admin (Admin API), mastered from one factory pipeline",
+  "type": "module",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "locate": "node factory/locate.mjs",
+    "download": "node factory/download.mjs",
+    "prepass": "node factory/pre-pass.mjs",
+    "split": "node node_modules/@stackql/provider-utils/bin/provider-dev-utils.mjs split --api-doc stackql_anthropic_provider/provider-dev/source/anthropic-prepassed.yaml --provider-name anthropic --output-dir stackql_anthropic_provider/provider-dev/source/split --svc-discriminator function --svc-discriminator-fn factory/service-map.mjs --overwrite",
+    "normalize": "node node_modules/@stackql/provider-utils/bin/provider-dev-utils.mjs normalize --api-dir stackql_anthropic_provider/provider-dev/source/split && node factory/scrub-unions.mjs --api-dir stackql_anthropic_provider/provider-dev/source/split",
+    "analyze": "node node_modules/@stackql/provider-utils/bin/provider-dev-utils.mjs analyze --input-dir stackql_anthropic_provider/provider-dev/source/split --output-dir stackql_anthropic_provider/provider-dev/config",
+    "generate": "node node_modules/@stackql/provider-utils/bin/provider-dev-utils.mjs generate --input-dir stackql_anthropic_provider/provider-dev/source/split --output-dir stackql_anthropic_provider/provider-dev/openapi/src/anthropic --config-path stackql_anthropic_provider/provider-dev/config/all_services.csv --provider-id anthropic --servers '[{\"url\":\"https://api.anthropic.com\"}]' --provider-config '{\"auth\":{\"type\":\"custom\",\"location\":\"header\",\"name\":\"x-api-key\",\"credentialsenvvar\":\"ANTHROPIC_API_KEY\"}}' --naive-req-body-translate --overwrite && node factory/post-pass.mjs --provider-root stackql_anthropic_provider/provider-dev/openapi/src/anthropic/v00.00.00000",
+    "guards": "node factory/guards.mjs --provider anthropic --provider-root stackql_anthropic_provider/provider-dev/openapi/src/anthropic/v00.00.00000 --spec stackql_anthropic_provider/provider-dev/downloaded/anthropic-openapi.yml --exclusions factory/exclusions.yaml",
+    "build": "npm run prepass && npm run split && npm run normalize && npm run analyze && npm run generate && npm run guards"
   },
   "repository": {
     "type": "git",
-    "url": "http://local_proxy@127.0.0.1:41729/git/stackql-registry/stackql-provider-anthropic"
+    "url": "https://github.com/stackql-registry/stackql-provider-anthropic"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@stackql/pgwire-lite": "^1.0.1",
     "@stackql/provider-utils": "^0.7.6",
+    "js-yaml": "^4.3.0",
     "yaml": "^2.9.0"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
