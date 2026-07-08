@@ -1,0 +1,78 @@
+name: ci
+
+on:
+  push:
+    branches: [stackql-provider]
+  pull_request:
+    branches: [stackql-provider]
+  workflow_dispatch:
+
+jobs:
+  providers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: install deps (runs the provider-utils docgen patch via postinstall)
+        run: npm ci
+
+      - name: guard 5 — upstream .stats.yml drift check
+        run: node factory/locate.mjs
+
+      - name: regenerate both providers from vendored inputs
+        run: |
+          npm run build
+          npm run build-admin
+
+      - name: regen must be byte-idempotent (committed trees == regenerated trees)
+        run: |
+          git diff --exit-code -- \
+            stackql_anthropic_provider/provider-dev/openapi \
+            stackql_anthropic_admin_provider/provider-dev/openapi \
+            stackql_anthropic_provider/provider-dev/config/all_services.csv \
+            stackql_anthropic_admin_provider/provider-dev/config/all_services.csv
+
+      # guards 1-4 + 6 run inside `npm run build` / `npm run build-admin`
+      # (factory/guards.mjs) and hard-fail the steps above.
+
+      - name: install stackql
+        run: |
+          curl -sSL -o stackql.zip https://releases.stackql.io/stackql/latest/stackql_linux_amd64.zip
+          unzip -o stackql.zip && chmod +x stackql
+          echo "STACKQL=$PWD/stackql" >> "$GITHUB_ENV"
+
+      - name: meta routes — anthropic (zero errors required)
+        run: node stackql_anthropic_provider/bin/test-meta-routes.cjs anthropic
+
+      - name: meta routes — anthropic_admin (zero errors required)
+        run: node stackql_anthropic_admin_provider/bin/test-meta-routes.cjs anthropic_admin
+
+      - name: mock smoke — anthropic
+        run: node stackql_anthropic_provider/tests/smoke.cjs
+
+      - name: mock smoke — anthropic_admin
+        run: node stackql_anthropic_provider/tests/smoke.cjs --manifest stackql_anthropic_admin_provider/tests/manifest.yaml
+
+  websites:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        site:
+          - stackql_anthropic_provider/website
+          - stackql_anthropic_admin_provider/website
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: build site
+        working-directory: ${{ matrix.site }}
+        run: |
+          yarn install --frozen-lockfile
+          yarn build
