@@ -60,7 +60,67 @@ const only = (argOf('--only', '') || '').split(',').filter(Boolean);
 
 const manifest = YAML.parse(fs.readFileSync(manifestPath, 'utf8'));
 const cfg = manifest.config || {};
-const stackqlBin = argOf('--stackql', process.env.STACKQL || cfg.stackql || path.join(baseDir, 'stackql'));
+
+// Resolve the stackql binary to an ABSOLUTE path. fs.existsSync resolves
+// bare names against the CWD while spawn() resolves them against PATH, so
+// relative candidates must be absolutized before spawning. Order:
+// --stackql / $STACKQL / config.stackql (path or PATH-resolved command) →
+// <provider>/stackql → ./stackql → `stackql` on PATH → download the latest
+// release into the provider dir.
+function resolveStackql() {
+  const { execSync } = require('child_process');
+  const tryPath = (p) => {
+    if (!p) return null;
+    const abs = path.resolve(p);
+    return fs.existsSync(abs) && fs.statSync(abs).isFile() ? abs : null;
+  };
+  const fromPathLookup = (cmd) => {
+    try {
+      const found = execSync(
+        process.platform === 'win32' ? `where ${cmd}` : `command -v ${cmd}`,
+        { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] },
+      ).split('\n')[0].trim();
+      return found ? found : null;
+    } catch (e) {
+      return null;
+    }
+  };
+  for (const candidate of [argOf('--stackql', null), process.env.STACKQL, cfg.stackql]) {
+    if (!candidate) continue;
+    const resolved = candidate.includes(path.sep) || candidate.includes('/')
+      ? tryPath(path.resolve(path.dirname(manifestPath), candidate)) || tryPath(candidate)
+      : (tryPath(candidate) || fromPathLookup(candidate));
+    if (resolved) return resolved;
+    console.warn(`stackql candidate '${candidate}' does not resolve to a binary - falling back`);
+  }
+  const local = tryPath(path.join(baseDir, 'stackql')) || tryPath(path.join(process.cwd(), 'stackql'));
+  if (local) return local;
+  const onPath = fromPathLookup('stackql');
+  if (onPath) return onPath;
+  if (process.platform !== 'linux' && process.platform !== 'darwin') {
+    console.error('stackql binary not found (set STACKQL, or place ./stackql in the provider dir)');
+    process.exit(2);
+  }
+  const arch = process.arch === 'arm64' ? 'arm64' : 'amd64';
+  const url = `https://releases.stackql.io/stackql/latest/stackql_${process.platform}_${arch}.zip`;
+  console.log(`stackql binary not found - downloading ${url}`);
+  try {
+    execSync(
+      `curl -sSL -o stackql.zip "${url}" && unzip -o stackql.zip stackql && rm -f stackql.zip && chmod +x stackql`,
+      { cwd: baseDir, stdio: ['ignore', 'inherit', 'inherit'] },
+    );
+  } catch (e) {
+    console.error(`stackql download failed: ${e.message}`);
+    process.exit(2);
+  }
+  const downloaded = tryPath(path.join(baseDir, 'stackql'));
+  if (!downloaded) {
+    console.error('stackql download did not produce a usable binary');
+    process.exit(2);
+  }
+  return downloaded;
+}
+const stackqlBin = resolveStackql();
 const queriesDir = path.resolve(path.dirname(manifestPath), cfg.queries_dir || 'queries');
 const mockPort = cfg.mock_port || 8990;
 const fatalPatterns = [...DEFAULT_FATAL, ...(cfg.fatal_patterns || [])];

@@ -5,10 +5,10 @@ wire-contract-enforcing mock, which also enforces the disjoint
 `sk-ant-admin...` key space on `/v1/organizations/*`):
 
 ```bash
-STACKQL=/path/to/stackql node bin/test-meta-routes.cjs anthropic_admin
-STACKQL=/path/to/stackql node ../stackql_anthropic_provider/tests/smoke.cjs \
+node bin/test-meta-routes.cjs anthropic_admin   # STACKQL=/path/to/stackql to override
+node ../stackql_anthropic_provider/tests/smoke.cjs \
   --manifest tests/manifest.yaml            # mock mode
-STACKQL=/path/to/stackql node ../stackql_anthropic_provider/tests/smoke.cjs \
+node ../stackql_anthropic_provider/tests/smoke.cjs \
   --manifest tests/manifest.yaml --live     # READ-ONLY live subset
 ```
 
