@@ -2,9 +2,9 @@ name: ci
 
 on:
   push:
-    branches: [stackql-provider]
+    branches: [main]
   pull_request:
-    branches: [stackql-provider]
+    branches: [main]
   workflow_dispatch:
 
 jobs:

@@ -10,7 +10,8 @@ This repo masters TWO StackQL providers from one pipeline ("the factory"):
 The two key types are disjoint (neither can call the other's endpoints) but the wire auth
 structure is identical: `x-api-key` + `anthropic-version` headers.
 
-Default branch: `stackql-provider`. This is a PLAIN repo (not a fork). Rules marked
+Default branch: `main` (this is a PLAIN repo, not a fork — the `stackql-provider`
+default-branch convention applies only to forked SDK repos). Rules marked
 **(verified)** were empirically confirmed on the wire against stackql v0.10.542 during a
 prior build — do not re-litigate them.
 
