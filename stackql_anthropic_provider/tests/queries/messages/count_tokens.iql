@@ -1,0 +1,4 @@
+SELECT input_tokens
+FROM anthropic.messages.token_counts
+WHERE model = '{{ model }}'
+  AND messages = '[{"role":"user","content":"how many tokens is this?"}]';

@@ -1,0 +1,1 @@
+EXEC anthropic.agents.agents.archive @agent_id = '{{ agents_insert.agent_id }}';

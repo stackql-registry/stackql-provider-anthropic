@@ -1,0 +1,5 @@
+SELECT id, model, role, stop_reason
+FROM anthropic.messages.messages
+WHERE model = 'claude-haiku-4-5-20251001'
+  AND max_tokens = 16
+  AND messages = '[{"role":"user","content":"Reply with the single word: ok"}]';
