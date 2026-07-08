@@ -1,0 +1,62 @@
+# Documented exclusion list for the `anthropic` provider.
+#
+# CI guard 1 (spec-coverage diff) asserts:
+#   official spec ops  -  provider ops  ==  EXACTLY this list.
+#
+# Keys are "<METHOD> <path>" using the spec's literal path keys (beta paths
+# carry the pre-baked `?beta=true` suffix). Each entry says why it is out.
+
+sse_streams:
+  # Server-sent-event streams are not SQL result sets.
+  - op: GET /v1/sessions/{session_id}/events/stream?beta=true
+    reason: SSE stream endpoint
+  - op: GET /v1/sessions/{session_id}/threads/{thread_id}/stream?beta=true
+    reason: SSE stream endpoint
+
+tunnels:
+  # Tunnels are managed via `workspace:manage_tunnels` OAuth, not API keys;
+  # excluded from both official SDKs for the same reason.
+  - op: GET /v1/tunnels?beta=true
+    reason: OAuth-only surface
+  - op: POST /v1/tunnels?beta=true
+    reason: OAuth-only surface
+  - op: GET /v1/tunnels/{tunnel_id}?beta=true
+    reason: OAuth-only surface
+  - op: POST /v1/tunnels/{tunnel_id}/archive?beta=true
+    reason: OAuth-only surface
+  - op: POST /v1/tunnels/{tunnel_id}/reveal_token?beta=true
+    reason: OAuth-only surface
+  - op: POST /v1/tunnels/{tunnel_id}/rotate_token?beta=true
+    reason: OAuth-only surface
+  - op: GET /v1/tunnels/{tunnel_id}/certificates?beta=true
+    reason: OAuth-only surface
+  - op: POST /v1/tunnels/{tunnel_id}/certificates?beta=true
+    reason: OAuth-only surface
+  - op: GET /v1/tunnels/{tunnel_id}/certificates/{certificate_id}?beta=true
+    reason: OAuth-only surface
+  - op: POST /v1/tunnels/{tunnel_id}/certificates/{certificate_id}/archive?beta=true
+    reason: OAuth-only surface
+
+beta_duplicates_of_ga:
+  # Beta twins of GA messages/batches/models ops fold into the GA surface;
+  # exposing both would double every signature in the resource.
+  - op: POST /v1/messages?beta=true
+    reason: beta duplicate of GA messages_post
+  - op: POST /v1/messages/count_tokens?beta=true
+    reason: beta duplicate of GA messages_count_tokens_post
+  - op: GET /v1/messages/batches?beta=true
+    reason: beta duplicate of GA message_batches_list
+  - op: POST /v1/messages/batches?beta=true
+    reason: beta duplicate of GA message_batches_post
+  - op: GET /v1/messages/batches/{message_batch_id}?beta=true
+    reason: beta duplicate of GA message_batches_retrieve
+  - op: DELETE /v1/messages/batches/{message_batch_id}?beta=true
+    reason: beta duplicate of GA message_batches_delete
+  - op: POST /v1/messages/batches/{message_batch_id}/cancel?beta=true
+    reason: beta duplicate of GA message_batches_cancel
+  - op: GET /v1/messages/batches/{message_batch_id}/results?beta=true
+    reason: beta duplicate of GA message_batches_results
+  - op: GET /v1/models?beta=true
+    reason: beta duplicate of GA models_list
+  - op: GET /v1/models/{model_id}?beta=true
+    reason: beta duplicate of GA models_get

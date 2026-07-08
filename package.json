@@ -1,0 +1,21 @@
+{
+  "name": "stackql-provider-anthropic",
+  "version": "1.0.0",
+  "description": "Generates stackql providers for Anthropic",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://local_proxy@127.0.0.1:41729/git/stackql-registry/stackql-provider-anthropic"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@stackql/pgwire-lite": "^1.0.1",
+    "@stackql/provider-utils": "^0.7.6",
+    "yaml": "^2.9.0"
+  }
+}

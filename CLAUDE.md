@@ -65,6 +65,39 @@ Hand-authored per-service specs in `stackql_anthropic_admin_provider/provider-de
 (transcribed from the reference pages listed below), entering the SAME chain at
 normalize → analyze → generate → post-pass. ~24 operations; stable surface.
 
+## Spike findings (Phase 0, 2026-07-08, spec hash d272f069e15d096063103c857fb8e2a7)
+
+Messages service walked end-to-end (locate → download → pre-pass → split → normalize →
+scrub → analyze → CSV review → generate → post-pass → stackql v0.10.542 load →
+meta routes → mock SELECTs). All findings empirical:
+
+- **(a) 3.1 constructs**: the spec has NO `type: [...]` arrays; the 3.1-isms are 478
+  `{type: 'null'}` anyOf/oneOf members, 476 `const`, 23 numeric
+  exclusiveMinimum/Maximum. `factory/pre-pass.mjs` downlevels all three (null members
+  stripped + `nullable: true`, const→enum, exclusive→min/max) and stamps
+  `openapi: 3.0.3`; the stackql loader accepts the result cleanly.
+- **(b) Message-class schemas ARE SQL-shaped** after shallow normalize: `Message`
+  projects id/type/role/content(array→JSON)/model/stop_reason/…/usage(object→JSON);
+  `MessageTokensCount` projects `input_tokens`. POST-as-SELECT verified on a mock:
+  WHERE keys pass into the JSON body via naive translate (`messages` string fans out
+  to a real JSON array), the Message row comes back as a result set.
+- **normalize is NOT sufficient for guard 4**: it leaves nested unions (48 oneOf in
+  messages alone) and ~700 `additionalProperties` across services.
+  `factory/scrub-unions.mjs` (new pipeline step, runs after normalize) collapses
+  residual nested unions to opaque JSON-blob schemas and deletes every
+  `additionalProperties` — all 12 services then scan clean.
+- **Pagination classification** (from the spec, mechanical): 20 cursor lists
+  (`page` query param + `$.next_page` in response — ALL beta lists) get pagination
+  config; 3 after_id lists (models, GA batches, files) get none. `factory/post-pass.mjs`
+  detects the cursor pattern structurally, no hand list.
+- **Wire quirk**: stackql appends a bare `?` to request URLs when no query params are
+  supplied (`POST /v1/messages?`). Harmless on real servers; mocks must parse the URL
+  rather than string-match it.
+- provider-utils@0.7.6 needs `@jsr:registry=https://npm.jsr.io` in `.npmrc`
+  (dependency `@jsr/stackql__deno-openapi-dereferencer`).
+- split's "Operations processed" log undercounts (prints 100, emits all 104 ops);
+  count ops in the split output, not from the log.
+
 ## Output rules (both providers)
 
 ### 1. Auth — `type: custom`, NOT `api_key` **(verified)**
@@ -101,10 +134,12 @@ The spec declares the `anthropic-beta` header but NOT the per-endpoint flag cons
 (that's Stainless config). Maintain a small checked-in table
 (`factory/beta-flags.yaml`), extracted at build time from the published PyPI `anthropic`
 package (`pip download anthropic` → grep resource modules for
-`extra_headers = {"anthropic-beta": "<flag>"`). Known at audit time:
-`managed-agents-2026-04-01` (agents/deployments/environments/sessions/skills/
-user_profiles/vaults/files et al.), `agent-memory-2026-07-22` (memory stores). Verify,
-don't trust this list.
+`extra_headers = {"anthropic-beta": "<flag>"`). **Verified against anthropic==0.116.0
+(2026-07-08)** — the audit-time list was wrong for three services. Actual table
+(checked into `factory/beta-flags.yaml`): `managed-agents-2026-04-01`
+(agents/deployments/deployment_runs/environments/sessions/vaults),
+`agent-memory-2026-07-22` (memory_stores), `files-api-2025-04-14` (files),
+`skills-2025-10-02` (skills), `user-profiles-2026-03-24` (user_profiles).
 
 ### 5. No polymorphism; flat SQL-result-set rows
 
