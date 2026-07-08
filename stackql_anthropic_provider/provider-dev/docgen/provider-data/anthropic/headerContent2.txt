@@ -1,0 +1,25 @@
+See also:    [[` SHOW `]](https://stackql.io/docs/language-spec/show) [[` DESCRIBE `]](https://stackql.io/docs/language-spec/describe)  [[` REGISTRY `]](https://stackql.io/docs/language-spec/registry)   
+
+* * *   
+
+## Installation 
+
+```bash 
+REGISTRY PULL anthropic; 
+```  
+
+## Authentication  
+
+The `anthropic` provider authenticates with a workspace-scoped Claude API key (`sk-ant-api...`) sent in the `x-api-key` header. Set the following environment variable:
+
+- <CopyableCode code="ANTHROPIC_API_KEY" /> - a Claude API key, created in the [Claude Console](https://platform.claude.com/settings/keys)
+
+The required `anthropic-version` header is sent automatically (default `2023-06-01`); beta endpoints automatically send the per-endpoint `anthropic-beta` flag. Either can be overridden per query by supplying the header as a `WHERE` clause parameter.
+
+## Coverage
+
+Every operation in Anthropic's official OpenAPI specification is exposed, except the following documented exclusions:
+
+- 2 server-sent-event stream endpoints (`sessions/{session_id}/events/stream`, `sessions/{session_id}/threads/{thread_id}/stream`) — SSE streams are not SQL result sets
+- 10 tunnels endpoints — managed via `workspace:manage_tunnels` OAuth, not API keys (excluded from the official SDKs for the same reason)
+- 10 beta duplicates of the GA messages/batches/models operations — folded into the GA surface

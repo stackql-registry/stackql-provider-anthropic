@@ -1,0 +1,26 @@
+---
+title: anthropic
+hide_title: false
+hide_table_of_contents: false
+keywords:
+  - anthropic
+  - claude
+  - stackql
+  - infrastructure-as-code
+  - configuration-as-data
+  - cloud inventory
+description: Query and interact with Anthropic (Claude) resources using SQL
+custom_edit_url: null
+image: /img/stackql-cover.png
+id: 'provider-intro'
+---
+
+import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
+
+Run Claude inference, count tokens, and manage models, batches, files, agents, deployments, environments, sessions, skills, memory stores, user profiles and vaults on the Anthropic API using SQL.
+
+:::info
+
+For organization administration (users, invites, workspaces, API keys, usage/cost reports, rate limits, Claude Code analytics) use the [__`anthropic_admin`__](https://anthropic-admin-provider.stackql.io/) provider — it authenticates with a separate, org-scoped Admin key.
+
+:::
