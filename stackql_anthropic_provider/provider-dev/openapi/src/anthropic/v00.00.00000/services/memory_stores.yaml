@@ -3111,6 +3111,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
         get:
           operation:
             $ref: "#/paths/~1v1~1memory_stores~1{memory_store_id}~1memories~1{memory_id}?beta=true/get"
@@ -3165,6 +3168,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
         get:
           operation:
             $ref: "#/paths/~1v1~1memory_stores~1{memory_store_id}~1memory_versions~1{memory_version_id}?beta=true/get"
@@ -3218,6 +3224,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
         get:
           operation:
             $ref: "#/paths/~1v1~1memory_stores~1{memory_store_id}?beta=true/get"

@@ -9443,6 +9443,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
         get:
           operation:
             $ref: "#/paths/~1v1~1sessions~1{session_id}?beta=true/get"
@@ -9503,6 +9506,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
         send:
           config:
             requestBodyTranslate:
@@ -9541,6 +9547,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
         get:
           operation:
             $ref: "#/paths/~1v1~1sessions~1{session_id}~1threads~1{thread_id}?beta=true/get"
@@ -9583,6 +9592,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
       sqlVerbs:
         select:
           - $ref: "#/components/x-stackQL-resources/thread_events/methods/list"
@@ -9610,6 +9622,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
         add:
           config:
             requestBodyTranslate:

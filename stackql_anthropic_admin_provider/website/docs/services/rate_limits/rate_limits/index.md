@@ -97,7 +97,7 @@ The following methods are available for this resource:
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-group_type"><code>group_type</code></a>, <a href="#parameter-model"><code>model</code></a>, <a href="#parameter-page"><code>page</code></a></td>
+    <td><a href="#parameter-group_type"><code>group_type</code></a>, <a href="#parameter-model"><code>model</code></a></td>
     <td>List Messages API rate limits for the organization. Each entry corresponds to one rate-limit group - a model family or an API-surface category such as the Files API or Message Batches - and carries the set of limiter values that apply to it.</td>
 </tr>
 </tbody>
@@ -116,11 +116,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     </tr>
 </thead>
 <tbody>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td>The version of the Claude API you want to use.</td>
-</tr>
 <tr id="parameter-group_type">
     <td><CopyableCode code="group_type" /></td>
     <td><code>string</code></td>
@@ -130,11 +125,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="model" /></td>
     <td><code>string</code></td>
     <td>Filter to the single entry containing this model. Accepts full model names and aliases. Returns 404 if the model is not found or has no rate limits for this organization.</td>
-</tr>
-<tr id="parameter-page">
-    <td><CopyableCode code="page" /></td>
-    <td><code>string</code></td>
-    <td>Opaque cursor from a previous response's `next_page`.</td>
 </tr>
 </tbody>
 </table>
@@ -160,7 +150,6 @@ type
 FROM anthropic_admin.rate_limits.rate_limits
 WHERE group_type = '{{ group_type }}'
 AND model = '{{ model }}'
-AND page = '{{ page }}'
 ;
 ```
 </TabItem>

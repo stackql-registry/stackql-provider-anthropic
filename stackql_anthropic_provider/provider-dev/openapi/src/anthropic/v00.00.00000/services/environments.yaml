@@ -2495,6 +2495,10 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
+                maxValue: 1000
         get:
           operation:
             $ref: "#/paths/~1v1~1environments~1{environment_id}?beta=true/get"
@@ -2629,6 +2633,10 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
+                maxValue: 1000
       sqlVerbs:
         select:
           - $ref: "#/components/x-stackQL-resources/work_items/methods/get"

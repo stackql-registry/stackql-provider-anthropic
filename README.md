@@ -11,7 +11,13 @@ Anthropic (Claude) platform from one factory pipeline:
 The two key types are disjoint (neither can call the other's endpoints); both send
 `x-api-key` + `anthropic-version` headers on the wire.
 
-## Quick taste
+## Quick test
+
+```bash
+REG_ROOT="$(pwd)/stackql_anthropic_provider/provider-dev/openapi"
+REG="{\"url\":\"file://${REG_ROOT}\",\"localDocRoot\":\"${REG_ROOT}\",\"verifyConfig\":{\"nopVerify\":true}}"
+./stackql --registry="${REG}" shell
+```
 
 ```sql
 -- inference is a result set
@@ -46,13 +52,31 @@ stackql_anthropic_admin_provider/    docs-driven provider: provider-dev/{source,
 ## Build & test
 
 ```bash
-npm install                 # patches provider-utils docgen via postinstall
-npm run build               # anthropic:   prepass → split → normalize+scrub → analyze → generate → post-pass → guards
-npm run build-admin         # anthropic_admin: same chain from normalize onward
-npm run test-meta-routes    # SHOW/DESCRIBE walk, zero errors required (auto-downloads stackql if absent)
-npm run smoke               # wire-contract-enforcing mock suite
-npm run smoke-admin
+npm install                     # patches provider-utils docgen via postinstall
+npm run build                   # anthropic:   prepass → split → normalize+scrub → analyze → generate → post-pass → guards
+npm run build-admin             # anthropic_admin: same chain from normalize onward
+npm run test-meta-routes        # anthropic: SHOW/DESCRIBE walk, zero errors required (auto-downloads stackql if absent)
+npm run test-meta-routes-admin  # anthropic_admin: SHOW/DESCRIBE walk, zero errors required (auto-downloads stackql if absent)
+npm run smoke                   # anthropic: wire-contract-enforcing mock suite
+npm run smoke-admin             # anthropic_admin: wire-contract-enforcing mock suite
+npm run smoke-live              # anthropic: authenticated smoke tests
+npm run smoke-live-admin        # anthropic_admin: authenticated smoke tests
 npm run docgen && npm run docgen-admin   # regenerate website docs
+```
+
+## Microsite Testing
+
+```bash
+cd stackql_anthropic_provider/website
+yarn build
+yarn serve
+cd ../..
+```
+```bash
+cd stackql_anthropic_admin_provider/website
+yarn build
+yarn serve
+cd ../..
 ```
 
 Regeneration is byte-idempotent given the committed mapping CSVs and the vendored spec

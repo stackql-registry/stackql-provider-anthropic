@@ -315,7 +315,7 @@ The following methods are available for this resource:
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-model"><code>model</code></a>, <a href="#parameter-messages"><code>messages</code></a>, <a href="#parameter-max_tokens"><code>max_tokens</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-user-profile-id"><code>anthropic-user-profile-id</code></a></td>
+    <td><a href="#parameter-cache_control"><code>cache_control</code></a>, <a href="#parameter-container"><code>container</code></a>, <a href="#parameter-inference_geo"><code>inference_geo</code></a>, <a href="#parameter-metadata"><code>metadata</code></a>, <a href="#parameter-output_config"><code>output_config</code></a>, <a href="#parameter-service_tier"><code>service_tier</code></a>, <a href="#parameter-stop_sequences"><code>stop_sequences</code></a>, <a href="#parameter-system"><code>system</code></a>, <a href="#parameter-temperature"><code>temperature</code></a>, <a href="#parameter-thinking"><code>thinking</code></a>, <a href="#parameter-tool_choice"><code>tool_choice</code></a>, <a href="#parameter-tools"><code>tools</code></a>, <a href="#parameter-top_k"><code>top_k</code></a>, <a href="#parameter-top_p"><code>top_p</code></a></td>
     <td>Send a structured list of input messages with text and/or image content, and the model will generate the next message in the conversation.<br /><br />The Messages API can be used for either single queries or stateless multi-turn conversations.<br /><br />Learn more about the Messages API in our [user guide](https://platform.claude.com/docs/en/get-started)</td>
 </tr>
 </tbody>
@@ -334,15 +334,90 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     </tr>
 </thead>
 <tbody>
-<tr id="parameter-anthropic-user-profile-id">
-    <td><CopyableCode code="anthropic-user-profile-id" /></td>
+<tr id="parameter-cache_control">
+    <td><CopyableCode code="cache_control" /></td>
     <td><code>string</code></td>
-    <td>The user profile ID to attribute this request to. Use when acting on behalf of a party other than your organization. Requires the `user-profiles` beta header.</td>
+    <td>Top-level cache control automatically applies a cache_control marker to the last cacheable block in the request.</td>
 </tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
+<tr id="parameter-container">
+    <td><CopyableCode code="container" /></td>
     <td><code>string</code></td>
-    <td>The version of the Claude API you want to use.  Read more about versioning and our version history [here](https://platform.claude.com/docs/en/api/versioning).</td>
+    <td>Container identifier for reuse across requests.</td>
+</tr>
+<tr id="parameter-inference_geo">
+    <td><CopyableCode code="inference_geo" /></td>
+    <td><code>string</code></td>
+    <td>Specifies the geographic region for inference processing. If not specified, the workspace's `default_inference_geo` is used.</td>
+</tr>
+<tr id="parameter-max_tokens">
+    <td><CopyableCode code="max_tokens" /></td>
+    <td><code>integer</code></td>
+    <td>The maximum number of tokens to generate before stopping.</td>
+</tr>
+<tr id="parameter-messages">
+    <td><CopyableCode code="messages" /></td>
+    <td><code>array</code></td>
+    <td>Input messages.</td>
+</tr>
+<tr id="parameter-metadata">
+    <td><CopyableCode code="metadata" /></td>
+    <td><code>object</code></td>
+    <td></td>
+</tr>
+<tr id="parameter-model">
+    <td><CopyableCode code="model" /></td>
+    <td><code>string</code></td>
+    <td>The model that will complete your prompt.</td>
+</tr>
+<tr id="parameter-output_config">
+    <td><CopyableCode code="output_config" /></td>
+    <td><code>object</code></td>
+    <td></td>
+</tr>
+<tr id="parameter-service_tier">
+    <td><CopyableCode code="service_tier" /></td>
+    <td><code>string</code></td>
+    <td>Determines whether to use priority capacity (if available) or standard capacity for this request.</td>
+</tr>
+<tr id="parameter-stop_sequences">
+    <td><CopyableCode code="stop_sequences" /></td>
+    <td><code>array</code></td>
+    <td>Custom text sequences that will cause the model to stop generating.</td>
+</tr>
+<tr id="parameter-system">
+    <td><CopyableCode code="system" /></td>
+    <td><code>string</code></td>
+    <td>System prompt.</td>
+</tr>
+<tr id="parameter-temperature">
+    <td><CopyableCode code="temperature" /></td>
+    <td><code>number</code></td>
+    <td>Amount of randomness injected into the response.</td>
+</tr>
+<tr id="parameter-thinking">
+    <td><CopyableCode code="thinking" /></td>
+    <td><code>object</code></td>
+    <td>Configuration for enabling Claude's extended thinking.</td>
+</tr>
+<tr id="parameter-tool_choice">
+    <td><CopyableCode code="tool_choice" /></td>
+    <td><code>object</code></td>
+    <td>How the model should use the provided tools. The model can use a specific tool, any available tool, decide by itself, or not use tools at all.</td>
+</tr>
+<tr id="parameter-tools">
+    <td><CopyableCode code="tools" /></td>
+    <td><code>array</code></td>
+    <td>Definitions of tools that the model may use.</td>
+</tr>
+<tr id="parameter-top_k">
+    <td><CopyableCode code="top_k" /></td>
+    <td><code>integer</code></td>
+    <td>Only sample from the top K options for each subsequent token.</td>
+</tr>
+<tr id="parameter-top_p">
+    <td><CopyableCode code="top_p" /></td>
+    <td><code>number</code></td>
+    <td>Use nucleus sampling.</td>
 </tr>
 </tbody>
 </table>
@@ -358,6 +433,15 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <TabItem value="create">
 
 Send a structured list of input messages with text and/or image content, and the model will generate the next message in the conversation.<br /><br />The Messages API can be used for either single queries or stateless multi-turn conversations.<br /><br />Learn more about the Messages API in our [user guide](https://platform.claude.com/docs/en/get-started)
+
+<Tabs
+    defaultValue="shape"
+    values={[
+        { label: 'Query Shape', value: 'shape' },
+        { label: 'Query Example', value: 'example' }
+    ]}
+>
+<TabItem value="shape">
 
 ```sql
 SELECT
@@ -375,8 +459,48 @@ FROM anthropic.messages.messages
 WHERE model = '{{ model }}' -- required
 AND messages = '{{ messages }}' -- required
 AND max_tokens = '{{ max_tokens }}' -- required
-AND "anthropic-user-profile-id" = '{{ anthropic-user-profile-id }}'
+AND cache_control = '{{ cache_control }}'
+AND container = '{{ container }}'
+AND inference_geo = '{{ inference_geo }}'
+AND metadata = '{{ metadata }}'
+AND output_config = '{{ output_config }}'
+AND service_tier = '{{ service_tier }}'
+AND stop_sequences = '{{ stop_sequences }}'
+AND system = '{{ system }}'
+AND temperature = '{{ temperature }}'
+AND thinking = '{{ thinking }}'
+AND tool_choice = '{{ tool_choice }}'
+AND tools = '{{ tools }}'
+AND top_k = '{{ top_k }}'
+AND top_p = '{{ top_p }}'
 ;
 ```
+</TabItem>
+<TabItem value="example">
+
+```sql
+SELECT
+id,
+model,
+stop_reason,
+JSON_EXTRACT(content, '$[0].text') AS assistant_message,
+JSON_EXTRACT(usage, '$.output_tokens') AS output_tokens
+FROM anthropic.messages.messages
+WHERE model = 'claude-sonnet-5'
+AND max_tokens = 2048
+AND messages = '[
+  {
+    "role": "user",
+    "content": "how does stackql work?"
+  }
+]'
+AND system = 'You are a technical assistant. Answer in one short paragraph.'
+AND thinking = '{"type": "disabled"}'
+AND metadata = '{"user_id": "stackql-docs-example"}'
+AND stop_sequences = '["<END>"]'
+;
+```
+</TabItem>
+</Tabs>
 </TabItem>
 </Tabs>

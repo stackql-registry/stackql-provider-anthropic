@@ -111,35 +111,35 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-workspace_id"><code>workspace_id</code></a>, <a href="#parameter-user_id"><code>user_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Get a workspace member.</td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-workspace_id"><code>workspace_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-before_id"><code>before_id</code></a>, <a href="#parameter-after_id"><code>after_id</code></a>, <a href="#parameter-limit"><code>limit</code></a></td>
+    <td><a href="#parameter-before_id"><code>before_id</code></a>, <a href="#parameter-after_id"><code>after_id</code></a></td>
     <td>List members of a workspace.</td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-workspace_id"><code>workspace_id</code></a>, <a href="#parameter-user_id"><code>user_id</code></a>, <a href="#parameter-workspace_role"><code>workspace_role</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Add an organization member to a workspace. The role cannot be `workspace_billing`.</td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-workspace_id"><code>workspace_id</code></a>, <a href="#parameter-user_id"><code>user_id</code></a>, <a href="#parameter-workspace_role"><code>workspace_role</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Update a workspace member's role.</td>
 </tr>
 <tr>
     <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-workspace_id"><code>workspace_id</code></a>, <a href="#parameter-user_id"><code>user_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Remove a member from a workspace.</td>
 </tr>
 </tbody>
@@ -173,20 +173,10 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>ID of the object to use as a cursor for pagination. Returns the page of results immediately after this object.</td>
 </tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td>The version of the Claude API you want to use.</td>
-</tr>
 <tr id="parameter-before_id">
     <td><CopyableCode code="before_id" /></td>
     <td><code>string</code></td>
     <td>ID of the object to use as a cursor for pagination. Returns the page of results immediately before this object.</td>
-</tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer</code></td>
-    <td>Number of items to return per page. Defaults to 20; ranges from 1 to 1000.</td>
 </tr>
 </tbody>
 </table>
@@ -230,7 +220,6 @@ FROM anthropic_admin.workspaces.members
 WHERE workspace_id = '{{ workspace_id }}' -- required
 AND before_id = '{{ before_id }}'
 AND after_id = '{{ after_id }}'
-AND limit = '{{ limit }}'
 ;
 ```
 </TabItem>
@@ -254,14 +243,12 @@ Add an organization member to a workspace. The role cannot be `workspace_billing
 INSERT INTO anthropic_admin.workspaces.members (
 user_id,
 workspace_role,
-workspace_id,
-anthropic-version
+workspace_id
 )
 SELECT 
 '{{ user_id }}' /* required */,
 '{{ workspace_role }}' /* required */,
-'{{ workspace_id }}',
-'{{ anthropic-version }}'
+'{{ workspace_id }}'
 RETURNING
 user_id,
 workspace_id,
@@ -287,10 +274,6 @@ workspace_role
       description: |
         Role of the new Workspace Member. Cannot be \`workspace_billing\`.
       valid_values: ['workspace_admin', 'workspace_developer', 'workspace_restricted_developer', 'workspace_user']
-    - name: anthropic-version
-      value: "{{ anthropic-version }}"
-      description: The version of the Claude API you want to use.
-      description: The version of the Claude API you want to use.
 `}</CodeBlock>
 
 </TabItem>

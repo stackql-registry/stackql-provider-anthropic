@@ -57,22 +57,8 @@ jobs:
       - name: mock smoke — anthropic_admin
         run: node stackql_anthropic_provider/tests/smoke.cjs --manifest stackql_anthropic_admin_provider/tests/manifest.yaml
 
-  websites:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        site:
-          - stackql_anthropic_provider/website
-          - stackql_anthropic_admin_provider/website
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: build site
-        working-directory: ${{ matrix.site }}
-        run: |
-          yarn install --frozen-lockfile
-          yarn build
+  # No website jobs here: both microsites deploy via Netlify (per-site base
+  # directories + selective-build ignore rules in each website/netlify.toml),
+  # and Netlify builds deploy previews on PRs — a CI site build would just
+  # duplicate it. This repo never uses GitHub Pages (one Pages site per repo;
+  # we have two sites).

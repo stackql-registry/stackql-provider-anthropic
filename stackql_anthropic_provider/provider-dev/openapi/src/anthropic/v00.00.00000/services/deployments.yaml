@@ -4483,6 +4483,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
         get:
           operation:
             $ref: "#/paths/~1v1~1deployments~1{deployment_id}?beta=true/get"
@@ -4556,6 +4559,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
         get:
           operation:
             $ref: "#/paths/~1v1~1deployment_runs~1{deployment_run_id}?beta=true/get"

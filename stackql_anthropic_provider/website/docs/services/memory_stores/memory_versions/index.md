@@ -293,21 +293,21 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a>, <a href="#parameter-memory_version_id"><code>memory_version_id</code></a></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-view"><code>view</code></a></td>
+    <td><a href="#parameter-view"><code>view</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-memory_id"><code>memory_id</code></a>, <a href="#parameter-session_id"><code>session_id</code></a>, <a href="#parameter-api_key_id"><code>api_key_id</code></a>, <a href="#parameter-operation"><code>operation</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-page"><code>page</code></a>, <a href="#parameter-view"><code>view</code></a></td>
+    <td><a href="#parameter-memory_id"><code>memory_id</code></a>, <a href="#parameter-session_id"><code>session_id</code></a>, <a href="#parameter-api_key_id"><code>api_key_id</code></a>, <a href="#parameter-operation"><code>operation</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-view"><code>view</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#redact"><CopyableCode code="redact" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a>, <a href="#parameter-memory_version_id"><code>memory_version_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 </tbody>
@@ -336,16 +336,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Path parameter memory_version_id</td>
 </tr>
-<tr id="parameter-anthropic-beta">
-    <td><CopyableCode code="anthropic-beta" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
 <tr id="parameter-api_key_id">
     <td><CopyableCode code="api_key_id" /></td>
     <td><code>string</code></td>
@@ -361,11 +351,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string (date-time)</code></td>
     <td>Return versions created at or before this time (inclusive).</td>
 </tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer (int32)</code></td>
-    <td>Query parameter for limit</td>
-</tr>
 <tr id="parameter-memory_id">
     <td><CopyableCode code="memory_id" /></td>
     <td><code>string</code></td>
@@ -376,11 +361,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Query parameter for operation</td>
 </tr>
-<tr id="parameter-page">
-    <td><CopyableCode code="page" /></td>
-    <td><code>string</code></td>
-    <td>Query parameter for page</td>
-</tr>
 <tr id="parameter-session_id">
     <td><CopyableCode code="session_id" /></td>
     <td><code>string</code></td>
@@ -390,11 +370,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="view" /></td>
     <td><code>string</code></td>
     <td>Query parameter for view</td>
-</tr>
-<tr id="parameter-x-api-key">
-    <td><CopyableCode code="x-api-key" /></td>
-    <td><code>string</code></td>
-    <td></td>
 </tr>
 </tbody>
 </table>
@@ -430,7 +405,6 @@ type
 FROM anthropic.memory_stores.memory_versions
 WHERE memory_store_id = '{{ memory_store_id }}' -- required
 AND memory_version_id = '{{ memory_version_id }}' -- required
-AND "x-api-key" = '{{ x-api-key }}'
 AND view = '{{ view }}'
 ;
 ```
@@ -456,15 +430,12 @@ redacted_by,
 type
 FROM anthropic.memory_stores.memory_versions
 WHERE memory_store_id = '{{ memory_store_id }}' -- required
-AND "x-api-key" = '{{ x-api-key }}'
 AND memory_id = '{{ memory_id }}'
 AND session_id = '{{ session_id }}'
 AND api_key_id = '{{ api_key_id }}'
 AND operation = '{{ operation }}'
 AND "created_at[gte]" = '{{ created_at[gte] }}'
 AND "created_at[lte]" = '{{ created_at[lte] }}'
-AND limit = '{{ limit }}'
-AND page = '{{ page }}'
 AND view = '{{ view }}'
 ;
 ```
@@ -487,9 +458,7 @@ Successful response (OK)
 ```sql
 EXEC anthropic.memory_stores.memory_versions.redact 
 @memory_store_id='{{ memory_store_id }}' --required, 
-@memory_version_id='{{ memory_version_id }}' --required, 
-@anthropic-version='{{ anthropic-version }}', 
-@anthropic-beta='{{ anthropic-beta }}'
+@memory_version_id='{{ memory_version_id }}' --required
 ;
 ```
 </TabItem>

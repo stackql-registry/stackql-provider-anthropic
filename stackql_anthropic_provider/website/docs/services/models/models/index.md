@@ -587,14 +587,14 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-model_id"><code>model_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-x-api-key"><code>x-api-key</code></a></td>
+    <td></td>
     <td>Get a specific model.<br /><br />The Models API response can be used to determine information about a specific model or resolve a model alias to a model ID.</td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-before_id"><code>before_id</code></a>, <a href="#parameter-after_id"><code>after_id</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-x-api-key"><code>x-api-key</code></a></td>
+    <td><a href="#parameter-before_id"><code>before_id</code></a>, <a href="#parameter-after_id"><code>after_id</code></a></td>
     <td>List available models.<br /><br />The Models API response can be used to determine which models are available for use in the API. More recently released models are listed first.</td>
 </tr>
 </tbody>
@@ -623,30 +623,10 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>ID of the object to use as a cursor for pagination. When provided, returns the page of results immediately after this object.</td>
 </tr>
-<tr id="parameter-anthropic-beta">
-    <td><CopyableCode code="anthropic-beta" /></td>
-    <td><code>string</code></td>
-    <td>Optional header to specify the beta version(s) you want to use.  To use multiple betas, use a comma separated list like `beta1,beta2` or specify the header multiple times for each beta.</td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td>The version of the Claude API you want to use.  Read more about versioning and our version history [here](https://platform.claude.com/docs/en/api/versioning).</td>
-</tr>
 <tr id="parameter-before_id">
     <td><CopyableCode code="before_id" /></td>
     <td><code>string</code></td>
     <td>ID of the object to use as a cursor for pagination. When provided, returns the page of results immediately before this object.</td>
-</tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer</code></td>
-    <td>Number of items to return per page.  Defaults to `20`. Ranges from `1` to `1000`.</td>
-</tr>
-<tr id="parameter-x-api-key">
-    <td><CopyableCode code="x-api-key" /></td>
-    <td><code>string</code></td>
-    <td>Your unique API key for authentication.  This key is required in the header of all API requests, to authenticate your account and access Anthropic's services. Get your API key through the [Console](https://console.anthropic.com/settings/keys). Each key is scoped to a Workspace.</td>
 </tr>
 </tbody>
 </table>
@@ -675,7 +655,6 @@ max_tokens,
 type
 FROM anthropic.models.models
 WHERE model_id = '{{ model_id }}' -- required
-AND "x-api-key" = '{{ x-api-key }}'
 ;
 ```
 </TabItem>
@@ -695,8 +674,6 @@ type
 FROM anthropic.models.models
 WHERE before_id = '{{ before_id }}'
 AND after_id = '{{ after_id }}'
-AND limit = '{{ limit }}'
-AND "x-api-key" = '{{ x-api-key }}'
 ;
 ```
 </TabItem>

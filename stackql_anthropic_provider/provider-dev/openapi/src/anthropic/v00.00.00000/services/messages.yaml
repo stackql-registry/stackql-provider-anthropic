@@ -6888,6 +6888,11 @@ components:
             mediaType: application/json
             openAPIDocKey: "200"
             objectKey: $.data
+          config:
+            queryParamPushdown:
+              top:
+                paramName: limit
+                maxValue: 1000
         get:
           operation:
             $ref: "#/paths/~1v1~1messages~1batches~1{message_batch_id}/get"

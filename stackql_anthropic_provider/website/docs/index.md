@@ -28,8 +28,8 @@ For organization administration (users, invites, workspaces, API keys, usage/cos
 
 :::info[Provider Summary]
 
-total services: __12__
-total resources: __38__
+total services: __11__
+total resources: __37__
 
 :::
 
@@ -64,14 +64,13 @@ Every operation in Anthropic's official OpenAPI specification is exposed, except
 <div class="row">
 <div class="providerDocColumn">
 <a href="/services/agents/">agents</a><br />
-<a href="/services/completions/">completions</a><br />
 <a href="/services/deployments/">deployments</a><br />
 <a href="/services/environments/">environments</a><br />
 <a href="/services/files/">files</a><br />
 <a href="/services/memory_stores/">memory_stores</a><br />
+<a href="/services/messages/">messages</a><br />
 </div>
 <div class="providerDocColumn">
-<a href="/services/messages/">messages</a><br />
 <a href="/services/models/">models</a><br />
 <a href="/services/sessions/">sessions</a><br />
 <a href="/services/skills/">skills</a><br />

@@ -632,6 +632,11 @@ components:
             mediaType: application/json
             openAPIDocKey: "200"
             objectKey: $.data
+          config:
+            queryParamPushdown:
+              top:
+                paramName: limit
+                maxValue: 1000
         create:
           config:
             requestBodyTranslate:
@@ -690,6 +695,11 @@ components:
             mediaType: application/json
             openAPIDocKey: "200"
             objectKey: $.data
+          config:
+            queryParamPushdown:
+              top:
+                paramName: limit
+                maxValue: 1000
         create:
           config:
             requestBodyTranslate:

@@ -1708,6 +1708,8 @@ components:
           response:
             mediaType: application/json
             openAPIDocKey: "200"
+            schema_override:
+              $ref: "#/components/schemas/StackqlExecResult"
           request:
             mediaType: multipart/form-data
         list:
@@ -1725,6 +1727,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
         get:
           operation:
             $ref: "#/paths/~1v1~1skills~1{skill_id}?beta=true/get"
@@ -1741,8 +1746,7 @@ components:
         select:
           - $ref: "#/components/x-stackQL-resources/skills/methods/get"
           - $ref: "#/components/x-stackQL-resources/skills/methods/list"
-        insert:
-          - $ref: "#/components/x-stackQL-resources/skills/methods/create"
+        insert: []
         update: []
         delete:
           - $ref: "#/components/x-stackQL-resources/skills/methods/delete"
@@ -1761,6 +1765,8 @@ components:
           response:
             mediaType: application/json
             openAPIDocKey: "200"
+            schema_override:
+              $ref: "#/components/schemas/StackqlExecResult"
           request:
             mediaType: multipart/form-data
         list:
@@ -1778,6 +1784,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
         get:
           operation:
             $ref: "#/paths/~1v1~1skills~1{skill_id}~1versions~1{version}?beta=true/get"
@@ -1802,8 +1811,7 @@ components:
         select:
           - $ref: "#/components/x-stackQL-resources/versions/methods/get"
           - $ref: "#/components/x-stackQL-resources/versions/methods/list"
-        insert:
-          - $ref: "#/components/x-stackQL-resources/versions/methods/create"
+        insert: []
         update: []
         delete:
           - $ref: "#/components/x-stackQL-resources/versions/methods/delete"

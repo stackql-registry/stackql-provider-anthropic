@@ -741,6 +741,11 @@ components:
             mediaType: application/json
             openAPIDocKey: "200"
             objectKey: $.data
+          config:
+            queryParamPushdown:
+              top:
+                paramName: limit
+                maxValue: 1000
         get:
           operation:
             $ref: "#/paths/~1v1~1models~1{model_id}/get"
@@ -755,5 +760,132 @@ components:
         update: []
         delete: []
         replace: []
+    vw_model_capabilities:
+      name: vw_model_capabilities
+      id: anthropic.models.vw_model_capabilities
+      config:
+        docs:
+          fields:
+            - name: id
+              type: string
+              description: Unique model identifier, e.g. `claude-sonnet-5`.
+            - name: display_name
+              type: string
+              description: Human-readable name of the model.
+            - name: batch
+              type: boolean
+              description: Whether the model supports the Message Batches API.
+            - name: citations
+              type: boolean
+              description: Whether the model supports citations.
+            - name: code_execution
+              type: boolean
+              description: Whether the model supports the code execution tool.
+            - name: context_management
+              type: boolean
+              description: Whether the model supports context management.
+            - name: effort
+              type: boolean
+              description: Whether the model supports the effort parameter.
+            - name: xhigh
+              type: boolean
+              description: Whether the `xhigh` effort tier is supported.
+            - name: high
+              type: boolean
+              description: Whether the `high` effort tier is supported.
+            - name: max
+              type: boolean
+              description: Whether the `max` effort tier is supported.
+            - name: medium
+              type: boolean
+              description: Whether the `medium` effort tier is supported.
+            - name: low
+              type: boolean
+              description: Whether the `low` effort tier is supported.
+            - name: image_input
+              type: boolean
+              description: Whether the model accepts image input.
+            - name: pdf_input
+              type: boolean
+              description: Whether the model accepts PDF input.
+            - name: structured_outputs
+              type: boolean
+              description: Whether the model supports structured outputs.
+            - name: thinking
+              type: boolean
+              description: Whether the model supports extended thinking.
+            - name: adaptive
+              type: boolean
+              description: Whether adaptive thinking is supported.
+            - name: enabled
+              type: boolean
+              description: Whether manually-enabled thinking is supported.
+            - name: created_at
+              type: string
+              description: RFC 3339 timestamp when the model was released.
+            - name: max_input_tokens
+              type: integer
+              description: Maximum number of input tokens accepted by the model.
+            - name: max_tokens
+              type: integer
+              description: Maximum number of output tokens the model can generate.
+            - name: type
+              type: string
+              description: Object type; always `model`.
+        views:
+          select:
+            predicate: sqlDialect == "sqlite3"
+            ddl: |-
+              SELECT
+                id,
+                display_name,
+                JSON_EXTRACT(capabilities, '$.batch.supported') AS batch,
+                JSON_EXTRACT(capabilities, '$.citations.supported') AS citations,
+                JSON_EXTRACT(capabilities, '$.code_execution.supported') AS code_execution,
+                JSON_EXTRACT(capabilities, '$.context_management.supported') AS context_management,
+                JSON_EXTRACT(capabilities, '$.effort.supported') AS effort,
+                JSON_EXTRACT(capabilities, '$.effort.xhigh.supported') AS xhigh,
+                JSON_EXTRACT(capabilities, '$.effort.high.supported') AS high,
+                JSON_EXTRACT(capabilities, '$.effort.max.supported') AS max,
+                JSON_EXTRACT(capabilities, '$.effort.medium.supported') AS medium,
+                JSON_EXTRACT(capabilities, '$.effort.low.supported') AS low,
+                JSON_EXTRACT(capabilities, '$.image_input.supported') AS image_input,
+                JSON_EXTRACT(capabilities, '$.pdf_input.supported') AS pdf_input,
+                JSON_EXTRACT(capabilities, '$.structured_outputs.supported') AS structured_outputs,
+                JSON_EXTRACT(capabilities, '$.thinking.supported') AS thinking,
+                JSON_EXTRACT(capabilities, '$.thinking.types.adaptive.supported') AS adaptive,
+                JSON_EXTRACT(capabilities, '$.thinking.types.enabled.supported') AS enabled,
+                created_at,
+                max_input_tokens,
+                max_tokens,
+                type
+              FROM anthropic.models.models
+            fallback:
+              predicate: sqlDialect == "postgres"
+              ddl: |-
+                SELECT
+                  id,
+                  display_name,
+                  json_extract_path_text(capabilities::json, 'batch', 'supported') AS batch,
+                  json_extract_path_text(capabilities::json, 'citations', 'supported') AS citations,
+                  json_extract_path_text(capabilities::json, 'code_execution', 'supported') AS code_execution,
+                  json_extract_path_text(capabilities::json, 'context_management', 'supported') AS context_management,
+                  json_extract_path_text(capabilities::json, 'effort', 'supported') AS effort,
+                  json_extract_path_text(capabilities::json, 'effort', 'xhigh', 'supported') AS xhigh,
+                  json_extract_path_text(capabilities::json, 'effort', 'high', 'supported') AS high,
+                  json_extract_path_text(capabilities::json, 'effort', 'max', 'supported') AS max,
+                  json_extract_path_text(capabilities::json, 'effort', 'medium', 'supported') AS medium,
+                  json_extract_path_text(capabilities::json, 'effort', 'low', 'supported') AS low,
+                  json_extract_path_text(capabilities::json, 'image_input', 'supported') AS image_input,
+                  json_extract_path_text(capabilities::json, 'pdf_input', 'supported') AS pdf_input,
+                  json_extract_path_text(capabilities::json, 'structured_outputs', 'supported') AS structured_outputs,
+                  json_extract_path_text(capabilities::json, 'thinking', 'supported') AS thinking,
+                  json_extract_path_text(capabilities::json, 'thinking', 'types', 'adaptive', 'supported') AS adaptive,
+                  json_extract_path_text(capabilities::json, 'thinking', 'types', 'enabled', 'supported') AS enabled,
+                  created_at,
+                  max_input_tokens,
+                  max_tokens,
+                  type
+                FROM anthropic.models.models
 servers:
   - url: https://api.anthropic.com

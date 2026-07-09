@@ -105,7 +105,7 @@ The following methods are available for this resource:
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-starting_at"><code>starting_at</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-page"><code>page</code></a></td>
+    <td></td>
     <td>Get daily aggregated Claude Code usage analytics. Each record represents one actor's activity for the single UTC day specified by `starting_at`.</td>
 </tr>
 </tbody>
@@ -128,26 +128,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="starting_at" /></td>
     <td><code>string</code></td>
     <td>UTC date in YYYY-MM-DD format; returns metrics for this single day only.</td>
-</tr>
-<tr id="parameter-anthropic-beta">
-    <td><CopyableCode code="anthropic-beta" /></td>
-    <td><code>string</code></td>
-    <td>Optional beta version header. Grouping or filtering by `speed` requires `fast-mode-2026-02-01`; no default is stamped so standard reports stay on the GA surface.</td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td>The version of the Claude API you want to use.</td>
-</tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer</code></td>
-    <td>Number of records per page (default 20, max 1000).</td>
-</tr>
-<tr id="parameter-page">
-    <td><CopyableCode code="page" /></td>
-    <td><code>string</code></td>
-    <td>Opaque cursor token from the previous response's `next_page` field.</td>
 </tr>
 </tbody>
 </table>
@@ -176,8 +156,6 @@ terminal_type,
 tool_actions
 FROM anthropic_admin.usage.claude_code_reports
 WHERE starting_at = '{{ starting_at }}' -- required
-AND limit = '{{ limit }}'
-AND page = '{{ page }}'
 ;
 ```
 </TabItem>

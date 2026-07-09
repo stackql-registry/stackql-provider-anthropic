@@ -2614,6 +2614,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
         get:
           operation:
             $ref: "#/paths/~1v1~1agents~1{agent_id}?beta=true/get"
@@ -2667,6 +2670,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
       sqlVerbs:
         select:
           - $ref: "#/components/x-stackQL-resources/versions/methods/list"

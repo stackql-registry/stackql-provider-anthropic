@@ -5,7 +5,7 @@ agents.yaml,/v1/agents/{agent_id}?beta=true,BetaGetAgent,beta_get_agent,get,Beta
 agents.yaml,/v1/agents/{agent_id}?beta=true,BetaUpdateAgent,beta_update_agent,post,BetaManagedAgentsAgent,,,agents,update,update,,Update Agent
 agents.yaml,/v1/agents/{agent_id}/archive?beta=true,BetaArchiveAgent,beta_archive_agent,post,BetaManagedAgentsAgent,,,agents,archive,exec,,Archive Agent
 agents.yaml,/v1/agents/{agent_id}/versions?beta=true,BetaListAgentVersions,beta_list_agent_versions,get,BetaManagedAgentsListAgentVersions,,,versions,list,select,$.data,List Agent Versions
-completions.yaml,/v1/complete,complete_post,complete_post,post,CompletionResponse,,,completions,create,select,,Create a Text Completion
+completions.yaml,/v1/complete,complete_post,complete_post,post,CompletionResponse,,,skip_this_resource,create,select,,Create a Text Completion
 deployments.yaml,/v1/deployments?beta=true,BetaCreateDeployment,beta_create_deployment,post,BetaManagedAgentsDeployment,,,deployments,create,insert,,Create Deployment
 deployments.yaml,/v1/deployments?beta=true,BetaListDeployments,beta_list_deployments,get,BetaManagedAgentsListDeploymentsData,,,deployments,list,select,$.data,List Deployments
 deployments.yaml,/v1/deployments/{deployment_id}?beta=true,BetaGetDeployment,beta_get_deployment,get,BetaManagedAgentsDeployment,,,deployments,get,select,,Get Deployment
@@ -76,11 +76,11 @@ sessions.yaml,/v1/sessions/{session_id}/resources?beta=true,BetaAddResource,beta
 sessions.yaml,/v1/sessions/{session_id}/resources/{resource_id}?beta=true,BetaGetResource,beta_get_resource,get,BetaManagedAgentsGetSessionResource,,,resources,get,select,,Get Session Resource
 sessions.yaml,/v1/sessions/{session_id}/resources/{resource_id}?beta=true,BetaDeleteResource,beta_delete_resource,delete,BetaManagedAgentsDeleteSessionResource,,,resources,delete,delete,,Delete Session Resource
 sessions.yaml,/v1/sessions/{session_id}/resources/{resource_id}?beta=true,BetaUpdateResource,beta_update_resource,post,BetaManagedAgentsUpdateSessionResource,,,resources,update,update,,Update Session Resource
-skills.yaml,/v1/skills?beta=true,beta_create_skill_v1_skills_post,beta_create_skill_v1_skills_post,post,BetaCreateSkillResponse,,,skills,create,insert,,Create Skill
+skills.yaml,/v1/skills?beta=true,beta_create_skill_v1_skills_post,beta_create_skill_v1_skills_post,post,BetaCreateSkillResponse,,,skills,create,exec,,Create Skill (multipart - not SQL-expressible yet)
 skills.yaml,/v1/skills?beta=true,beta_list_skills_v1_skills_get,beta_list_skills_v1_skills_get,get,BetaListSkillsResponse,,,skills,list,select,$.data,List Skills
 skills.yaml,/v1/skills/{skill_id}?beta=true,beta_get_skill_v1_skills__skill_id__get,beta_get_skill_v1_skills__skill_id__get,get,BetaGetSkillResponse,,,skills,get,select,,Get Skill
 skills.yaml,/v1/skills/{skill_id}?beta=true,beta_delete_skill_v1_skills__skill_id__delete,beta_delete_skill_v1_skills__skill_id__delete,delete,BetaDeleteSkillResponse,,,skills,delete,delete,,Delete Skill
-skills.yaml,/v1/skills/{skill_id}/versions?beta=true,beta_create_skill_version_v1_skills__skill_id__versions_post,beta_create_skill_version_v1_skills__skill_id__versions_post,post,BetaCreateSkillVersionResponse,,,versions,create,insert,,Create Skill Version
+skills.yaml,/v1/skills/{skill_id}/versions?beta=true,beta_create_skill_version_v1_skills__skill_id__versions_post,beta_create_skill_version_v1_skills__skill_id__versions_post,post,BetaCreateSkillVersionResponse,,,versions,create,exec,,Create Skill Version (multipart - not SQL-expressible yet)
 skills.yaml,/v1/skills/{skill_id}/versions?beta=true,beta_list_skill_versions_v1_skills__skill_id__versions_get,beta_list_skill_versions_v1_skills__skill_id__versions_get,get,BetaListSkillVersionsResponse,,,versions,list,select,$.data,List Skill Versions
 skills.yaml,/v1/skills/{skill_id}/versions/{version}?beta=true,beta_get_skill_version_v1_skills__skill_id__versions__version__get,beta_get_skill_version_v1_skills__skill_id__versions__version__get,get,BetaGetSkillVersionResponse,,,versions,get,select,,Get Skill Version
 skills.yaml,/v1/skills/{skill_id}/versions/{version}?beta=true,beta_delete_skill_version_v1_skills__skill_id__versions__version__delete,beta_delete_skill_version_v1_skills__skill_id__versions__version__delete,delete,BetaDeleteSkillVersionResponse,,,versions,delete,delete,,Delete Skill Version

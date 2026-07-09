@@ -569,35 +569,35 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-agent_id"><code>agent_id</code></a></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-version"><code>version</code></a></td>
+    <td><a href="#parameter-version"><code>version</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-page"><code>page</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-include_archived"><code>include_archived</code></a></td>
+    <td><a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-include_archived"><code>include_archived</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-name"><code>name</code></a>, <a href="#parameter-model"><code>model</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-agent_id"><code>agent_id</code></a>, <a href="#parameter-version"><code>version</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#archive"><CopyableCode code="archive" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-agent_id"><code>agent_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 </tbody>
@@ -621,16 +621,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Path parameter agent_id (example: agent_011CZkYpogX7uDKUyvBTophP)</td>
 </tr>
-<tr id="parameter-anthropic-beta">
-    <td><CopyableCode code="anthropic-beta" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
 <tr id="parameter-created_at[gte]">
     <td><CopyableCode code="created_at[gte]" /></td>
     <td><code>string (date-time)</code></td>
@@ -646,25 +636,10 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>boolean</code></td>
     <td>Include archived agents in results. Defaults to false.</td>
 </tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer (int32)</code></td>
-    <td>Maximum results per page. Default 20, maximum 100.</td>
-</tr>
-<tr id="parameter-page">
-    <td><CopyableCode code="page" /></td>
-    <td><code>string</code></td>
-    <td>Opaque pagination cursor from a previous response.</td>
-</tr>
 <tr id="parameter-version">
     <td><CopyableCode code="version" /></td>
     <td><code>integer (int32)</code></td>
     <td>Agent version. Omit for the most recent version. Must be at least 1 if specified.</td>
-</tr>
-<tr id="parameter-x-api-key">
-    <td><CopyableCode code="x-api-key" /></td>
-    <td><code>string</code></td>
-    <td></td>
 </tr>
 </tbody>
 </table>
@@ -701,7 +676,6 @@ updated_at,
 version
 FROM anthropic.agents.agents
 WHERE agent_id = '{{ agent_id }}' -- required
-AND "x-api-key" = '{{ x-api-key }}'
 AND version = '{{ version }}'
 ;
 ```
@@ -728,10 +702,7 @@ type,
 updated_at,
 version
 FROM anthropic.agents.agents
-WHERE "x-api-key" = '{{ x-api-key }}'
-AND limit = '{{ limit }}'
-AND page = '{{ page }}'
-AND "created_at[gte]" = '{{ created_at[gte] }}'
+WHERE "created_at[gte]" = '{{ created_at[gte] }}'
 AND "created_at[lte]" = '{{ created_at[lte] }}'
 AND include_archived = '{{ include_archived }}'
 ;
@@ -763,9 +734,7 @@ tools,
 mcp_servers,
 skills,
 metadata,
-multiagent,
-anthropic-version,
-anthropic-beta
+multiagent
 )
 SELECT 
 '{{ name }}' /* required */,
@@ -776,9 +745,7 @@ SELECT
 '{{ mcp_servers }}',
 '{{ skills }}',
 '{{ metadata }}',
-'{{ multiagent }}',
-'{{ anthropic-version }}',
-'{{ anthropic-beta }}'
+'{{ multiagent }}'
 RETURNING
 id,
 name,
@@ -863,10 +830,6 @@ version
         type: "{{ type }}"
         agents:
           - "{{ agents }}"
-    - name: anthropic-version
-      value: "{{ anthropic-version }}"
-    - name: anthropic-beta
-      value: "{{ anthropic-beta }}"
 `}</CodeBlock>
 
 </TabItem>
@@ -936,9 +899,7 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.agents.agents.archive 
-@agent_id='{{ agent_id }}' --required, 
-@anthropic-version='{{ anthropic-version }}', 
-@anthropic-beta='{{ anthropic-beta }}'
+@agent_id='{{ agent_id }}' --required
 ;
 ```
 </TabItem>

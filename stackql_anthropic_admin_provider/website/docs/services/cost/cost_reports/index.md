@@ -132,7 +132,7 @@ The following methods are available for this resource:
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-starting_at"><code>starting_at</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-ending_at"><code>ending_at</code></a>, <a href="#parameter-bucket_width"><code>bucket_width</code></a>, <a href="#parameter-group_by[]"><code>group_by[]</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-page"><code>page</code></a></td>
+    <td><a href="#parameter-ending_at"><code>ending_at</code></a>, <a href="#parameter-bucket_width"><code>bucket_width</code></a>, <a href="#parameter-group_by[]"><code>group_by[]</code></a></td>
     <td>Get a cost report bucketed by day, optionally grouped by `workspace_id` and/or `description`. Costs are USD decimal strings in lowest currency units (cents).</td>
 </tr>
 </tbody>
@@ -156,16 +156,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Time buckets that start on or after this RFC 3339 timestamp will be returned. Snapped to the start of the day in UTC.</td>
 </tr>
-<tr id="parameter-anthropic-beta">
-    <td><CopyableCode code="anthropic-beta" /></td>
-    <td><code>string</code></td>
-    <td>Optional beta version header.</td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td>The version of the Claude API you want to use.</td>
-</tr>
 <tr id="parameter-bucket_width">
     <td><CopyableCode code="bucket_width" /></td>
     <td><code>string</code></td>
@@ -180,16 +170,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="group_by[]" /></td>
     <td><code>array</code></td>
     <td>Group by any subset of `description` and `workspace_id`. When grouping by `description`, responses include parsed fields like `model` and `cost_type`.</td>
-</tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer</code></td>
-    <td>Maximum number of time buckets to return in the response.</td>
-</tr>
-<tr id="parameter-page">
-    <td><CopyableCode code="page" /></td>
-    <td><code>string</code></td>
-    <td>Optionally set to the `next_page` token from the previous response.</td>
 </tr>
 </tbody>
 </table>
@@ -216,8 +196,6 @@ WHERE starting_at = '{{ starting_at }}' -- required
 AND ending_at = '{{ ending_at }}'
 AND bucket_width = '{{ bucket_width }}'
 AND "group_by[]" = '{{ group_by[] }}'
-AND limit = '{{ limit }}'
-AND page = '{{ page }}'
 ;
 ```
 </TabItem>

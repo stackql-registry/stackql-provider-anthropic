@@ -11,15 +11,6 @@ providerServices:
     title: agents API
     version: v00.00.00000
     description: anthropic agents API
-  completions:
-    id: completions:v00.00.00000
-    name: completions
-    preferred: true
-    service:
-      $ref: anthropic/v00.00.00000/services/completions.yaml
-    title: completions API
-    version: v00.00.00000
-    description: anthropic completions API
   deployments:
     id: deployments:v00.00.00000
     name: deployments

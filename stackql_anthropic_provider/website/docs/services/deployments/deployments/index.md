@@ -675,56 +675,56 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-deployment_id"><code>deployment_id</code></a></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-page"><code>page</code></a>, <a href="#parameter-agent_id"><code>agent_id</code></a>, <a href="#parameter-status"><code>status</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-include_archived"><code>include_archived</code></a></td>
+    <td><a href="#parameter-agent_id"><code>agent_id</code></a>, <a href="#parameter-status"><code>status</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-include_archived"><code>include_archived</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-name"><code>name</code></a>, <a href="#parameter-agent"><code>agent</code></a>, <a href="#parameter-environment_id"><code>environment_id</code></a>, <a href="#parameter-initial_events"><code>initial_events</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-deployment_id"><code>deployment_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#archive"><CopyableCode code="archive" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-deployment_id"><code>deployment_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#pause"><CopyableCode code="pause" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-deployment_id"><code>deployment_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#unpause"><CopyableCode code="unpause" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-deployment_id"><code>deployment_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#run"><CopyableCode code="run" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-deployment_id"><code>deployment_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 </tbody>
@@ -753,16 +753,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Filter by agent ID.</td>
 </tr>
-<tr id="parameter-anthropic-beta">
-    <td><CopyableCode code="anthropic-beta" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
 <tr id="parameter-created_at[gte]">
     <td><CopyableCode code="created_at[gte]" /></td>
     <td><code>string (date-time)</code></td>
@@ -778,25 +768,10 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>boolean</code></td>
     <td>When true, includes archived deployments. Default: false (exclude archived).</td>
 </tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer (int32)</code></td>
-    <td>Maximum results per page. Default 20, maximum 100.</td>
-</tr>
-<tr id="parameter-page">
-    <td><CopyableCode code="page" /></td>
-    <td><code>string</code></td>
-    <td>Opaque pagination cursor.</td>
-</tr>
 <tr id="parameter-status">
     <td><CopyableCode code="status" /></td>
     <td><code>string</code></td>
     <td>Filter by status: active or paused. Omit for both. To include archived deployments, use include_archived instead; the two cannot be combined.</td>
-</tr>
-<tr id="parameter-x-api-key">
-    <td><CopyableCode code="x-api-key" /></td>
-    <td><code>string</code></td>
-    <td></td>
 </tr>
 </tbody>
 </table>
@@ -834,7 +809,6 @@ updated_at,
 vault_ids
 FROM anthropic.deployments.deployments
 WHERE deployment_id = '{{ deployment_id }}' -- required
-AND "x-api-key" = '{{ x-api-key }}'
 ;
 ```
 </TabItem>
@@ -861,10 +835,7 @@ type,
 updated_at,
 vault_ids
 FROM anthropic.deployments.deployments
-WHERE "x-api-key" = '{{ x-api-key }}'
-AND limit = '{{ limit }}'
-AND page = '{{ page }}'
-AND agent_id = '{{ agent_id }}'
+WHERE agent_id = '{{ agent_id }}'
 AND status = '{{ status }}'
 AND "created_at[gte]" = '{{ created_at[gte] }}'
 AND "created_at[lte]" = '{{ created_at[lte] }}'
@@ -898,9 +869,7 @@ vault_ids,
 initial_events,
 resources,
 metadata,
-schedule,
-anthropic-version,
-anthropic-beta
+schedule
 )
 SELECT 
 '{{ name }}' /* required */,
@@ -911,9 +880,7 @@ SELECT
 '{{ initial_events }}' /* required */,
 '{{ resources }}',
 '{{ metadata }}',
-'{{ schedule }}',
-'{{ anthropic-version }}',
-'{{ anthropic-beta }}'
+'{{ schedule }}'
 RETURNING
 id,
 name,
@@ -999,10 +966,6 @@ vault_ids
         type: "{{ type }}"
         expression: "{{ expression }}"
         timezone: "{{ timezone }}"
-    - name: anthropic-version
-      value: "{{ anthropic-version }}"
-    - name: anthropic-beta
-      value: "{{ anthropic-beta }}"
 `}</CodeBlock>
 
 </TabItem>
@@ -1074,9 +1037,7 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.deployments.deployments.archive 
-@deployment_id='{{ deployment_id }}' --required, 
-@anthropic-version='{{ anthropic-version }}', 
-@anthropic-beta='{{ anthropic-beta }}'
+@deployment_id='{{ deployment_id }}' --required
 ;
 ```
 </TabItem>
@@ -1086,9 +1047,7 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.deployments.deployments.pause 
-@deployment_id='{{ deployment_id }}' --required, 
-@anthropic-version='{{ anthropic-version }}', 
-@anthropic-beta='{{ anthropic-beta }}'
+@deployment_id='{{ deployment_id }}' --required
 ;
 ```
 </TabItem>
@@ -1098,9 +1057,7 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.deployments.deployments.unpause 
-@deployment_id='{{ deployment_id }}' --required, 
-@anthropic-version='{{ anthropic-version }}', 
-@anthropic-beta='{{ anthropic-beta }}'
+@deployment_id='{{ deployment_id }}' --required
 ;
 ```
 </TabItem>
@@ -1110,9 +1067,7 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.deployments.deployments.run 
-@deployment_id='{{ deployment_id }}' --required, 
-@anthropic-version='{{ anthropic-version }}', 
-@anthropic-beta='{{ anthropic-beta }}'
+@deployment_id='{{ deployment_id }}' --required
 ;
 ```
 </TabItem>

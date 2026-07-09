@@ -18,7 +18,7 @@ models service documentation.
 
 :::info[Service Summary]
 
-total resources: __1__  
+total resources: __2__  
 
 :::
 
@@ -28,6 +28,6 @@ total resources: __1__
 <a href="/services/models/models/">models</a>
 </div>
 <div class="providerDocColumn">
-
+<a href="/services/models/vw_model_capabilities/">vw_model_capabilities</a>
 </div>
 </div>

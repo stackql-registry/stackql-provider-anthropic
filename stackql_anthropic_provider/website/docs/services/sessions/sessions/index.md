@@ -1069,42 +1069,42 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-session_id"><code>session_id</code></a></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-page"><code>page</code></a>, <a href="#parameter-include_archived"><code>include_archived</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[gt]"><code>created_at[gt]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-created_at[lt]"><code>created_at[lt]</code></a>, <a href="#parameter-agent_id"><code>agent_id</code></a>, <a href="#parameter-agent_version"><code>agent_version</code></a>, <a href="#parameter-order"><code>order</code></a>, <a href="#parameter-memory_store_id"><code>memory_store_id</code></a>, <a href="#parameter-deployment_id"><code>deployment_id</code></a>, <a href="#parameter-statuses[]"><code>statuses[]</code></a></td>
+    <td><a href="#parameter-include_archived"><code>include_archived</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[gt]"><code>created_at[gt]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-created_at[lt]"><code>created_at[lt]</code></a>, <a href="#parameter-agent_id"><code>agent_id</code></a>, <a href="#parameter-agent_version"><code>agent_version</code></a>, <a href="#parameter-order"><code>order</code></a>, <a href="#parameter-memory_store_id"><code>memory_store_id</code></a>, <a href="#parameter-deployment_id"><code>deployment_id</code></a>, <a href="#parameter-statuses[]"><code>statuses[]</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-agent"><code>agent</code></a>, <a href="#parameter-environment_id"><code>environment_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-session_id"><code>session_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-session_id"><code>session_id</code></a></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#archive"><CopyableCode code="archive" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-session_id"><code>session_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 </tbody>
@@ -1138,16 +1138,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>integer (int32)</code></td>
     <td>Filter by agent version. Only applies when agent_id is also set.</td>
 </tr>
-<tr id="parameter-anthropic-beta">
-    <td><CopyableCode code="anthropic-beta" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
 <tr id="parameter-created_at[gt]">
     <td><CopyableCode code="created_at[gt]" /></td>
     <td><code>string (date-time)</code></td>
@@ -1178,11 +1168,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>boolean</code></td>
     <td>When true, includes archived sessions. Default: false (exclude archived).</td>
 </tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer (int32)</code></td>
-    <td>Maximum number of results to return.</td>
-</tr>
 <tr id="parameter-memory_store_id">
     <td><CopyableCode code="memory_store_id" /></td>
     <td><code>string</code></td>
@@ -1193,20 +1178,10 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Sort direction for results, ordered by created_at. Defaults to desc (newest first).</td>
 </tr>
-<tr id="parameter-page">
-    <td><CopyableCode code="page" /></td>
-    <td><code>string</code></td>
-    <td>Opaque pagination cursor from a previous response.</td>
-</tr>
 <tr id="parameter-statuses[]">
     <td><CopyableCode code="statuses[]" /></td>
     <td><code>array</code></td>
     <td>Filter by session status. Repeat the parameter to match any of multiple statuses.</td>
-</tr>
-<tr id="parameter-x-api-key">
-    <td><CopyableCode code="x-api-key" /></td>
-    <td><code>string</code></td>
-    <td></td>
 </tr>
 </tbody>
 </table>
@@ -1244,7 +1219,6 @@ usage,
 vault_ids
 FROM anthropic.sessions.sessions
 WHERE session_id = '{{ session_id }}' -- required
-AND "x-api-key" = '{{ x-api-key }}'
 ;
 ```
 </TabItem>
@@ -1271,10 +1245,7 @@ updated_at,
 usage,
 vault_ids
 FROM anthropic.sessions.sessions
-WHERE "x-api-key" = '{{ x-api-key }}'
-AND limit = '{{ limit }}'
-AND page = '{{ page }}'
-AND include_archived = '{{ include_archived }}'
+WHERE include_archived = '{{ include_archived }}'
 AND "created_at[gte]" = '{{ created_at[gte] }}'
 AND "created_at[gt]" = '{{ created_at[gt] }}'
 AND "created_at[lte]" = '{{ created_at[lte] }}'
@@ -1311,9 +1282,7 @@ environment_id,
 title,
 metadata,
 resources,
-vault_ids,
-anthropic-version,
-anthropic-beta
+vault_ids
 )
 SELECT 
 '{{ agent }}' /* required */,
@@ -1321,9 +1290,7 @@ SELECT
 '{{ title }}',
 '{{ metadata }}',
 '{{ resources }}',
-'{{ vault_ids }}',
-'{{ anthropic-version }}',
-'{{ anthropic-beta }}'
+'{{ vault_ids }}'
 RETURNING
 id,
 deployment_id,
@@ -1386,10 +1353,6 @@ vault_ids
         - "{{ vault_ids }}"
       description: |
         Vault IDs for stored credentials the agent can use during the session.
-    - name: anthropic-version
-      value: "{{ anthropic-version }}"
-    - name: anthropic-beta
-      value: "{{ anthropic-beta }}"
 `}</CodeBlock>
 
 </TabItem>
@@ -1454,7 +1417,6 @@ No description available.
 ```sql
 DELETE FROM anthropic.sessions.sessions
 WHERE session_id = '{{ session_id }}' --required
-AND "x-api-key" = '{{ x-api-key }}'
 ;
 ```
 </TabItem>
@@ -1475,9 +1437,7 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.sessions.sessions.archive 
-@session_id='{{ session_id }}' --required, 
-@anthropic-version='{{ anthropic-version }}', 
-@anthropic-beta='{{ anthropic-beta }}'
+@session_id='{{ session_id }}' --required
 ;
 ```
 </TabItem>

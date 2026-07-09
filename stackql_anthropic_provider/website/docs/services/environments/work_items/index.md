@@ -215,49 +215,49 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a>, <a href="#parameter-work_id"><code>work_id</code></a></td>
-    <td><a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-x-api-key"><code>x-api-key</code></a></td>
+    <td></td>
     <td>Note: these endpoints are called automatically by the pre-built environment worker provided in the SDKs and CLI, for orchestrating sessions with self-hosted sandbox environments. They are included here as a reference; you do not need to invoke them directly.<br /><br />Retrieve detailed information about a specific work item.</td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a></td>
-    <td><a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-page"><code>page</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-authorization"><code>authorization</code></a></td>
+    <td></td>
     <td>Note: these endpoints are called automatically by the pre-built environment worker provided in the SDKs and CLI, for orchestrating sessions with self-hosted sandbox environments. They are included here as a reference; you do not need to invoke them directly.<br /><br />List work items in an environment.</td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a>, <a href="#parameter-work_id"><code>work_id</code></a>, <a href="#parameter-metadata"><code>metadata</code></a></td>
-    <td><a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Note: these endpoints are called automatically by the pre-built environment worker provided in the SDKs and CLI, for orchestrating sessions with self-hosted sandbox environments. They are included here as a reference; you do not need to invoke them directly.<br /><br />Update work item metadata with merge semantics.</td>
 </tr>
 <tr>
     <td><a href="#poll"><CopyableCode code="poll" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a></td>
-    <td><a href="#parameter-block_ms"><code>block_ms</code></a>, <a href="#parameter-reclaim_older_than_ms"><code>reclaim_older_than_ms</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-Anthropic-Worker-ID"><code>Anthropic-Worker-ID</code></a>, <a href="#parameter-authorization"><code>authorization</code></a></td>
+    <td><a href="#parameter-block_ms"><code>block_ms</code></a>, <a href="#parameter-reclaim_older_than_ms"><code>reclaim_older_than_ms</code></a></td>
     <td>Note: these endpoints are called automatically by the pre-built environment worker provided in the SDKs and CLI, for orchestrating sessions with self-hosted sandbox environments. They are included here as a reference; you do not need to invoke them directly.<br /><br />Long poll for work items in the queue.</td>
 </tr>
 <tr>
     <td><a href="#ack"><CopyableCode code="ack" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a>, <a href="#parameter-work_id"><code>work_id</code></a></td>
-    <td><a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-authorization"><code>authorization</code></a></td>
+    <td></td>
     <td>Note: these endpoints are called automatically by the pre-built environment worker provided in the SDKs and CLI, for orchestrating sessions with self-hosted sandbox environments. They are included here as a reference; you do not need to invoke them directly.<br /><br />Acknowledge receipt of a work item, transitioning it from 'queued' to 'starting' and removing it from the queue.</td>
 </tr>
 <tr>
     <td><a href="#heartbeat"><CopyableCode code="heartbeat" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a>, <a href="#parameter-work_id"><code>work_id</code></a></td>
-    <td><a href="#parameter-desired_ttl_seconds"><code>desired_ttl_seconds</code></a>, <a href="#parameter-expected_last_heartbeat"><code>expected_last_heartbeat</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-authorization"><code>authorization</code></a></td>
+    <td><a href="#parameter-desired_ttl_seconds"><code>desired_ttl_seconds</code></a>, <a href="#parameter-expected_last_heartbeat"><code>expected_last_heartbeat</code></a></td>
     <td>Note: these endpoints are called automatically by the pre-built environment worker provided in the SDKs and CLI, for orchestrating sessions with self-hosted sandbox environments. They are included here as a reference; you do not need to invoke them directly.<br /><br />Record a heartbeat for a work item to maintain the lease.</td>
 </tr>
 <tr>
     <td><a href="#stop"><CopyableCode code="stop" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a>, <a href="#parameter-work_id"><code>work_id</code></a></td>
-    <td><a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-authorization"><code>authorization</code></a></td>
+    <td></td>
     <td>Note: these endpoints are called automatically by the pre-built environment worker provided in the SDKs and CLI, for orchestrating sessions with self-hosted sandbox environments. They are included here as a reference; you do not need to invoke them directly.<br /><br />Stop a work item, initiating graceful or forced shutdown.</td>
 </tr>
 </tbody>
@@ -286,26 +286,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td></td>
 </tr>
-<tr id="parameter-Anthropic-Worker-ID">
-    <td><CopyableCode code="Anthropic-Worker-ID" /></td>
-    <td><code>string</code></td>
-    <td>Unique identifier for the specific worker polling, used to track aggregated environment-level work metrics in Console</td>
-</tr>
-<tr id="parameter-anthropic-beta">
-    <td><CopyableCode code="anthropic-beta" /></td>
-    <td><code>string</code></td>
-    <td>Optional header to specify the beta version(s) you want to use.  To use multiple betas, use a comma separated list like `beta1,beta2` or specify the header multiple times for each beta.</td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td>The version of the Claude API you want to use.  Read more about versioning and our version history [here](https://platform.claude.com/docs/en/api/versioning).</td>
-</tr>
-<tr id="parameter-authorization">
-    <td><CopyableCode code="authorization" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
 <tr id="parameter-block_ms">
     <td><CopyableCode code="block_ms" /></td>
     <td><code>integer</code></td>
@@ -321,25 +301,10 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Expected last_heartbeat for conditional update (optimistic concurrency). Use literal 'NO_HEARTBEAT' to claim an unclaimed lease (first heartbeat). For subsequent heartbeats, echo the server's previous last_heartbeat value exactly. Returns 412 Precondition Failed if the actual value doesn't match.</td>
 </tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer</code></td>
-    <td>Maximum number of work items to return</td>
-</tr>
-<tr id="parameter-page">
-    <td><CopyableCode code="page" /></td>
-    <td><code>string</code></td>
-    <td>Opaque cursor from previous response for pagination</td>
-</tr>
 <tr id="parameter-reclaim_older_than_ms">
     <td><CopyableCode code="reclaim_older_than_ms" /></td>
     <td><code>integer</code></td>
     <td>Reclaim unacknowledged work items older than this many milliseconds. If omitted, uses the default (5000ms).</td>
-</tr>
-<tr id="parameter-x-api-key">
-    <td><CopyableCode code="x-api-key" /></td>
-    <td><code>string</code></td>
-    <td></td>
 </tr>
 </tbody>
 </table>
@@ -374,7 +339,6 @@ type
 FROM anthropic.environments.work_items
 WHERE environment_id = '{{ environment_id }}' -- required
 AND work_id = '{{ work_id }}' -- required
-AND "x-api-key" = '{{ x-api-key }}'
 ;
 ```
 </TabItem>
@@ -398,9 +362,6 @@ stopped_at,
 type
 FROM anthropic.environments.work_items
 WHERE environment_id = '{{ environment_id }}' -- required
-AND limit = '{{ limit }}'
-AND page = '{{ page }}'
-AND authorization = '{{ authorization }}'
 ;
 ```
 </TabItem>
@@ -464,11 +425,7 @@ Note: these endpoints are called automatically by the pre-built environment work
 EXEC anthropic.environments.work_items.poll 
 @environment_id='{{ environment_id }}' --required, 
 @block_ms='{{ block_ms }}', 
-@reclaim_older_than_ms='{{ reclaim_older_than_ms }}', 
-@anthropic-beta='{{ anthropic-beta }}', 
-@anthropic-version='{{ anthropic-version }}', 
-@Anthropic-Worker-ID='{{ Anthropic-Worker-ID }}', 
-@authorization='{{ authorization }}'
+@reclaim_older_than_ms='{{ reclaim_older_than_ms }}'
 ;
 ```
 </TabItem>
@@ -479,10 +436,7 @@ Note: these endpoints are called automatically by the pre-built environment work
 ```sql
 EXEC anthropic.environments.work_items.ack 
 @environment_id='{{ environment_id }}' --required, 
-@work_id='{{ work_id }}' --required, 
-@anthropic-beta='{{ anthropic-beta }}', 
-@anthropic-version='{{ anthropic-version }}', 
-@authorization='{{ authorization }}'
+@work_id='{{ work_id }}' --required
 ;
 ```
 </TabItem>
@@ -495,10 +449,7 @@ EXEC anthropic.environments.work_items.heartbeat
 @environment_id='{{ environment_id }}' --required, 
 @work_id='{{ work_id }}' --required, 
 @desired_ttl_seconds='{{ desired_ttl_seconds }}', 
-@expected_last_heartbeat='{{ expected_last_heartbeat }}', 
-@anthropic-beta='{{ anthropic-beta }}', 
-@anthropic-version='{{ anthropic-version }}', 
-@authorization='{{ authorization }}'
+@expected_last_heartbeat='{{ expected_last_heartbeat }}'
 ;
 ```
 </TabItem>
@@ -509,10 +460,7 @@ Note: these endpoints are called automatically by the pre-built environment work
 ```sql
 EXEC anthropic.environments.work_items.stop 
 @environment_id='{{ environment_id }}' --required, 
-@work_id='{{ work_id }}' --required, 
-@anthropic-beta='{{ anthropic-beta }}', 
-@anthropic-version='{{ anthropic-version }}', 
-@authorization='{{ authorization }}' 
+@work_id='{{ work_id }}' --required
 @@json=
 '{
 "force": {{ force }}

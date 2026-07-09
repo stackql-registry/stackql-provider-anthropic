@@ -131,28 +131,28 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-user_id"><code>user_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Get an organization member by ID.</td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-before_id"><code>before_id</code></a>, <a href="#parameter-after_id"><code>after_id</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-email"><code>email</code></a></td>
+    <td><a href="#parameter-before_id"><code>before_id</code></a>, <a href="#parameter-after_id"><code>after_id</code></a>, <a href="#parameter-email"><code>email</code></a></td>
     <td>List members of the organization.</td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-user_id"><code>user_id</code></a>, <a href="#parameter-role"><code>role</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Update an organization member's role. The role cannot be set to `admin` via the API.</td>
 </tr>
 <tr>
     <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-user_id"><code>user_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Remove a member from the organization. Members with the `admin` role cannot be removed via the API.</td>
 </tr>
 </tbody>
@@ -181,11 +181,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>ID of the object to use as a cursor for pagination. Returns the page of results immediately after this object.</td>
 </tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td>The version of the Claude API you want to use.</td>
-</tr>
 <tr id="parameter-before_id">
     <td><CopyableCode code="before_id" /></td>
     <td><code>string</code></td>
@@ -195,11 +190,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="email" /></td>
     <td><code>string</code></td>
     <td>Filter by user email.</td>
-</tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer</code></td>
-    <td>Number of items to return per page. Defaults to 20; ranges from 1 to 1000.</td>
 </tr>
 </tbody>
 </table>
@@ -245,7 +235,6 @@ type
 FROM anthropic_admin.organization.users
 WHERE before_id = '{{ before_id }}'
 AND after_id = '{{ after_id }}'
-AND limit = '{{ limit }}'
 AND email = '{{ email }}'
 ;
 ```

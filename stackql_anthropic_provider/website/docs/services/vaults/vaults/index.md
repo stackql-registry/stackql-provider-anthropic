@@ -145,42 +145,42 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-vault_id"><code>vault_id</code></a></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-page"><code>page</code></a>, <a href="#parameter-include_archived"><code>include_archived</code></a></td>
+    <td><a href="#parameter-include_archived"><code>include_archived</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-display_name"><code>display_name</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-vault_id"><code>vault_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-vault_id"><code>vault_id</code></a></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#archive"><CopyableCode code="archive" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-vault_id"><code>vault_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 </tbody>
@@ -204,35 +204,10 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Path parameter vault_id (example: vlt_011CZkZDLs7fYzm1hXNPeRjv)</td>
 </tr>
-<tr id="parameter-anthropic-beta">
-    <td><CopyableCode code="anthropic-beta" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
 <tr id="parameter-include_archived">
     <td><CopyableCode code="include_archived" /></td>
     <td><code>boolean</code></td>
     <td>Whether to include archived vaults in the results.</td>
-</tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer (int32)</code></td>
-    <td>Maximum number of vaults to return per page. Defaults to 20, maximum 100.</td>
-</tr>
-<tr id="parameter-page">
-    <td><CopyableCode code="page" /></td>
-    <td><code>string</code></td>
-    <td>Opaque pagination token from a previous `list_vaults` response.</td>
-</tr>
-<tr id="parameter-x-api-key">
-    <td><CopyableCode code="x-api-key" /></td>
-    <td><code>string</code></td>
-    <td></td>
 </tr>
 </tbody>
 </table>
@@ -261,7 +236,6 @@ type,
 updated_at
 FROM anthropic.vaults.vaults
 WHERE vault_id = '{{ vault_id }}' -- required
-AND "x-api-key" = '{{ x-api-key }}'
 ;
 ```
 </TabItem>
@@ -279,10 +253,7 @@ metadata,
 type,
 updated_at
 FROM anthropic.vaults.vaults
-WHERE "x-api-key" = '{{ x-api-key }}'
-AND limit = '{{ limit }}'
-AND page = '{{ page }}'
-AND include_archived = '{{ include_archived }}'
+WHERE include_archived = '{{ include_archived }}'
 ;
 ```
 </TabItem>
@@ -305,15 +276,11 @@ No description available.
 ```sql
 INSERT INTO anthropic.vaults.vaults (
 display_name,
-metadata,
-anthropic-version,
-anthropic-beta
+metadata
 )
 SELECT 
 '{{ display_name }}' /* required */,
-'{{ metadata }}',
-'{{ anthropic-version }}',
-'{{ anthropic-beta }}'
+'{{ metadata }}'
 RETURNING
 id,
 display_name,
@@ -338,10 +305,6 @@ updated_at
       value: "{{ metadata }}"
       description: |
         Arbitrary key-value metadata to attach to the vault. Maximum 16 pairs, keys up to 64 chars, values up to 512 chars.
-    - name: anthropic-version
-      value: "{{ anthropic-version }}"
-    - name: anthropic-beta
-      value: "{{ anthropic-beta }}"
 `}</CodeBlock>
 
 </TabItem>
@@ -395,7 +358,6 @@ No description available.
 ```sql
 DELETE FROM anthropic.vaults.vaults
 WHERE vault_id = '{{ vault_id }}' --required
-AND "x-api-key" = '{{ x-api-key }}'
 ;
 ```
 </TabItem>
@@ -416,9 +378,7 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.vaults.vaults.archive 
-@vault_id='{{ vault_id }}' --required, 
-@anthropic-version='{{ anthropic-version }}', 
-@anthropic-beta='{{ anthropic-beta }}'
+@vault_id='{{ vault_id }}' --required
 ;
 ```
 </TabItem>

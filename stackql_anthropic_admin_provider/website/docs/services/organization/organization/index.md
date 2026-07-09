@@ -80,7 +80,7 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Retrieve information about the organization associated with the authenticated Admin API key.</td>
 </tr>
 </tbody>
@@ -88,24 +88,8 @@ The following methods are available for this resource:
 
 ## Parameters
 
-Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#methods) section to see which parameters are required or optional for each operation.
+This resource's methods take no path, query, or request-body parameters; authentication and API-version headers are handled automatically.
 
-<table>
-<thead>
-    <tr>
-    <th>Name</th>
-    <th>Datatype</th>
-    <th>Description</th>
-    </tr>
-</thead>
-<tbody>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td>The version of the Claude API you want to use.</td>
-</tr>
-</tbody>
-</table>
 
 ## `SELECT` examples
 

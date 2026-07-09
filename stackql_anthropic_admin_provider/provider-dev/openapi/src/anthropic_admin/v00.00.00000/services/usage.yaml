@@ -335,6 +335,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
       sqlVerbs:
         select:
           - $ref: "#/components/x-stackQL-resources/usage_reports/methods/list"
@@ -362,6 +365,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
       sqlVerbs:
         select:
           - $ref: "#/components/x-stackQL-resources/claude_code_reports/methods/list"

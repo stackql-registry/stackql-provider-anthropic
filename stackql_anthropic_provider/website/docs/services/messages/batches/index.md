@@ -225,42 +225,42 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-message_batch_id"><code>message_batch_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-x-api-key"><code>x-api-key</code></a></td>
+    <td></td>
     <td>This endpoint is idempotent and can be used to poll for Message Batch completion. To access the results of a Message Batch, make a request to the `results_url` field in the response.<br /><br />Learn more about the Message Batches API in our [user guide](https://platform.claude.com/docs/en/build-with-claude/batch-processing)</td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-before_id"><code>before_id</code></a>, <a href="#parameter-after_id"><code>after_id</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-x-api-key"><code>x-api-key</code></a></td>
+    <td><a href="#parameter-before_id"><code>before_id</code></a>, <a href="#parameter-after_id"><code>after_id</code></a></td>
     <td>List all Message Batches within a Workspace. Most recently created batches are returned first.<br /><br />Learn more about the Message Batches API in our [user guide](https://platform.claude.com/docs/en/build-with-claude/batch-processing)</td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-requests"><code>requests</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-user-profile-id"><code>anthropic-user-profile-id</code></a></td>
+    <td></td>
     <td>Send a batch of Message creation requests.<br /><br />The Message Batches API can be used to process multiple Messages API requests at once. Once a Message Batch is created, it begins processing immediately. Batches can take up to 24 hours to complete.<br /><br />Learn more about the Message Batches API in our [user guide](https://platform.claude.com/docs/en/build-with-claude/batch-processing)</td>
 </tr>
 <tr>
     <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-message_batch_id"><code>message_batch_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-x-api-key"><code>x-api-key</code></a></td>
+    <td></td>
     <td>Delete a Message Batch.<br /><br />Message Batches can only be deleted once they've finished processing. If you'd like to delete an in-progress batch, you must first cancel it.<br /><br />Learn more about the Message Batches API in our [user guide](https://platform.claude.com/docs/en/build-with-claude/batch-processing)</td>
 </tr>
 <tr>
     <td><a href="#cancel"><CopyableCode code="cancel" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-message_batch_id"><code>message_batch_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Batches may be canceled any time before processing ends. Once cancellation is initiated, the batch enters a `canceling` state, at which time the system may complete any in-progress, non-interruptible requests before finalizing cancellation.<br /><br />The number of canceled requests is specified in `request_counts`. To determine which requests were canceled, check the individual results within the batch. Note that cancellation may not result in any canceled requests if they were non-interruptible.<br /><br />Learn more about the Message Batches API in our [user guide](https://platform.claude.com/docs/en/build-with-claude/batch-processing)</td>
 </tr>
 <tr>
     <td><a href="#results"><CopyableCode code="results" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-message_batch_id"><code>message_batch_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-x-api-key"><code>x-api-key</code></a></td>
+    <td></td>
     <td>Streams the results of a Message Batch as a `.jsonl` file.<br /><br />Each line in the file is a JSON object containing the result of a single request in the Message Batch. Results are not guaranteed to be in the same order as requests. Use the `custom_id` field to match results to requests.<br /><br />Learn more about the Message Batches API in our [user guide](https://platform.claude.com/docs/en/build-with-claude/batch-processing)</td>
 </tr>
 </tbody>
@@ -289,30 +289,10 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>ID of the object to use as a cursor for pagination. When provided, returns the page of results immediately after this object.</td>
 </tr>
-<tr id="parameter-anthropic-user-profile-id">
-    <td><CopyableCode code="anthropic-user-profile-id" /></td>
-    <td><code>string</code></td>
-    <td>The user profile ID to attribute the requests in this batch to. Use when acting on behalf of a party other than your organization. Requires the `user-profiles` beta header. Applies to every request in the batch; an individual request whose `user_profile_id` body field conflicts with this header is errored.</td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td>The version of the Claude API you want to use.  Read more about versioning and our version history [here](https://platform.claude.com/docs/en/api/versioning).</td>
-</tr>
 <tr id="parameter-before_id">
     <td><CopyableCode code="before_id" /></td>
     <td><code>string</code></td>
     <td>ID of the object to use as a cursor for pagination. When provided, returns the page of results immediately before this object.</td>
-</tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer</code></td>
-    <td>Number of items to return per page.  Defaults to `20`. Ranges from `1` to `1000`.</td>
-</tr>
-<tr id="parameter-x-api-key">
-    <td><CopyableCode code="x-api-key" /></td>
-    <td><code>string</code></td>
-    <td>Your unique API key for authentication.  This key is required in the header of all API requests, to authenticate your account and access Anthropic's services. Get your API key through the [Console](https://console.anthropic.com/settings/keys). Each key is scoped to a Workspace.</td>
 </tr>
 </tbody>
 </table>
@@ -344,7 +324,6 @@ results_url,
 type
 FROM anthropic.messages.batches
 WHERE message_batch_id = '{{ message_batch_id }}' -- required
-AND "x-api-key" = '{{ x-api-key }}'
 ;
 ```
 </TabItem>
@@ -367,8 +346,6 @@ type
 FROM anthropic.messages.batches
 WHERE before_id = '{{ before_id }}'
 AND after_id = '{{ after_id }}'
-AND limit = '{{ limit }}'
-AND "x-api-key" = '{{ x-api-key }}'
 ;
 ```
 </TabItem>
@@ -390,14 +367,10 @@ Send a batch of Message creation requests.<br /><br />The Message Batches API ca
 
 ```sql
 INSERT INTO anthropic.messages.batches (
-requests,
-anthropic-version,
-anthropic-user-profile-id
+requests
 )
 SELECT 
-'{{ requests }}' /* required */,
-'{{ anthropic-version }}',
-'{{ anthropic-user-profile-id }}'
+'{{ requests }}' /* required */
 RETURNING
 id,
 archived_at,
@@ -456,14 +429,6 @@ type
               - "{{ tools }}"
             top_k: {{ top_k }}
             top_p: {{ top_p }}
-    - name: anthropic-version
-      value: "{{ anthropic-version }}"
-      description: The version of the Claude API you want to use.  Read more about versioning and our version history [here](https://platform.claude.com/docs/en/api/versioning).
-      description: The version of the Claude API you want to use.  Read more about versioning and our version history [here](https://platform.claude.com/docs/en/api/versioning).
-    - name: anthropic-user-profile-id
-      value: "{{ anthropic-user-profile-id }}"
-      description: The user profile ID to attribute the requests in this batch to. Use when acting on behalf of a party other than your organization. Requires the \`user-profiles\` beta header. Applies to every request in the batch; an individual request whose \`user_profile_id\` body field conflicts with this header is errored.
-      description: The user profile ID to attribute the requests in this batch to. Use when acting on behalf of a party other than your organization. Requires the \`user-profiles\` beta header. Applies to every request in the batch; an individual request whose \`user_profile_id\` body field conflicts with this header is errored.
 `}</CodeBlock>
 
 </TabItem>
@@ -485,7 +450,6 @@ Delete a Message Batch.<br /><br />Message Batches can only be deleted once they
 ```sql
 DELETE FROM anthropic.messages.batches
 WHERE message_batch_id = '{{ message_batch_id }}' --required
-AND "x-api-key" = '{{ x-api-key }}'
 ;
 ```
 </TabItem>
@@ -507,8 +471,7 @@ Batches may be canceled any time before processing ends. Once cancellation is in
 
 ```sql
 EXEC anthropic.messages.batches.cancel 
-@message_batch_id='{{ message_batch_id }}' --required, 
-@anthropic-version='{{ anthropic-version }}'
+@message_batch_id='{{ message_batch_id }}' --required
 ;
 ```
 </TabItem>
@@ -518,9 +481,7 @@ Streams the results of a Message Batch as a `.jsonl` file.<br /><br />Each line 
 
 ```sql
 EXEC anthropic.messages.batches.results 
-@message_batch_id='{{ message_batch_id }}' --required, 
-@anthropic-version='{{ anthropic-version }}', 
-@x-api-key='{{ x-api-key }}'
+@message_batch_id='{{ message_batch_id }}' --required
 ;
 ```
 </TabItem>

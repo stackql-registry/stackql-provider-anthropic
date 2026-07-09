@@ -1,0 +1,54 @@
+# Curated "Query Example" SQL for body-bearing SELECT methods (POST-as-SELECT
+# inference ops). Consumed by factory/enrich-select-docs.mjs, which renders each
+# method's SELECT example as nested tabs: "Query Shape" (mechanically derived,
+# placeholders + optional body params) and "Query Example" (the complete,
+# runnable query below, showing the nested JSON body values).
+#
+# Keyed <service>.<resource>.<method> under the provider id. Every query was
+# run live against api.anthropic.com (2026-07-09, stackql v0.10.542). Wire
+# rules the examples must respect:
+#   - integer literals reach the JSON body as numbers; FLOAT literals arrive
+#     as strings and are rejected (so no temperature/top_p in examples);
+#   - JSON array/object values fan out from single-quoted strings, but only
+#     when the string is VALID JSON — backslash escapes (\n) are interpreted
+#     by the SQL parser first and break it, so avoid them;
+#   - content[0] is only reliably a text block when thinking is disabled
+#     (claude-sonnet-5 can otherwise lead with a thinking block) — the example
+#     pins `thinking = '{"type": "disabled"}'` so JSON_EXTRACT($[0].text) is
+#     deterministic.
+anthropic:
+  messages.messages.create: |
+    SELECT
+    id,
+    model,
+    stop_reason,
+    JSON_EXTRACT(content, '$[0].text') AS assistant_message,
+    JSON_EXTRACT(usage, '$.output_tokens') AS output_tokens
+    FROM anthropic.messages.messages
+    WHERE model = 'claude-sonnet-5'
+    AND max_tokens = 2048
+    AND messages = '[
+      {
+        "role": "user",
+        "content": "how does stackql work?"
+      }
+    ]'
+    AND system = 'You are a technical assistant. Answer in one short paragraph.'
+    AND thinking = '{"type": "disabled"}'
+    AND metadata = '{"user_id": "stackql-docs-example"}'
+    AND stop_sequences = '["<END>"]'
+    ;
+  messages.token_counts.count_tokens: |
+    SELECT
+    input_tokens
+    FROM anthropic.messages.token_counts
+    WHERE model = 'claude-sonnet-5'
+    AND messages = '[
+      {
+        "role": "user",
+        "content": "how does stackql work?"
+      }
+    ]'
+    AND system = 'You are a technical assistant. Answer concisely.'
+    ;
+anthropic_admin: {}

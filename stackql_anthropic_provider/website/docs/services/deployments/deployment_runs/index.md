@@ -237,14 +237,14 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-deployment_run_id"><code>deployment_run_id</code></a></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-page"><code>page</code></a>, <a href="#parameter-deployment_id"><code>deployment_id</code></a>, <a href="#parameter-trigger_type"><code>trigger_type</code></a>, <a href="#parameter-has_error"><code>has_error</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-created_at[gt]"><code>created_at[gt]</code></a>, <a href="#parameter-created_at[lt]"><code>created_at[lt]</code></a></td>
+    <td><a href="#parameter-deployment_id"><code>deployment_id</code></a>, <a href="#parameter-trigger_type"><code>trigger_type</code></a>, <a href="#parameter-has_error"><code>has_error</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-created_at[gt]"><code>created_at[gt]</code></a>, <a href="#parameter-created_at[lt]"><code>created_at[lt]</code></a></td>
     <td></td>
 </tr>
 </tbody>
@@ -267,16 +267,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="deployment_run_id" /></td>
     <td><code>string</code></td>
     <td>Path parameter deployment_run_id</td>
-</tr>
-<tr id="parameter-anthropic-beta">
-    <td><CopyableCode code="anthropic-beta" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td></td>
 </tr>
 <tr id="parameter-created_at[gt]">
     <td><CopyableCode code="created_at[gt]" /></td>
@@ -308,25 +298,10 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>boolean</code></td>
     <td>Filter: true for runs with non-null error, false for runs with non-null session_id. Omit for all.</td>
 </tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer (int32)</code></td>
-    <td>Maximum results per page. Default 20, maximum 1000.</td>
-</tr>
-<tr id="parameter-page">
-    <td><CopyableCode code="page" /></td>
-    <td><code>string</code></td>
-    <td>Opaque pagination cursor. Pass next_page from the previous response. Invalid or expired cursors return 400.</td>
-</tr>
 <tr id="parameter-trigger_type">
     <td><CopyableCode code="trigger_type" /></td>
     <td><code>string</code></td>
     <td>Filter runs by what triggered them. Omit to return all runs.</td>
-</tr>
-<tr id="parameter-x-api-key">
-    <td><CopyableCode code="x-api-key" /></td>
-    <td><code>string</code></td>
-    <td></td>
 </tr>
 </tbody>
 </table>
@@ -356,7 +331,6 @@ trigger_context,
 type
 FROM anthropic.deployments.deployment_runs
 WHERE deployment_run_id = '{{ deployment_run_id }}' -- required
-AND "x-api-key" = '{{ x-api-key }}'
 ;
 ```
 </TabItem>
@@ -375,10 +349,7 @@ error,
 trigger_context,
 type
 FROM anthropic.deployments.deployment_runs
-WHERE "x-api-key" = '{{ x-api-key }}'
-AND limit = '{{ limit }}'
-AND page = '{{ page }}'
-AND deployment_id = '{{ deployment_id }}'
+WHERE deployment_id = '{{ deployment_id }}'
 AND trigger_type = '{{ trigger_type }}'
 AND has_error = '{{ has_error }}'
 AND "created_at[gte]" = '{{ created_at[gte] }}'

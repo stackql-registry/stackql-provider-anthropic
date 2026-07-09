@@ -147,7 +147,7 @@ The following methods are available for this resource:
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-starting_at"><code>starting_at</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-ending_at"><code>ending_at</code></a>, <a href="#parameter-bucket_width"><code>bucket_width</code></a>, <a href="#parameter-group_by[]"><code>group_by[]</code></a>, <a href="#parameter-account_ids[]"><code>account_ids[]</code></a>, <a href="#parameter-api_key_ids[]"><code>api_key_ids[]</code></a>, <a href="#parameter-workspace_ids[]"><code>workspace_ids[]</code></a>, <a href="#parameter-models[]"><code>models[]</code></a>, <a href="#parameter-service_tiers[]"><code>service_tiers[]</code></a>, <a href="#parameter-service_account_ids[]"><code>service_account_ids[]</code></a>, <a href="#parameter-context_window[]"><code>context_window[]</code></a>, <a href="#parameter-inference_geos[]"><code>inference_geos[]</code></a>, <a href="#parameter-speeds[]"><code>speeds[]</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-page"><code>page</code></a></td>
+    <td><a href="#parameter-ending_at"><code>ending_at</code></a>, <a href="#parameter-bucket_width"><code>bucket_width</code></a>, <a href="#parameter-group_by[]"><code>group_by[]</code></a>, <a href="#parameter-account_ids[]"><code>account_ids[]</code></a>, <a href="#parameter-api_key_ids[]"><code>api_key_ids[]</code></a>, <a href="#parameter-workspace_ids[]"><code>workspace_ids[]</code></a>, <a href="#parameter-models[]"><code>models[]</code></a>, <a href="#parameter-service_tiers[]"><code>service_tiers[]</code></a>, <a href="#parameter-service_account_ids[]"><code>service_account_ids[]</code></a>, <a href="#parameter-context_window[]"><code>context_window[]</code></a>, <a href="#parameter-inference_geos[]"><code>inference_geos[]</code></a>, <a href="#parameter-speeds[]"><code>speeds[]</code></a></td>
     <td>Get a Messages API usage report bucketed by time, optionally grouped and filtered. Each row is a time bucket carrying a `results` array with one item per group combination.</td>
 </tr>
 </tbody>
@@ -175,16 +175,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="account_ids[]" /></td>
     <td><code>array</code></td>
     <td>Restrict usage returned to the specified user account ID(s).</td>
-</tr>
-<tr id="parameter-anthropic-beta">
-    <td><CopyableCode code="anthropic-beta" /></td>
-    <td><code>string</code></td>
-    <td>Optional beta version header. Grouping or filtering by `speed` requires `fast-mode-2026-02-01`; no default is stamped so standard reports stay on the GA surface.</td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td>The version of the Claude API you want to use.</td>
 </tr>
 <tr id="parameter-api_key_ids[]">
     <td><CopyableCode code="api_key_ids[]" /></td>
@@ -216,20 +206,10 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>array</code></td>
     <td>Restrict usage returned to the specified inference geo(s) - `global`, `us`, or `not_available`.</td>
 </tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer</code></td>
-    <td>Maximum number of time buckets to return. Defaults 7 (`1d`), 24 (`1h`), 60 (`1m`); maxima 31/168/1440.</td>
-</tr>
 <tr id="parameter-models[]">
     <td><CopyableCode code="models[]" /></td>
     <td><code>array</code></td>
     <td>Restrict usage returned to the specified model(s).</td>
-</tr>
-<tr id="parameter-page">
-    <td><CopyableCode code="page" /></td>
-    <td><code>string</code></td>
-    <td>Optionally set to the `next_page` token from the previous response.</td>
 </tr>
 <tr id="parameter-service_account_ids[]">
     <td><CopyableCode code="service_account_ids[]" /></td>
@@ -285,8 +265,6 @@ AND "service_account_ids[]" = '{{ service_account_ids[] }}'
 AND "context_window[]" = '{{ context_window[] }}'
 AND "inference_geos[]" = '{{ inference_geos[] }}'
 AND "speeds[]" = '{{ speeds[] }}'
-AND limit = '{{ limit }}'
-AND page = '{{ page }}'
 ;
 ```
 </TabItem>

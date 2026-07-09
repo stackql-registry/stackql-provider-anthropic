@@ -25,7 +25,15 @@
 //      array property. Applied ONLY to exec-only methods (never referenced
 //      from sqlVerbs) that match either failure shape — methods whose
 //      schemas already carry an array property are left untouched.
-//   4. re-dump every YAML with YAML 1.1 keyword quoting (stackql's Go YAML
+//   4. LIMIT pushdown (wire-verified against stackql v0.10.542): every
+//      method whose operation carries a `limit` query param gets
+//      `config.queryParamPushdown: {top: {paramName: limit[, maxValue]}}`
+//      — SQL `LIMIT n` is then pushed to the wire as `limit=n` (clamped to
+//      the param schema's `maximum` when declared) while stackql's
+//      client-side LIMIT remains authoritative. The `limit` param itself is
+//      suppressed from the user docs by scrub-docs (API primitive beneath
+//      the SQL surface).
+//   5. re-dump every YAML with YAML 1.1 keyword quoting (stackql's Go YAML
 //      parser is YAML 1.1: bare `y`/`yes`/`no`/`on`/`off` strings would
 //      silently become booleans).
 
@@ -74,7 +82,7 @@ const EXEC_ENVELOPE = {
   },
 };
 
-let bodyStamped = 0, paginationStamped = 0, execOverrides = 0;
+let bodyStamped = 0, paginationStamped = 0, execOverrides = 0, pushdownStamped = 0;
 for (const f of fs.readdirSync(servicesDir).filter((x) => /\.ya?ml$/.test(x))) {
   const p = path.join(servicesDir, f);
   const spec = YAML.parse(fs.readFileSync(p, 'utf8'));
@@ -131,6 +139,17 @@ for (const f of fs.readdirSync(servicesDir).filter((x) => /\.ya?ml$/.test(x))) {
           paginationStamped++;
         }
       }
+
+      // 4. LIMIT pushdown on limit-bearing methods
+      const limitParam = (op.parameters || []).find((x) => x.in === 'query' && x.name === 'limit');
+      if (limitParam) {
+        const maximum = schemaOf(spec, limitParam.schema)?.maximum;
+        method.config = method.config || {};
+        method.config.queryParamPushdown = {
+          top: { paramName: 'limit', ...(Number.isFinite(maximum) ? { maxValue: maximum } : {}) },
+        };
+        pushdownStamped++;
+      }
     }
   }
   fs.writeFileSync(p, dump(spec));
@@ -140,4 +159,4 @@ for (const f of fs.readdirSync(servicesDir).filter((x) => /\.ya?ml$/.test(x))) {
 const providerYamlPath = path.join(providerRoot, 'provider.yaml');
 fs.writeFileSync(providerYamlPath, dump(YAML.parse(fs.readFileSync(providerYamlPath, 'utf8'))));
 
-console.log(`post-pass: ${bodyStamped} body-bearing methods bound, ${paginationStamped} cursor lists paginated, ${execOverrides} exec response overrides`);
+console.log(`post-pass: ${bodyStamped} body-bearing methods bound, ${paginationStamped} cursor lists paginated, ${execOverrides} exec response overrides, ${pushdownStamped} LIMIT pushdowns`);

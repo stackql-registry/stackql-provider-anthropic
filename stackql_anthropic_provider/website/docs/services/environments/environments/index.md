@@ -323,42 +323,42 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a></td>
-    <td><a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-x-api-key"><code>x-api-key</code></a></td>
+    <td></td>
     <td>Retrieve a specific environment by ID.</td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-page"><code>page</code></a>, <a href="#parameter-include_archived"><code>include_archived</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-x-api-key"><code>x-api-key</code></a></td>
+    <td><a href="#parameter-include_archived"><code>include_archived</code></a></td>
     <td>List environments with pagination support.</td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-name"><code>name</code></a></td>
-    <td><a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Create a new environment with the specified configuration.</td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a></td>
-    <td><a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Update an existing environment's configuration.</td>
 </tr>
 <tr>
     <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a></td>
-    <td><a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-x-api-key"><code>x-api-key</code></a></td>
+    <td></td>
     <td>Delete an environment by ID. Returns a confirmation of the deletion.</td>
 </tr>
 <tr>
     <td><a href="#archive"><CopyableCode code="archive" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a></td>
-    <td><a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Archive an environment by ID. Archived environments cannot be used to create new sessions.</td>
 </tr>
 </tbody>
@@ -382,35 +382,10 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td> (example: env_011CZkZ9X2dpNyB7HsEFoRfW)</td>
 </tr>
-<tr id="parameter-anthropic-beta">
-    <td><CopyableCode code="anthropic-beta" /></td>
-    <td><code>string</code></td>
-    <td>Optional header to specify the beta version(s) you want to use.  To use multiple betas, use a comma separated list like `beta1,beta2` or specify the header multiple times for each beta.</td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td>The version of the Claude API you want to use.  Read more about versioning and our version history [here](https://platform.claude.com/docs/en/api/versioning).</td>
-</tr>
 <tr id="parameter-include_archived">
     <td><CopyableCode code="include_archived" /></td>
     <td><code>boolean</code></td>
     <td>Include archived environments in the response</td>
-</tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer</code></td>
-    <td>Maximum number of environments to return</td>
-</tr>
-<tr id="parameter-page">
-    <td><CopyableCode code="page" /></td>
-    <td><code>string</code></td>
-    <td>Opaque cursor from previous response for pagination. Pass the `next_page` value from the previous response.</td>
-</tr>
-<tr id="parameter-x-api-key">
-    <td><CopyableCode code="x-api-key" /></td>
-    <td><code>string</code></td>
-    <td></td>
 </tr>
 </tbody>
 </table>
@@ -442,7 +417,6 @@ type,
 updated_at
 FROM anthropic.environments.environments
 WHERE environment_id = '{{ environment_id }}' -- required
-AND "x-api-key" = '{{ x-api-key }}'
 ;
 ```
 </TabItem>
@@ -463,10 +437,7 @@ scope,
 type,
 updated_at
 FROM anthropic.environments.environments
-WHERE limit = '{{ limit }}'
-AND page = '{{ page }}'
-AND include_archived = '{{ include_archived }}'
-AND "x-api-key" = '{{ x-api-key }}'
+WHERE include_archived = '{{ include_archived }}'
 ;
 ```
 </TabItem>
@@ -492,18 +463,14 @@ config,
 description,
 metadata,
 name,
-scope,
-anthropic-beta,
-anthropic-version
+scope
 )
 SELECT 
 '{{ config }}',
 '{{ description }}',
 '{{ metadata }}',
 '{{ name }}' /* required */,
-'{{ scope }}',
-'{{ anthropic-beta }}',
-'{{ anthropic-version }}'
+'{{ scope }}'
 RETURNING
 id,
 name,
@@ -544,14 +511,6 @@ updated_at
       description: |
         The visibility scope for this environment. 'organization' makes the environment visible to all accounts. 'account' restricts visibility to the owning account only. Only applicable for self-hosted environments. If not specified, defaults based on organization type.
       valid_values: ['organization', 'account']
-    - name: anthropic-beta
-      value: "{{ anthropic-beta }}"
-      description: Optional header to specify the beta version(s) you want to use.  To use multiple betas, use a comma separated list like \`beta1,beta2\` or specify the header multiple times for each beta.
-      description: Optional header to specify the beta version(s) you want to use.  To use multiple betas, use a comma separated list like \`beta1,beta2\` or specify the header multiple times for each beta.
-    - name: anthropic-version
-      value: "{{ anthropic-version }}"
-      description: The version of the Claude API you want to use.  Read more about versioning and our version history [here](https://platform.claude.com/docs/en/api/versioning).
-      description: The version of the Claude API you want to use.  Read more about versioning and our version history [here](https://platform.claude.com/docs/en/api/versioning).
 `}</CodeBlock>
 
 </TabItem>
@@ -611,7 +570,6 @@ Delete an environment by ID. Returns a confirmation of the deletion.
 ```sql
 DELETE FROM anthropic.environments.environments
 WHERE environment_id = '{{ environment_id }}' --required
-AND "x-api-key" = '{{ x-api-key }}'
 ;
 ```
 </TabItem>
@@ -632,9 +590,7 @@ Archive an environment by ID. Archived environments cannot be used to create new
 
 ```sql
 EXEC anthropic.environments.environments.archive 
-@environment_id='{{ environment_id }}' --required, 
-@anthropic-beta='{{ anthropic-beta }}', 
-@anthropic-version='{{ anthropic-version }}'
+@environment_id='{{ environment_id }}' --required
 ;
 ```
 </TabItem>

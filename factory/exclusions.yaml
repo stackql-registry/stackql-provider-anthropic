@@ -60,3 +60,10 @@ beta_duplicates_of_ga:
     reason: beta duplicate of GA models_list
   - op: GET /v1/models/{model_id}?beta=true
     reason: beta duplicate of GA models_get
+
+hard_deprecated:
+  # Endpoints the API rejects outright — mapped to `skip_this_resource` in the
+  # CSV (verified live 2026-07-09: 400 "The /v1/complete endpoint has been
+  # deprecated. Please use the /v1/messages endpoint instead.").
+  - op: POST /v1/complete
+    reason: hard-deprecated server-side (400 on every call)

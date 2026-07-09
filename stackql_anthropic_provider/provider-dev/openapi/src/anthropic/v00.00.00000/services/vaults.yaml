@@ -4138,6 +4138,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
         get:
           operation:
             $ref: "#/paths/~1v1~1vaults~1{vault_id}?beta=true/get"
@@ -4211,6 +4214,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
         get:
           operation:
             $ref: "#/paths/~1v1~1vaults~1{vault_id}~1credentials~1{credential_id}?beta=true/get"

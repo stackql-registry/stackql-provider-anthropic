@@ -165,35 +165,35 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-user_profile_id"><code>user_profile_id</code></a></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-page"><code>page</code></a>, <a href="#parameter-order"><code>order</code></a></td>
+    <td><a href="#parameter-order"><code>order</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-user_profile_id"><code>user_profile_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#create_enrollment_url"><CopyableCode code="create_enrollment_url" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-user_profile_id"><code>user_profile_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 </tbody>
@@ -217,35 +217,10 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Path parameter user_profile_id (example: uprof_011CZkZCu8hGbp5mYRQgUmz9)</td>
 </tr>
-<tr id="parameter-anthropic-beta">
-    <td><CopyableCode code="anthropic-beta" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer (int32)</code></td>
-    <td>Query parameter for limit</td>
-</tr>
 <tr id="parameter-order">
     <td><CopyableCode code="order" /></td>
     <td><code>string</code></td>
     <td>Query parameter for order</td>
-</tr>
-<tr id="parameter-page">
-    <td><CopyableCode code="page" /></td>
-    <td><code>string</code></td>
-    <td>Query parameter for page</td>
-</tr>
-<tr id="parameter-x-api-key">
-    <td><CopyableCode code="x-api-key" /></td>
-    <td><code>string</code></td>
-    <td></td>
 </tr>
 </tbody>
 </table>
@@ -276,7 +251,6 @@ type,
 updated_at
 FROM anthropic.user_profiles.user_profiles
 WHERE user_profile_id = '{{ user_profile_id }}' -- required
-AND "x-api-key" = '{{ x-api-key }}'
 ;
 ```
 </TabItem>
@@ -296,10 +270,7 @@ trust_grants,
 type,
 updated_at
 FROM anthropic.user_profiles.user_profiles
-WHERE "x-api-key" = '{{ x-api-key }}'
-AND limit = '{{ limit }}'
-AND page = '{{ page }}'
-AND order = '{{ order }}'
+WHERE order = '{{ order }}'
 ;
 ```
 </TabItem>
@@ -324,17 +295,13 @@ INSERT INTO anthropic.user_profiles.user_profiles (
 external_id,
 name,
 relationship,
-metadata,
-anthropic-version,
-anthropic-beta
+metadata
 )
 SELECT 
 '{{ external_id }}',
 '{{ name }}',
 '{{ relationship }}',
-'{{ metadata }}',
-'{{ anthropic-version }}',
-'{{ anthropic-beta }}'
+'{{ metadata }}'
 RETURNING
 id,
 name,
@@ -370,10 +337,6 @@ updated_at
       value: "{{ metadata }}"
       description: |
         Free-form key-value data to attach to this user profile. Maximum 16 keys, with keys up to 64 characters and values up to 512 characters. Values must be non-empty strings.
-    - name: anthropic-version
-      value: "{{ anthropic-version }}"
-    - name: anthropic-beta
-      value: "{{ anthropic-beta }}"
 `}</CodeBlock>
 
 </TabItem>
@@ -430,9 +393,7 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.user_profiles.user_profiles.create_enrollment_url 
-@user_profile_id='{{ user_profile_id }}' --required, 
-@anthropic-version='{{ anthropic-version }}', 
-@anthropic-beta='{{ anthropic-beta }}'
+@user_profile_id='{{ user_profile_id }}' --required
 ;
 ```
 </TabItem>

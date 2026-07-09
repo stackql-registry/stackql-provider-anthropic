@@ -175,35 +175,35 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a>, <a href="#parameter-memory_id"><code>memory_id</code></a></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-view"><code>view</code></a></td>
+    <td><a href="#parameter-view"><code>view</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-path_prefix"><code>path_prefix</code></a>, <a href="#parameter-depth"><code>depth</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-page"><code>page</code></a>, <a href="#parameter-view"><code>view</code></a></td>
+    <td><a href="#parameter-path_prefix"><code>path_prefix</code></a>, <a href="#parameter-depth"><code>depth</code></a>, <a href="#parameter-view"><code>view</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a>, <a href="#parameter-path"><code>path</code></a>, <a href="#parameter-content"><code>content</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-view"><code>view</code></a></td>
+    <td><a href="#parameter-view"><code>view</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a>, <a href="#parameter-memory_id"><code>memory_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-view"><code>view</code></a></td>
+    <td><a href="#parameter-view"><code>view</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a>, <a href="#parameter-memory_id"><code>memory_id</code></a></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-expected_content_sha256"><code>expected_content_sha256</code></a></td>
+    <td><a href="#parameter-expected_content_sha256"><code>expected_content_sha256</code></a></td>
     <td></td>
 </tr>
 </tbody>
@@ -232,16 +232,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Path parameter memory_store_id</td>
 </tr>
-<tr id="parameter-anthropic-beta">
-    <td><CopyableCode code="anthropic-beta" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
 <tr id="parameter-depth">
     <td><CopyableCode code="depth" /></td>
     <td><code>integer (int32)</code></td>
@@ -252,16 +242,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Query parameter for expected_content_sha256</td>
 </tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer (int32)</code></td>
-    <td>Maximum number of items to return per page. Must be between 1 and 100. Defaults to 20 when omitted. Capped at 20 when `view=full`. Both `memory` and `memory_prefix` items count toward the limit.</td>
-</tr>
-<tr id="parameter-page">
-    <td><CopyableCode code="page" /></td>
-    <td><code>string</code></td>
-    <td>Opaque pagination cursor (a `page_...` value). Pass the `next_page` value from a previous response to fetch the next page; omit for the first page.</td>
-</tr>
 <tr id="parameter-path_prefix">
     <td><CopyableCode code="path_prefix" /></td>
     <td><code>string</code></td>
@@ -271,11 +251,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="view" /></td>
     <td><code>string</code></td>
     <td>Query parameter for view</td>
-</tr>
-<tr id="parameter-x-api-key">
-    <td><CopyableCode code="x-api-key" /></td>
-    <td><code>string</code></td>
-    <td></td>
 </tr>
 </tbody>
 </table>
@@ -308,7 +283,6 @@ updated_at
 FROM anthropic.memory_stores.memories
 WHERE memory_store_id = '{{ memory_store_id }}' -- required
 AND memory_id = '{{ memory_id }}' -- required
-AND "x-api-key" = '{{ x-api-key }}'
 AND view = '{{ view }}'
 ;
 ```
@@ -331,11 +305,8 @@ type,
 updated_at
 FROM anthropic.memory_stores.memories
 WHERE memory_store_id = '{{ memory_store_id }}' -- required
-AND "x-api-key" = '{{ x-api-key }}'
 AND path_prefix = '{{ path_prefix }}'
 AND depth = '{{ depth }}'
-AND limit = '{{ limit }}'
-AND page = '{{ page }}'
 AND view = '{{ view }}'
 ;
 ```
@@ -361,16 +332,12 @@ INSERT INTO anthropic.memory_stores.memories (
 path,
 content,
 memory_store_id,
-anthropic-version,
-anthropic-beta,
 view
 )
 SELECT 
 '{{ path }}' /* required */,
 '{{ content }}' /* required */,
 '{{ memory_store_id }}',
-'{{ anthropic-version }}',
-'{{ anthropic-beta }}',
 '{{ view }}'
 RETURNING
 id,
@@ -402,10 +369,6 @@ updated_at
       value: "{{ content }}"
       description: |
         UTF-8 text content for the new memory. Maximum 100 kB (102,400 bytes). Required; pass \`""\` explicitly to create an empty memory.
-    - name: anthropic-version
-      value: "{{ anthropic-version }}"
-    - name: anthropic-beta
-      value: "{{ anthropic-beta }}"
     - name: view
       value: "{{ view }}"
       description: Query parameter for view
@@ -470,7 +433,6 @@ No description available.
 DELETE FROM anthropic.memory_stores.memories
 WHERE memory_store_id = '{{ memory_store_id }}' --required
 AND memory_id = '{{ memory_id }}' --required
-AND "x-api-key" = '{{ x-api-key }}'
 AND expected_content_sha256 = '{{ expected_content_sha256 }}'
 ;
 ```

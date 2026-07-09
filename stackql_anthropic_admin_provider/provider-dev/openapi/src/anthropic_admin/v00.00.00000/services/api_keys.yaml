@@ -218,6 +218,11 @@ components:
             mediaType: application/json
             openAPIDocKey: "200"
             objectKey: $.data
+          config:
+            queryParamPushdown:
+              top:
+                paramName: limit
+                maxValue: 1000
         get:
           operation:
             $ref: "#/paths/~1v1~1organizations~1api_keys~1{api_key_id}/get"

@@ -163,6 +163,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
       sqlVerbs:
         select:
           - $ref: "#/components/x-stackQL-resources/cost_reports/methods/list"

@@ -1194,6 +1194,9 @@ components:
               responseToken:
                 key: $.next_page
                 location: body
+            queryParamPushdown:
+              top:
+                paramName: limit
         get:
           operation:
             $ref: "#/paths/~1v1~1user_profiles~1{user_profile_id}?beta=true/get"

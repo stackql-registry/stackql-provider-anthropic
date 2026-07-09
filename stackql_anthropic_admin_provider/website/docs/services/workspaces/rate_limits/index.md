@@ -102,7 +102,7 @@ The following methods are available for this resource:
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-workspace_id"><code>workspace_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-group_type"><code>group_type</code></a>, <a href="#parameter-page"><code>page</code></a></td>
+    <td><a href="#parameter-group_type"><code>group_type</code></a></td>
     <td>List rate-limit overrides configured for a workspace. Only groups and limiter types with a workspace-level override are returned; everything else inherits the organization limits.</td>
 </tr>
 </tbody>
@@ -126,20 +126,10 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>ID of the Workspace.</td>
 </tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td>The version of the Claude API you want to use.</td>
-</tr>
 <tr id="parameter-group_type">
     <td><CopyableCode code="group_type" /></td>
     <td><code>string</code></td>
     <td>Filter by group type.</td>
-</tr>
-<tr id="parameter-page">
-    <td><CopyableCode code="page" /></td>
-    <td><code>string</code></td>
-    <td>Opaque cursor from a previous response's `next_page`.</td>
 </tr>
 </tbody>
 </table>
@@ -165,7 +155,6 @@ type
 FROM anthropic_admin.workspaces.rate_limits
 WHERE workspace_id = '{{ workspace_id }}' -- required
 AND group_type = '{{ group_type }}'
-AND page = '{{ page }}'
 ;
 ```
 </TabItem>

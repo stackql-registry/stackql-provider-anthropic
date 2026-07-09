@@ -205,35 +205,35 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-workspace_id"><code>workspace_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Get a workspace by ID.</td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-before_id"><code>before_id</code></a>, <a href="#parameter-after_id"><code>after_id</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-include_archived"><code>include_archived</code></a></td>
+    <td><a href="#parameter-before_id"><code>before_id</code></a>, <a href="#parameter-after_id"><code>after_id</code></a>, <a href="#parameter-include_archived"><code>include_archived</code></a></td>
     <td>List workspaces in the organization.</td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-name"><code>name</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Create a new workspace.</td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-workspace_id"><code>workspace_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Update a workspace's name or tags.</td>
 </tr>
 <tr>
     <td><a href="#archive"><CopyableCode code="archive" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-workspace_id"><code>workspace_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Archive a workspace.</td>
 </tr>
 </tbody>
@@ -262,11 +262,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>ID of the object to use as a cursor for pagination. Returns the page of results immediately after this object.</td>
 </tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td>The version of the Claude API you want to use.</td>
-</tr>
 <tr id="parameter-before_id">
     <td><CopyableCode code="before_id" /></td>
     <td><code>string</code></td>
@@ -276,11 +271,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="include_archived" /></td>
     <td><code>boolean</code></td>
     <td>Whether to include Workspaces that have been archived in the response.</td>
-</tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer</code></td>
-    <td>Number of items to return per page. Defaults to 20; ranges from 1 to 1000.</td>
 </tr>
 </tbody>
 </table>
@@ -334,7 +324,6 @@ type
 FROM anthropic_admin.workspaces.workspaces
 WHERE before_id = '{{ before_id }}'
 AND after_id = '{{ after_id }}'
-AND limit = '{{ limit }}'
 AND include_archived = '{{ include_archived }}'
 ;
 ```
@@ -360,15 +349,13 @@ INSERT INTO anthropic_admin.workspaces.workspaces (
 name,
 data_residency,
 external_key_id,
-tags,
-anthropic-version
+tags
 )
 SELECT 
 '{{ name }}' /* required */,
 '{{ data_residency }}',
 '{{ external_key_id }}',
-'{{ tags }}',
-'{{ anthropic-version }}'
+'{{ tags }}'
 RETURNING
 id,
 name,
@@ -404,10 +391,6 @@ type
       value: "{{ tags }}"
       description: |
         User-defined tags as a JSON object of string key-value pairs. Keys may not begin with \`anthropic\`.
-    - name: anthropic-version
-      value: "{{ anthropic-version }}"
-      description: The version of the Claude API you want to use.
-      description: The version of the Claude API you want to use.
 `}</CodeBlock>
 
 </TabItem>
@@ -463,8 +446,7 @@ Archive a workspace.
 
 ```sql
 EXEC anthropic_admin.workspaces.workspaces.archive 
-@workspace_id='{{ workspace_id }}' --required, 
-@anthropic-version='{{ anthropic-version }}'
+@workspace_id='{{ workspace_id }}' --required
 ;
 ```
 </TabItem>

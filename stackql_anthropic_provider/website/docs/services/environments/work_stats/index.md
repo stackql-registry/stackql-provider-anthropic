@@ -90,7 +90,7 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a></td>
-    <td><a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-authorization"><code>authorization</code></a></td>
+    <td></td>
     <td>Get statistics about the work queue for an environment.</td>
 </tr>
 </tbody>
@@ -113,26 +113,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="environment_id" /></td>
     <td><code>string</code></td>
     <td> (example: env_011CZkZ9X2dpNyB7HsEFoRfW)</td>
-</tr>
-<tr id="parameter-anthropic-beta">
-    <td><CopyableCode code="anthropic-beta" /></td>
-    <td><code>string</code></td>
-    <td>Optional header to specify the beta version(s) you want to use.  To use multiple betas, use a comma separated list like `beta1,beta2` or specify the header multiple times for each beta.</td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td>The version of the Claude API you want to use.  Read more about versioning and our version history [here](https://platform.claude.com/docs/en/api/versioning).</td>
-</tr>
-<tr id="parameter-authorization">
-    <td><CopyableCode code="authorization" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
-<tr id="parameter-x-api-key">
-    <td><CopyableCode code="x-api-key" /></td>
-    <td><code>string</code></td>
-    <td></td>
 </tr>
 </tbody>
 </table>
@@ -158,8 +138,6 @@ type,
 workers_polling
 FROM anthropic.environments.work_stats
 WHERE environment_id = '{{ environment_id }}' -- required
-AND "x-api-key" = '{{ x-api-key }}'
-AND authorization = '{{ authorization }}'
 ;
 ```
 </TabItem>

@@ -185,21 +185,21 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-api_key_id"><code>api_key_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Get an API key by ID.</td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-before_id"><code>before_id</code></a>, <a href="#parameter-after_id"><code>after_id</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-status"><code>status</code></a>, <a href="#parameter-workspace_id"><code>workspace_id</code></a>, <a href="#parameter-created_by_user_id"><code>created_by_user_id</code></a></td>
+    <td><a href="#parameter-before_id"><code>before_id</code></a>, <a href="#parameter-after_id"><code>after_id</code></a>, <a href="#parameter-status"><code>status</code></a>, <a href="#parameter-workspace_id"><code>workspace_id</code></a>, <a href="#parameter-created_by_user_id"><code>created_by_user_id</code></a></td>
     <td>List API keys in the organization.</td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-api_key_id"><code>api_key_id</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a></td>
+    <td></td>
     <td>Update an API key's name or status.</td>
 </tr>
 </tbody>
@@ -228,11 +228,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>ID of the object to use as a cursor for pagination. Returns the page of results immediately after this object.</td>
 </tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td>The version of the Claude API you want to use.</td>
-</tr>
 <tr id="parameter-before_id">
     <td><CopyableCode code="before_id" /></td>
     <td><code>string</code></td>
@@ -242,11 +237,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="created_by_user_id" /></td>
     <td><code>string</code></td>
     <td>Filter by the ID of the User who created the object.</td>
-</tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer</code></td>
-    <td>Number of items to return per page. Defaults to 20; ranges from 1 to 1000.</td>
 </tr>
 <tr id="parameter-status">
     <td><CopyableCode code="status" /></td>
@@ -308,7 +298,6 @@ type
 FROM anthropic_admin.api_keys.api_keys
 WHERE before_id = '{{ before_id }}'
 AND after_id = '{{ after_id }}'
-AND limit = '{{ limit }}'
 AND status = '{{ status }}'
 AND workspace_id = '{{ workspace_id }}'
 AND created_by_user_id = '{{ created_by_user_id }}'

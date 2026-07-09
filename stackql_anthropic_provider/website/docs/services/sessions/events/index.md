@@ -668,14 +668,14 @@ The following methods are available for this resource:
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-session_id"><code>session_id</code></a></td>
-    <td><a href="#parameter-x-api-key"><code>x-api-key</code></a>, <a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a>, <a href="#parameter-limit"><code>limit</code></a>, <a href="#parameter-page"><code>page</code></a>, <a href="#parameter-order"><code>order</code></a>, <a href="#parameter-types[]"><code>types[]</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[gt]"><code>created_at[gt]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-created_at[lt]"><code>created_at[lt]</code></a></td>
+    <td><a href="#parameter-order"><code>order</code></a>, <a href="#parameter-types[]"><code>types[]</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[gt]"><code>created_at[gt]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-created_at[lt]"><code>created_at[lt]</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#send"><CopyableCode code="send" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-session_id"><code>session_id</code></a>, <a href="#parameter-events"><code>events</code></a></td>
-    <td><a href="#parameter-anthropic-version"><code>anthropic-version</code></a>, <a href="#parameter-anthropic-beta"><code>anthropic-beta</code></a></td>
+    <td></td>
     <td></td>
 </tr>
 </tbody>
@@ -699,16 +699,6 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Path parameter session_id (example: sesn_011CZkZAtmR3yMPDzynEDxu7)</td>
 </tr>
-<tr id="parameter-anthropic-beta">
-    <td><CopyableCode code="anthropic-beta" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
-<tr id="parameter-anthropic-version">
-    <td><CopyableCode code="anthropic-version" /></td>
-    <td><code>string</code></td>
-    <td></td>
-</tr>
 <tr id="parameter-created_at[gt]">
     <td><CopyableCode code="created_at[gt]" /></td>
     <td><code>string (date-time)</code></td>
@@ -729,30 +719,15 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string (date-time)</code></td>
     <td>Return events created at or before this time (inclusive).</td>
 </tr>
-<tr id="parameter-limit">
-    <td><CopyableCode code="limit" /></td>
-    <td><code>integer (int32)</code></td>
-    <td>Query parameter for limit</td>
-</tr>
 <tr id="parameter-order">
     <td><CopyableCode code="order" /></td>
     <td><code>string</code></td>
     <td>Sort direction for results, ordered by created_at. Defaults to asc (chronological).</td>
 </tr>
-<tr id="parameter-page">
-    <td><CopyableCode code="page" /></td>
-    <td><code>string</code></td>
-    <td>Opaque pagination cursor from a previous response's next_page.</td>
-</tr>
 <tr id="parameter-types[]">
     <td><CopyableCode code="types[]" /></td>
     <td><code>array</code></td>
     <td>Filter by event type. Values match the `type` field on returned events (for example, `user.message` or `agent.tool_use`). Omit to return all event types.</td>
-</tr>
-<tr id="parameter-x-api-key">
-    <td><CopyableCode code="x-api-key" /></td>
-    <td><code>string</code></td>
-    <td></td>
 </tr>
 </tbody>
 </table>
@@ -808,9 +783,6 @@ type,
 usage
 FROM anthropic.sessions.events
 WHERE session_id = '{{ session_id }}' -- required
-AND "x-api-key" = '{{ x-api-key }}'
-AND limit = '{{ limit }}'
-AND page = '{{ page }}'
 AND order = '{{ order }}'
 AND "types[]" = '{{ types[] }}'
 AND "created_at[gte]" = '{{ created_at[gte] }}'
@@ -837,9 +809,7 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.sessions.events.send 
-@session_id='{{ session_id }}' --required, 
-@anthropic-version='{{ anthropic-version }}', 
-@anthropic-beta='{{ anthropic-beta }}' 
+@session_id='{{ session_id }}' --required
 @@json=
 '{
 "events": "{{ events }}"

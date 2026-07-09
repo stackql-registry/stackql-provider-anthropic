@@ -168,7 +168,25 @@ the guards (below) enforce the result.
   {key: $.next_page, location: body}}`. Auto-pagination wire-verified (multi-page walk).
 - `after_id`/`before_id` + `has_more`/`last_id` lists (models, GA batches, files, and ALL
   admin entity lists): NO pagination config — `last_id` stays populated on the final page
-  (infinite-loop risk). Keep cursor params for manual paging.
+  (infinite-loop risk). Keep cursor params for manual paging (`after_id`/`before_id`
+  remain documented; `page` and `limit` do not — see rule 6a).
+
+### 6a. LIMIT pushdown + paging-param suppression **(verified 2026-07-09)**
+
+stackql supports query-param pushdown (`internal/stackql/pushdown` in core, translation
+in any-sdk `ApplyPushdown`; in the v0.10.542 binary lineage). The neutral intent covers
+projection/filter/order-by/limit/offset/count, but only `top` (LIMIT) is dialect-neutral
+— filter/order-by rendering is OData-only, and select (projection) needs a
+`supportedColumns` list; `skip`/`count` have no matching Anthropic API primitives. So:
+every method with a `limit` query param gets `config.queryParamPushdown: {top:
+{paramName: limit, maxValue: <param schema maximum, when declared>}}` (post-pass step 4,
+mechanical). Wire-verified on a mock: `SELECT ... LIMIT 2` → `?limit=2`; no LIMIT → no
+param; client-side LIMIT stays authoritative so this is purely a fetch optimisation.
+Live-verified on models (after_id list) and skills (cursor list with pagination config).
+API paging primitives are then SUPPRESSED from the user docs by scrub-docs, derived from
+the stamped configs (not hardcoded): pagination `requestToken` keys in query location
+(`page` — auto-pagination owns it) and pushdown `top.paramName` (`limit` — SQL LIMIT
+owns it). Users see LIMIT and auto-pagination, not the wire params.
 
 ### 7. Request bodies — naive translator **(verified)**
 
@@ -184,8 +202,13 @@ INSERT, UPDATE SET).
 lifecycle/rpc ops (`archive`, `cancel`, `pause`, `unpause`, `run`, `redact`, `ack`,
 `heartbeat`, `poll`, `stop`, `send`, `add`, `mcp_oauth_validate`,
 `create_enrollment_url`) → EXEC. Exceptions: inference ops (`messages` create,
-token counting, legacy `complete`) → SELECT (the result IS a result set); multipart
-`files` upload → EXEC; JSONL `batches` results → EXEC.
+token counting) → SELECT (the result IS a result set); ALL `multipart/form-data`
+POSTs → EXEC (temporary policy 2026-07-09 until there is a strategy for multipart:
+`files.upload`, `skills.create`, `skills.versions.create` — stackql v0.10.542
+rejects multipart dispatch with "media type not supported", so INSERT-mapping them
+just documents queries that can't run); JSONL `batches` results → EXEC. (Legacy
+`complete` was SELECT until the endpoint was hard-deprecated server-side and
+dropped — see Taxonomies.)
 
 ### 9. ONE select shape per resource — split divergent shapes into separate resources
 
@@ -258,14 +281,20 @@ client-side alias. Emit the bracketed wire names (backtick-quoted in SQL samples
 
 ## Taxonomies (agreed — changes need explicit confirmation)
 
-### `anthropic` — 12 services, 26 resources
+### `anthropic` — 11 services, 25 resources
 
-messages (messages, token_counts, batches) · models (models) · completions (completions)
-· agents (agents, versions) · deployments (deployments, deployment_runs) · environments
-(environments, work_items, work_stats) · files (files) · memory_stores (memory_stores,
-memories, memory_versions) · sessions (sessions, events, resources, threads,
-thread_events) · skills (skills, versions) · user_profiles (user_profiles) · vaults
-(vaults, credentials).
+messages (messages, token_counts, batches) · models (models) · agents (agents,
+versions) · deployments (deployments, deployment_runs) · environments (environments,
+work_items, work_stats) · files (files) · memory_stores (memory_stores, memories,
+memory_versions) · sessions (sessions, events, resources, threads, thread_events) ·
+skills (skills, versions) · user_profiles (user_profiles) · vaults (vaults,
+credentials).
+
+Dropped 2026-07-09 (user-confirmed): the `completions` service — `POST /v1/complete`
+is hard-deprecated server-side (400 "use /v1/messages" on every call, verified live).
+Mapped to the `skip_this_resource` sentinel in the CSV (the provider-utils generate
+primitive for op exclusion) + listed in `factory/exclusions.yaml` under
+`hard_deprecated` so guard 1 balances.
 
 Excluded, documented: 2 SSE stream endpoints, 10 tunnels ops (OAuth-only), SDK-side
 conveniences (`parse`), beta duplicates of GA messages/batches/models (fold into GA).
@@ -313,6 +342,22 @@ Also: usage/cost/claude_code reports and both rate_limits endpoints are CURSOR-p
 (`page` + `next_page`) and get pagination config — the after_id policy applies only to
 the admin ENTITY lists (users/invites/workspaces/members/api_keys).
 
+## Views
+
+Convenience views live in `stackql_anthropic_provider/provider-dev/views/<service>/
+views.yaml` (hand-authored, checked in) and are spliced into `x-stackQL-resources`
+by the provider-utils `generate --views-dir` flag (wired into the `generate` npm
+script; API-derived resources win on key collision). Stanza per view (databricks-repo
+archetype): `name`, `id`, `config.docs.fields` (name/type/description — this drives
+the docgen view page; add `config.docs.requiredParams` for views with `{{ param }}`
+placeholders) and `config.views.select` with dialect-predicated DDL:
+`predicate: sqlDialect == "sqlite3"` primary + `fallback: {predicate: sqlDialect ==
+"postgres", ddl: ...}` (JSON_EXTRACT('$.a.b') ↔ json_extract_path_text(col::json,
+'a','b')). docgen-v2 renders views natively (Type: View, fields table, tabbed SQL
+Definition). First view: `anthropic.models.vw_model_capabilities` (per-model
+capability flags fanned out of the `capabilities` JSON column) — live-verified
+2026-07-09; meta-routes DESCRIBE EXTENDED sees all 22 columns.
+
 ## Build guards (CI hard-fails)
 
 1. **Spec-coverage diff**: official spec ops minus provider ops must equal EXACTLY the
@@ -349,7 +394,9 @@ One Docusaurus 3.10 site per provider (`anthropic-provider.stackql.io`,
 downloads binaries from GitHub releases, which breaks in restricted environments).
 Deployment is Netlify (NOT GitHub Pages — one Pages site per repo): mirror the layout in
 stackql-registry/stackql-provider-databricks (`stackql-provider` branch) — per-site base
-directories, selective builds. Admin site auth docs: Admin key, admin-role-created,
+directories, selective builds. CI carries NO website jobs (removed 2026-07-09): Netlify
+builds both sites (deploy previews on PRs), so a CI site build would duplicate it —
+don't re-add one. Admin site auth docs: Admin key, admin-role-created,
 org accounts only; cross-link the `anthropic` site (and vice versa).
 
 Known docgen bug — PATCHED LOCALLY (2026-07-08): provider-utils includes
@@ -363,10 +410,52 @@ once a provider-utils release contains the fix.
 
 More website findings (2026-07-08): Docusaurus 3.10 with `future: {v4: true}` requires
 the `@docusaurus/faster` package (build hard-fails without it). `factory/scrub-docs.mjs`
-post-processes docgen SQL samples: auto-injected header params removed,
-hyphenated/bracketed identifiers DOUBLE-quoted (backticks are a stackql v0.10.542
-parser error for both shapes — supersedes the backtick advice in few-shot 5 and the
-MDX-safe rule).
+post-processes docgen output: hyphenated/bracketed identifiers DOUBLE-quoted in SQL
+samples (backticks are a stackql v0.10.542 parser error for both shapes — supersedes
+the backtick advice in few-shot 5 and the MDX-safe rule). Re-verified 2026-07-09 for
+INSERT column lists: bare AND backticked hyphenated column names are both parser
+errors there too; double quotes parse and route.
+
+Header params are NOT user docs (2026-07-09): documented params are path, query, and
+request-body ONLY. scrub-docs derives the `in: header` param set mechanically from the
+generated specs (`--provider-root`) and strips it from every surface: Methods-table
+Required/Optional cells, Parameters-table rows (a table left empty collapses to a
+sentence — admin `organization` is the only such page), SQL WHERE/AND conditions,
+INSERT column/value line pairs (positional), EXEC `@param` lines (comma re-fixing; the
+last surviving @param before `@@json=` carries no comma, matching docgen), and INSERT
+"Manifest" yaml props. `x-api-key` is auth plumbing; `anthropic-version` /
+`anthropic-beta` are auto-injected from schema defaults. This also hides the
+FUNCTIONAL headers (`Anthropic-Worker-ID`, `authorization` on environments/work_items;
+`anthropic-user-profile-id`; admin fast-mode `anthropic-beta` per resolved question
+(d)) — they still work on the wire, and scrub-docs `--keep h1,h2` re-documents them
+per provider if that's ever wanted. The provider index.md auth sections still describe
+the header MECHANISM (that's auth docs, not params).
+
+Post-docgen enrichment (2026-07-09): `factory/enrich-select-docs.mjs` (chained BEFORE
+scrub-docs in the `docgen`/`docgen-admin` npm scripts — enrich adds body-param rows
+before scrub evaluates empty-table collapse; both idempotent) documents the
+request-body params of body-bearing SELECT methods (the POST-as-SELECT inference ops:
+`messages.create`, `token_counts.count_tokens`), which docgen
+otherwise omits: optional body params are appended to the Methods-table "Optional
+Params" cell and the SELECT sample WHERE clause; Parameters-table rows are added for
+ALL body params (also repairing the dangling `#parameter-*` anchors for required body
+params); each such method's SELECT sample becomes nested tabs — "Query Shape"
+(placeholders) + "Query Example" (complete runnable query from the checked-in
+`factory/docgen-select-examples.yaml`, keyed `<service>.<resource>.<method>` per
+provider). `stream` is deliberately undocumented (SSE switch, not SQL-consumable).
+Query Examples were run LIVE (2026-07-09); wire rules they must respect:
+- integer literals reach the JSON body as numbers, but FLOAT literals arrive as
+  strings and the API rejects them (`temperature: Input should be a valid number`) —
+  no temperature/top_p in examples;
+- JSON array/object string values fan out only when the string is VALID JSON after SQL
+  parsing — backslash escapes (`\n`) are interpreted by the parser first and break the
+  JSON (value then arrives as a literal string);
+- claude-sonnet-5 can lead `content` with a thinking block, so `$[0].text` extraction
+  is only deterministic with `thinking = '{"type": "disabled"}'` in the WHERE clause —
+  the example pins that and extracts `$[0].text` as `assistant_message`;
+- `/v1/complete` is now rejected server-side as deprecated (400 → "use /v1/messages")
+  — the completions service was subsequently dropped from the provider entirely (see
+  Taxonomies).
 
 Websites re-platformed (2026-07-08, post-merge) onto the NEW archetype from
 stackql-registry/stackql-provider-aws (`stackql_aws_provider/website`, branch
