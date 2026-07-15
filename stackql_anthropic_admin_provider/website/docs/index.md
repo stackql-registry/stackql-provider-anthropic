@@ -58,6 +58,108 @@ On the Claude Platform on AWS only the workspace endpoints (create, get, list, u
 
 :::
 
+## Token usage and cost as rows
+
+Usage and cost reports are bucketed time series. Each row is one time bucket (`starting_at`, `ending_at`) whose `results` column holds the per-group breakdown, fanned out with `JSON_EACH` and read with `JSON_EXTRACT`.
+
+Token usage by model:
+
+```sql
+SELECT
+  u.starting_at,
+  JSON_EXTRACT(r.value, '$.model')                   AS model,
+  JSON_EXTRACT(r.value, '$.uncached_input_tokens')   AS input_tokens,
+  JSON_EXTRACT(r.value, '$.cache_read_input_tokens') AS cache_read_tokens,
+  JSON_EXTRACT(r.value, '$.output_tokens')           AS output_tokens
+FROM anthropic_admin.usage.usage_reports u, JSON_EACH(u.results) r
+WHERE u.starting_at = '2026-07-01T00:00:00Z'
+ORDER BY u.starting_at;
+```
+
+Spend in USD, per line item:
+
+```sql
+SELECT
+  c.starting_at,
+  JSON_EXTRACT(r.value, '$.description') AS line_item,
+  JSON_EXTRACT(r.value, '$.currency')    AS currency,
+  JSON_EXTRACT(r.value, '$.amount')      AS amount
+FROM anthropic_admin.cost.cost_reports c, JSON_EACH(c.results) r
+WHERE c.starting_at = '2026-07-01T00:00:00Z'
+ORDER BY c.starting_at;
+```
+
+Reports are grouped and filtered on the wire. Bracketed parameter names are addressed with double quotes, and take one value per query:
+
+```sql
+SELECT starting_at, results
+FROM anthropic_admin.usage.usage_reports
+WHERE starting_at = '2026-07-01T00:00:00Z'
+AND "group_by[]" = 'model';
+```
+
+## Claude Code adoption
+
+Who is using Claude Code, from where, and what it produced:
+
+```sql
+SELECT
+  date,
+  terminal_type,
+  JSON_EXTRACT(actor, '$.email_address')                  AS user_email,
+  JSON_EXTRACT(core_metrics, '$.num_sessions')            AS sessions,
+  JSON_EXTRACT(core_metrics, '$.lines_of_code.added')     AS lines_added,
+  JSON_EXTRACT(core_metrics, '$.commits_by_claude_code')  AS commits
+FROM anthropic_admin.usage.claude_code_reports
+WHERE starting_at = '2026-07-01'
+ORDER BY date;
+```
+
+## Governance
+
+Active workspaces and who is in them:
+
+```sql
+SELECT
+  w.name AS workspace,
+  m.user_id,
+  m.workspace_role
+FROM anthropic_admin.workspaces.workspaces w
+JOIN anthropic_admin.workspaces.members m
+  ON m.workspace_id = w.id
+WHERE w.archived_at IS NULL
+ORDER BY w.name, m.workspace_role;
+```
+
+API key inventory - which workspace each key belongs to, who created it, and whether it is still active:
+
+```sql
+SELECT
+  id,
+  name,
+  workspace_id,
+  status,
+  partial_key_hint,
+  created_at,
+  JSON_EXTRACT(created_by, '$.id') AS created_by
+FROM anthropic_admin.api_keys.api_keys
+ORDER BY created_at;
+```
+
+## Rate limits
+
+The organization's limits, one row per limit per model group:
+
+```sql
+SELECT
+  rl.group_type,
+  JSON_EXTRACT(rl.models, '$[0]')  AS model,
+  JSON_EXTRACT(l.value, '$.type')  AS limit_type,
+  JSON_EXTRACT(l.value, '$.value') AS limit_value
+FROM anthropic_admin.rate_limits.rate_limits rl, JSON_EACH(rl.limits) l
+ORDER BY rl.group_type;
+```
+
 ## Coverage
 
 The full Admin API surface is exposed, except the following documented exclusions:

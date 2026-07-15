@@ -1,0 +1,10 @@
+SELECT
+  id,
+  name,
+  model,
+  version,
+  JSON_ARRAY_LENGTH(tools)  AS tool_count,
+  JSON_ARRAY_LENGTH(skills) AS skill_count,
+  updated_at
+FROM anthropic.agents.agents
+ORDER BY updated_at DESC;

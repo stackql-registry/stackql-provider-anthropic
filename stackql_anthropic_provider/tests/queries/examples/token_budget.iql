@@ -1,0 +1,4 @@
+SELECT input_tokens
+FROM anthropic.messages.token_counts
+WHERE model = 'claude-sonnet-5'
+AND messages = '[{"role": "user", "content": "Name the four Galilean moons of Jupiter, comma separated."}]';

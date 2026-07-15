@@ -1,0 +1,3 @@
+SELECT id, display_name, thinking, image_input, pdf_input, batch, structured_outputs
+FROM anthropic.models.vw_model_capabilities
+ORDER BY created_at DESC;

@@ -1,0 +1,9 @@
+SELECT
+  w.name AS workspace,
+  m.user_id,
+  m.workspace_role
+FROM anthropic_admin.workspaces.workspaces w
+JOIN anthropic_admin.workspaces.members m
+  ON m.workspace_id = w.id
+WHERE w.archived_at IS NULL
+ORDER BY w.name, m.workspace_role;

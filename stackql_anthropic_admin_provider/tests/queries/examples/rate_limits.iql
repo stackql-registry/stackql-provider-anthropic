@@ -1,0 +1,7 @@
+SELECT
+  rl.group_type,
+  JSON_EXTRACT(rl.models, '$[0]')  AS model,
+  JSON_EXTRACT(l.value, '$.type')  AS limit_type,
+  JSON_EXTRACT(l.value, '$.value') AS limit_value
+FROM anthropic_admin.rate_limits.rate_limits rl, JSON_EACH(rl.limits) l
+ORDER BY rl.group_type;

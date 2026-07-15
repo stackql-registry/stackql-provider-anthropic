@@ -1,0 +1,10 @@
+SELECT
+  id,
+  name,
+  workspace_id,
+  status,
+  partial_key_hint,
+  created_at,
+  JSON_EXTRACT(created_by, '$.id') AS created_by
+FROM anthropic_admin.api_keys.api_keys
+ORDER BY created_at;

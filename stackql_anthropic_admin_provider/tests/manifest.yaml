@@ -162,6 +162,52 @@ tests:
       equals_rows: 1
       contains: ["claude-sonnet-5"]
 
+  # ---- documented examples ----------------------------------------------------------
+  # VERBATIM SQL from the provider docs index
+  # (provider-dev/docgen/provider-data/anthropic_admin/headerContent2.txt), run
+  # here so the front page cannot drift from what the provider actually does.
+  - name: docs_usage_by_model
+    description: docs example — usage buckets fanned out of the results JSON column
+    file: examples/usage_by_model.iql
+    expect:
+      min_rows: 2
+      contains: ["claude-sonnet-5", "2026-07-01T00:00:00Z"]
+
+  - name: docs_cost_by_line_item
+    description: docs example — USD cost per line item
+    file: examples/cost_by_line_item.iql
+    expect:
+      min_rows: 2
+      contains: ["USD", "12.34"]
+
+  - name: docs_claude_code_activity
+    description: docs example — Claude Code analytics per actor and terminal
+    file: examples/claude_code_activity.iql
+    expect:
+      equals_rows: 2
+      contains: ["jo@example.com", "vscode"]
+
+  - name: docs_workspace_members
+    description: docs example — workspaces joined to their members
+    file: examples/workspace_members.iql
+    expect:
+      min_rows: 1
+      contains: ["default-workspace", "workspace_admin"]
+
+  - name: docs_api_key_hygiene
+    description: docs example — API key inventory with creator and key hint
+    file: examples/api_key_hygiene.iql
+    expect:
+      equals_rows: 1
+      contains: ["ci-key", "sk-ant-api03-R2D...igAA"]
+
+  - name: docs_rate_limits
+    description: docs example — rate limits fanned out of the limits JSON column
+    file: examples/rate_limits.iql
+    expect:
+      min_rows: 3
+      contains: ["requests_per_minute", "enqueued_batch_requests"]
+
   # ---- live subset (READ-ONLY; never mutates a live org) ---------------------------
   - name: live_org_get
     description: real organization info

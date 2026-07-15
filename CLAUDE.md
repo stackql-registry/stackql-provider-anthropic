@@ -372,6 +372,14 @@ capability flags fanned out of the `capabilities` JSON column) — live-verified
 5. **`.stats.yml` drift check**: fail regen when upstream `openapi_spec_hash` differs
    from the vendored snapshot (conscious bump required).
 6. **Zero-column selects**: every SELECT-routed method projects ≥1 column.
+7. **Docs examples are tested** (`factory/check-doc-examples.mjs`, CI step after the
+   smoke jobs): every ` ```sql ` block on a provider's docs index (assembled from
+   `provider-dev/docgen/provider-data/<provider>/headerContent2.txt`) must match, modulo
+   whitespace, an `.iql` under that provider's `tests/queries` — so the front page cannot
+   claim a query the suite doesn't run. Illustrative blocks (placeholder ids in the agent
+   lifecycle snippet) are exempted by heading, with a reason, in the script's `EXEMPT` map.
+   Authored SQL is byte-identical to rendered SQL provided `AND` continuation lines are NOT
+   indented (scrub-docs left-aligns them).
 
 ## Tests (both providers)
 

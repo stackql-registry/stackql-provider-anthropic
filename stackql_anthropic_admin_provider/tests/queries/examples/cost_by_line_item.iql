@@ -1,0 +1,8 @@
+SELECT
+  c.starting_at,
+  JSON_EXTRACT(r.value, '$.description') AS line_item,
+  JSON_EXTRACT(r.value, '$.currency')    AS currency,
+  JSON_EXTRACT(r.value, '$.amount')      AS amount
+FROM anthropic_admin.cost.cost_reports c, JSON_EACH(c.results) r
+WHERE c.starting_at = '2026-07-01T00:00:00Z'
+ORDER BY c.starting_at;

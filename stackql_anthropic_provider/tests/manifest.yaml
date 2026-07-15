@@ -119,6 +119,46 @@ tests:
       equals_rows: 5
       not_contains: ["{{ agent_name }}"]
 
+  # ---- documented examples ----------------------------------------------------
+  # These files are the VERBATIM SQL published in the provider docs index
+  # (provider-dev/docgen/provider-data/anthropic/headerContent2.txt). They run
+  # here so the front page cannot drift from what the provider actually does.
+  # Read-only, and last in the list — the agents lifecycle above is finished.
+  - name: docs_inference
+    description: docs example — ask Claude, read the reply out of the content array
+    file: examples/inference.iql
+    expect:
+      min_rows: 1
+      contains: ["mock completion"]
+
+  - name: docs_token_budget
+    description: docs example — count tokens before spending them
+    file: examples/token_budget.iql
+    expect:
+      equals_rows: 1
+      contains: ["37"]
+
+  - name: docs_model_capabilities
+    description: docs example — the vw_model_capabilities view
+    file: examples/model_capabilities.iql
+    expect:
+      equals_rows: 2
+      contains: ["claude-sonnet-5", "claude-opus-4-8"]
+
+  - name: docs_batch_triage
+    description: docs example — batch progress from the request_counts JSON column
+    file: examples/batch_triage.iql
+    expect:
+      equals_rows: 2
+      contains: ["msgbatch_01", "in_progress"]
+
+  - name: docs_agent_inventory
+    description: docs example — agent inventory across the cursor-paginated list
+    file: examples/agent_inventory.iql
+    expect:
+      equals_rows: 5
+      contains: ["seed-agent-1"]
+
   # ---- live subset (READ-heavy; one tiny inference) ---------------------------
   - name: live_models_list
     description: real models list

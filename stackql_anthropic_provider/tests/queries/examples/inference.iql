@@ -1,0 +1,10 @@
+SELECT
+  JSON_EXTRACT(content, '$[0].text')     AS reply,
+  JSON_EXTRACT(usage, '$.input_tokens')  AS input_tokens,
+  JSON_EXTRACT(usage, '$.output_tokens') AS output_tokens,
+  stop_reason
+FROM anthropic.messages.messages
+WHERE model = 'claude-sonnet-5'
+AND max_tokens = 256
+AND thinking = '{"type": "disabled"}'
+AND messages = '[{"role": "user", "content": "Name the four Galilean moons of Jupiter, comma separated."}]';

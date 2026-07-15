@@ -1,0 +1,9 @@
+SELECT
+  u.starting_at,
+  JSON_EXTRACT(r.value, '$.model')                   AS model,
+  JSON_EXTRACT(r.value, '$.uncached_input_tokens')   AS input_tokens,
+  JSON_EXTRACT(r.value, '$.cache_read_input_tokens') AS cache_read_tokens,
+  JSON_EXTRACT(r.value, '$.output_tokens')           AS output_tokens
+FROM anthropic_admin.usage.usage_reports u, JSON_EACH(u.results) r
+WHERE u.starting_at = '2026-07-01T00:00:00Z'
+ORDER BY u.starting_at;

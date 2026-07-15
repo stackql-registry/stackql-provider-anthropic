@@ -1,0 +1,10 @@
+SELECT
+  id,
+  processing_status,
+  JSON_EXTRACT(request_counts, '$.processing') AS processing,
+  JSON_EXTRACT(request_counts, '$.succeeded')  AS succeeded,
+  JSON_EXTRACT(request_counts, '$.errored')    AS errored,
+  created_at,
+  ended_at
+FROM anthropic.messages.batches
+ORDER BY created_at DESC;

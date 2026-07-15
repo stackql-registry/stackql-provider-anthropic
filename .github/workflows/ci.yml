@@ -11,9 +11,9 @@ jobs:
   providers:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
 
@@ -56,6 +56,9 @@ jobs:
 
       - name: mock smoke — anthropic_admin
         run: node stackql_anthropic_provider/tests/smoke.cjs --manifest stackql_anthropic_admin_provider/tests/manifest.yaml
+
+      - name: docs index examples must be covered by the smoke suites
+        run: node factory/check-doc-examples.mjs
 
   # No website jobs here: both microsites deploy via Netlify (per-site base
   # directories + selective-build ignore rules in each website/netlify.toml),

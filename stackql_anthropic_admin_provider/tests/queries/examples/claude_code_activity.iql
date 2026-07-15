@@ -1,0 +1,10 @@
+SELECT
+  date,
+  terminal_type,
+  JSON_EXTRACT(actor, '$.email_address')                  AS user_email,
+  JSON_EXTRACT(core_metrics, '$.num_sessions')            AS sessions,
+  JSON_EXTRACT(core_metrics, '$.lines_of_code.added')     AS lines_added,
+  JSON_EXTRACT(core_metrics, '$.commits_by_claude_code')  AS commits
+FROM anthropic_admin.usage.claude_code_reports
+WHERE starting_at = '2026-07-01'
+ORDER BY date;
