@@ -140,15 +140,6 @@ WHERE agent_id = 'agent_01';
 EXEC anthropic.agents.agents.archive @agent_id = 'agent_01';
 ```
 
-## Coverage
-
-Every operation in Anthropic's official OpenAPI specification is exposed, except the following documented exclusions:
-
-- 2 server-sent-event stream endpoints (`sessions/{session_id}/events/stream`, `sessions/{session_id}/threads/{thread_id}/stream`) — SSE streams are not SQL result sets
-- 10 tunnels endpoints — managed via `workspace:manage_tunnels` OAuth, not API keys (excluded from the official SDKs for the same reason)
-- 10 beta duplicates of the GA messages/batches/models operations — folded into the GA surface
-
-
 ## Services
 <div class="row">
 <div class="providerDocColumn">

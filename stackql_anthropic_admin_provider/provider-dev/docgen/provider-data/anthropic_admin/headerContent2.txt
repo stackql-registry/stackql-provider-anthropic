@@ -123,10 +123,3 @@ SELECT
 FROM anthropic_admin.rate_limits.rate_limits rl, JSON_EACH(rl.limits) l
 ORDER BY rl.group_type;
 ```
-
-## Coverage
-
-The full Admin API surface is exposed, except the following documented exclusions:
-
-- Workload Identity Federation endpoints (service accounts, federation issuers, federation rules) — these reject Admin API keys and require an `org:admin` OAuth token
-- Compliance API, Spend Limits API and Claude Enterprise Analytics — these use a third key type (`sk-ant-api01-...`, Claude Enterprise) and belong in a future `anthropic_enterprise` provider
