@@ -1,0 +1,2 @@
+SELECT id, status, instructions
+FROM anthropic.dreams.dreams;

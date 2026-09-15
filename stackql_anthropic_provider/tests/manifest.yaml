@@ -1,0 +1,147 @@
+# Live smoke-test manifest for the stackql `anthropic` provider (tests/smoke.py).
+#
+#   python3 tests/smoke.py --env-file .env            # local provider (provider-dev/openapi)
+#   python3 tests/smoke.py --env-file .env --live     # published provider (REGISTRY PULL anthropic)
+#
+# Tests run in order and share a variable map: a test's `exports` publish
+# values as {test_name}.{export_name}, referenced by later templates (and
+# `contains` expectations) as {{ test_name.export_name }}. Statements are
+# inline `sql:` (Jinja2-rendered) or `file:` under tests/queries/.
+#
+# Budget: read-only apart from ONE 16-token completion on the cheapest
+# model (claude-haiku-4-5) - well under a cent per run. Token counting is
+# free. The managed-agents write lifecycle (create / get / archive, named
+# stackql-smoke-<stamp>-*) runs only with SMOKE_AGENTS=1, because it needs
+# a key enrolled in the managed agents beta; the rollback rule below
+# archives any stackql-smoke-* agent it finds. The workspace-scoped models
+# test runs only with ANTHROPIC_WORKSPACE_ID set to a workspace the key can
+# act on. Beta surfaces the key is not enrolled in (dreams, user profiles)
+# are not exercised.
+#
+# The mock integration suite (tests/integration/manifest.yaml) covers the
+# same statements plus the lifecycles without credentials.
+
+config:
+  provider: anthropic
+  credentials_env_var: ANTHROPIC_API_KEY
+  registry_path: ../provider-dev/openapi
+  queries_dir: queries
+  query_timeout_seconds: 120
+  inter_request_delay_seconds: 0.25
+  rollback:
+    - description: archive smoke agents
+      discover: SELECT id, name FROM anthropic.agents.agents
+      name_column: name
+      id_column: id
+      action: EXEC anthropic.agents.agents.archive @agent_id = '{{ id }}'
+
+vars:
+  model: claude-haiku-4-5-20251001
+  agent_name: stackql-smoke-{{ stamp }}-agent
+
+tests:
+  # ----- models ---------------------------------------------------------------
+  - name: models_list
+    description: models list (after_id style, LIMIT pushed down to the limit param)
+    file: models/models_list.iql
+    expect:
+      min_rows: 1
+      contains: ["claude"]
+    exports:
+      - name: model_id
+        column: id
+
+  - name: models_get
+    description: single model by path param (id exported from the list)
+    sql: >-
+      SELECT id, display_name, created_at FROM anthropic.models.models WHERE model_id = '{{ models_list.model_id }}'
+    expect:
+      min_rows: 1
+      contains: ["{{ models_list.model_id }}"]
+
+  - name: model_capabilities_view
+    description: the vw_model_capabilities view fans capability flags out of the capabilities JSON column
+    file: examples/model_capabilities.iql
+    expect:
+      min_rows: 1
+
+  - name: models_workspace_scoped
+    description: '"anthropic-workspace-id" WHERE condition sent as the header (needs ANTHROPIC_WORKSPACE_ID)'
+    requires_var: ANTHROPIC_WORKSPACE_ID
+    sql: >-
+      SELECT id, display_name FROM anthropic.models.models WHERE "anthropic-workspace-id" = '{{ env.ANTHROPIC_WORKSPACE_ID }}'
+    expect:
+      min_rows: 1
+
+  # ----- inference ------------------------------------------------------------
+  - name: token_count
+    description: token counting (free of charge) as a result set
+    file: messages/count_tokens.iql
+    expect:
+      min_rows: 1
+
+  - name: messages_infer
+    description: the one paid call - a 16-token completion on the cheapest model
+    file: messages/infer_live.iql
+    expect:
+      min_rows: 1
+      contains: ["assistant"]
+
+  # ----- batches, files, skills -----------------------------------------------
+  - name: batches_list
+    description: message batches (after_id style; an empty list is fine)
+    file: messages/batches_list.iql
+
+  - name: files_list
+    description: files list (GA, cursor-paginated; an empty list is fine)
+    file: files/files_list.iql
+
+  - name: skills_list
+    description: skills list includes the Anthropic-published skills
+    file: examples/skills_inventory.iql
+    expect:
+      min_rows: 1
+      contains: ["xlsx"]
+
+  - name: skills_get
+    description: single skill by path param
+    file: skills/skills_get.iql
+    expect:
+      min_rows: 1
+      contains: ["xlsx"]
+
+  - name: skill_versions_list
+    description: versions of the xlsx skill (path param + cursor list)
+    file: skills/skill_versions.iql
+    expect:
+      min_rows: 1
+      contains: ["skver_"]
+
+  # ----- managed agents write lifecycle (SMOKE_AGENTS=1) -----------------------
+  - name: agents_create
+    description: INSERT an agent named stackql-smoke-<stamp>-agent (RETURNING id)
+    requires_var: SMOKE_AGENTS
+    sql: >-
+      INSERT INTO anthropic.agents.agents (name, model) SELECT '{{ agent_name }}', '{{ model }}' RETURNING id, name
+    expect:
+      min_rows: 1
+      contains: ["{{ agent_name }}"]
+    exports:
+      - name: agent_id
+        column: id
+
+  - name: agents_get
+    description: point SELECT by the exported id
+    requires_var: SMOKE_AGENTS
+    sql: >-
+      SELECT id, name, model, version FROM anthropic.agents.agents WHERE agent_id = '{{ agents_create.agent_id }}'
+    expect:
+      min_rows: 1
+      contains: ["{{ agent_name }}"]
+
+  - name: agents_archive
+    description: archive the smoke agent (cleanup)
+    requires_var: SMOKE_AGENTS
+    always_run: true
+    sql: >-
+      EXEC anthropic.agents.agents.archive @agent_id = '{{ agents_create.agent_id }}'

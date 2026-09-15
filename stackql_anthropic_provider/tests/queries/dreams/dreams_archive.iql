@@ -1,0 +1,1 @@
+EXEC anthropic.dreams.dreams.archive @dream_id = '{{ dreams_insert.dream_id }}';

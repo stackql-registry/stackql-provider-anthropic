@@ -1,18 +1,19 @@
-# Smoke-test manifest for the stackql `anthropic_admin` provider.
+# Integration (mock) manifest for the stackql `anthropic_admin` provider.
 #
 # Runs through the SHARED runner + wire-contract-enforcing mock:
-#   node stackql_anthropic_provider/tests/smoke.cjs --manifest stackql_anthropic_admin_provider/tests/manifest.yaml
+#   node tests/integration/run_integration_tests.cjs --manifest stackql_anthropic_admin_provider/tests/integration/manifest.yaml
 #
 # The mock additionally enforces the disjoint admin key space (non
-# `sk-ant-admin` keys → 401 on /v1/organizations/*). Usage/cost reports are
-# served in 2 cursor pages to prove report pagination walks. Live mode
-# (--live, gated on ANTHROPIC_ADMIN_KEY) is READ-ONLY — it never mutates a
-# live organization.
+# `sk-ant-admin` keys -> 401 on /v1/organizations/*). Usage/cost reports are
+# served in 2 cursor pages to prove report pagination walks.
+#
+# The live suite is tests/manifest.yaml (tests/smoke.py) and is READ-ONLY:
+# it never mutates a live organization.
 
 config:
-  registry_path: ../provider-dev/openapi
-  queries_dir: queries
-  live_env_var: ANTHROPIC_ADMIN_KEY
+  registry_path: ../../provider-dev/openapi
+  queries_dir: ../queries
+  credentials_env_var: ANTHROPIC_ADMIN_KEY
   mock_key: sk-ant-admin01-mock
   mock_port: 8991
   query_timeout_seconds: 120
@@ -202,33 +203,8 @@ tests:
       contains: ["ci-key", "sk-ant-api03-R2D...igAA"]
 
   - name: docs_rate_limits
-    description: docs example — rate limits fanned out of the limits JSON column
+    description: docs example - rate limits fanned out of the limits JSON column
     file: examples/rate_limits.iql
     expect:
       min_rows: 3
       contains: ["requests_per_minute", "enqueued_batch_requests"]
-
-  # ---- live subset (READ-ONLY; never mutates a live org) ---------------------------
-  - name: live_org_get
-    description: real organization info
-    file: organization/org_get.iql
-    live: true
-    skip_mock: true
-    expect:
-      min_rows: 1
-
-  - name: live_users_list
-    description: real users list
-    file: organization/users_list.iql
-    live: true
-    skip_mock: true
-    expect:
-      min_rows: 1
-
-  - name: live_rate_limits
-    description: real rate limits list
-    file: rate_limits/rate_limits_list.iql
-    live: true
-    skip_mock: true
-    expect:
-      min_rows: 1

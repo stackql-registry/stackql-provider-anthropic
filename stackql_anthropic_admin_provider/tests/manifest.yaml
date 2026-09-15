@@ -1,0 +1,127 @@
+# Live smoke-test manifest for the stackql `anthropic_admin` provider
+# (tests/smoke.py).
+#
+#   python3 tests/smoke.py --env-file .env --manifest stackql_anthropic_admin_provider/tests/manifest.yaml
+#   python3 tests/smoke.py --env-file .env --manifest stackql_anthropic_admin_provider/tests/manifest.yaml --live
+#
+# READ-ONLY by policy: the suite never mutates a live organization (no
+# invites, no workspace writes, no member or key changes), so there are no
+# breadcrumbs and no rollback rules. The mock integration suite
+# (tests/integration/manifest.yaml) covers the write lifecycles.
+#
+# Needs an org-scoped Admin API key in ANTHROPIC_ADMIN_KEY (the variable the
+# provider reads); ANTHROPIC_ADMIN_API_KEY is accepted as an alias. Admin
+# calls carry no per-call charge.
+
+config:
+  provider: anthropic_admin
+  credentials_env_var: ANTHROPIC_ADMIN_KEY
+  credentials_env_aliases:
+    ANTHROPIC_ADMIN_KEY: [ANTHROPIC_ADMIN_API_KEY]
+  registry_path: ../provider-dev/openapi
+  queries_dir: queries
+  query_timeout_seconds: 120
+  inter_request_delay_seconds: 0.25
+
+vars: {}
+
+tests:
+  # ----- organization ---------------------------------------------------------
+  - name: org_get
+    description: the organization behind the key (/v1/organizations/me as a single-row resource)
+    file: organization/org_get.iql
+    expect:
+      min_rows: 1
+      contains: ["organization"]
+
+  - name: users_list
+    description: organization members (after_id entity list, no auto-pagination)
+    file: organization/users_list.iql
+    expect:
+      min_rows: 1
+    exports:
+      - name: user_id
+        column: id
+
+  - name: users_get
+    description: point SELECT by the exported user id
+    sql: >-
+      SELECT id, email, name, role FROM anthropic_admin.organization.users WHERE user_id = '{{ users_list.user_id }}'
+    expect:
+      min_rows: 1
+      contains: ["{{ users_list.user_id }}"]
+
+  - name: invites_list
+    description: pending invites (an empty list is fine)
+    sql: >-
+      SELECT id, email, role, status, expires_at FROM anthropic_admin.organization.invites
+
+  # ----- workspaces -----------------------------------------------------------
+  - name: workspaces_list
+    description: workspaces (every organization has at least the default workspace)
+    sql: >-
+      SELECT id, name, archived_at, created_at FROM anthropic_admin.workspaces.workspaces
+    expect:
+      min_rows: 1
+    exports:
+      - name: workspace_id
+        column: id
+
+  - name: workspaces_get
+    description: point SELECT by the exported workspace id
+    sql: >-
+      SELECT id, name, display_color FROM anthropic_admin.workspaces.workspaces WHERE workspace_id = '{{ workspaces_list.workspace_id }}'
+    expect:
+      min_rows: 1
+      contains: ["{{ workspaces_list.workspace_id }}"]
+
+  - name: members_list
+    description: members of the exported workspace (an empty list is fine)
+    sql: >-
+      SELECT user_id, workspace_id, workspace_role FROM anthropic_admin.workspaces.members WHERE workspace_id = '{{ workspaces_list.workspace_id }}'
+
+  - name: workspace_rate_limits
+    description: rate-limit overrides on the exported workspace (cursor list; may be empty)
+    sql: >-
+      SELECT group_type, models, limits FROM anthropic_admin.workspaces.rate_limits WHERE workspace_id = '{{ workspaces_list.workspace_id }}'
+
+  # ----- api keys (list / get / update only - the API forbids create/delete) ---
+  - name: api_keys_list
+    description: API key inventory with creator and key hint
+    file: examples/api_key_hygiene.iql
+    expect:
+      min_rows: 1
+    exports:
+      - name: api_key_id
+        column: id
+
+  - name: api_keys_get
+    description: point SELECT by the exported key id
+    sql: >-
+      SELECT id, name, status, workspace_id, partial_key_hint FROM anthropic_admin.api_keys.api_keys WHERE api_key_id = '{{ api_keys_list.api_key_id }}'
+    expect:
+      min_rows: 1
+      contains: ["{{ api_keys_list.api_key_id }}"]
+
+  # ----- reports and limits (cursor-paginated) --------------------------------
+  - name: usage_report
+    description: token usage over the last 7 days, one row per daily bucket, grouped by model
+    sql: >-
+      SELECT starting_at, ending_at, results FROM anthropic_admin.usage.usage_reports WHERE starting_at = '{{ days_ago_7_midnight_iso }}' AND bucket_width = '1d' AND "group_by[]" = 'model'
+
+  - name: cost_report
+    description: spend over the last 7 days, one row per daily bucket
+    sql: >-
+      SELECT starting_at, ending_at, results FROM anthropic_admin.cost.cost_reports WHERE starting_at = '{{ days_ago_7_midnight_iso }}' AND bucket_width = '1d'
+
+  - name: claude_code_report
+    description: Claude Code analytics for a recent day (empty when the org has no Claude Code data)
+    sql: >-
+      SELECT date, terminal_type, actor, core_metrics FROM anthropic_admin.usage.claude_code_reports WHERE starting_at = '{{ days_ago_7_date }}'
+
+  - name: rate_limits_list
+    description: organization rate limits, one row per model group
+    file: rate_limits/rate_limits_list.iql
+    expect:
+      min_rows: 1
+      contains: ["requests_per_minute"]

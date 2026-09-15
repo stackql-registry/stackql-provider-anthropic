@@ -1,14 +1,23 @@
 name: ci
 
+# Build both providers from the vendored spec and run every credential-free
+# test layer on each push / PR; the live smoke suites run only where the
+# Anthropic secrets are configured. Guard 5 (the upstream spec pin) is a
+# hard failure by design: a moved upstream spec fails the build until it is
+# consciously re-pinned (make refresh-spec), reviewed and regenerated.
+
 on:
   push:
-    branches: [main]
+    branches: [main, 'feature/**']
   pull_request:
     branches: [main]
+  schedule:
+    - cron: '23 3 * * 1'   # weekly upstream drift check (Monday 03:23 UTC)
   workflow_dispatch:
 
 jobs:
   providers:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -16,52 +25,170 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22
+          cache: npm
 
       - name: install deps (runs the provider-utils docgen patch via postinstall)
         run: npm ci
 
-      - name: guard 5 — upstream .stats.yml drift check
-        run: node factory/locate.mjs
+      - name: guard 5 - bundled upstream spec matches factory/spec-snapshot.json
+        run: make fetch-spec
 
-      - name: regenerate both providers from vendored inputs
+      - name: anthropic - pre-pass, split, normalize, analyze; all_services.csv must be the reviewed state
+        run: make check-mappings
+
+      - name: anthropic - generate, post-pass, guards 1-4 + 6
         run: |
-          npm run build
-          npm run build-admin
+          npm run generate
+          npm run guards
 
-      - name: regen must be byte-idempotent (committed trees == regenerated trees)
+      - name: anthropic_admin - stage, normalize, analyze, generate, post-pass, guards
+        run: make build-admin
+
+      - name: regen must be byte-idempotent (committed artifacts == regenerated artifacts)
         run: |
-          git diff --exit-code -- \
-            stackql_anthropic_provider/provider-dev/openapi \
-            stackql_anthropic_admin_provider/provider-dev/openapi \
-            stackql_anthropic_provider/provider-dev/config/all_services.csv \
-            stackql_anthropic_admin_provider/provider-dev/config/all_services.csv
+          git add -N .
+          if ! git diff --quiet -- \
+              stackql_anthropic_provider/provider-dev/openapi \
+              stackql_anthropic_provider/provider-dev/source \
+              stackql_anthropic_provider/provider-dev/config \
+              stackql_anthropic_admin_provider/provider-dev/openapi \
+              stackql_anthropic_admin_provider/provider-dev/source \
+              stackql_anthropic_admin_provider/provider-dev/config; then
+            echo "Generated output differs from the committed artifacts - run 'make build' and commit."
+            git diff --stat -- stackql_anthropic_provider/provider-dev stackql_anthropic_admin_provider/provider-dev
+            exit 1
+          fi
 
-      # guards 1-4 + 6 run inside `npm run build` / `npm run build-admin`
-      # (factory/guards.mjs) and hard-fail the steps above.
+      # puts the latest stackql on PATH; the offline, integration and
+      # meta-route runners resolve it from there
+      - name: install stackql
+        uses: stackql/setup-stackql@v2
+
+      - name: stackql version
+        run: stackql --version
+
+      - name: offline validation (SHOW / DESCRIBE over the local registry), both providers
+        run: make test-offline
+
+      - name: integration tests (wire-contract-enforcing mock API), both providers
+        run: make test-integration
+
+      - name: meta routes (zero errors required), both providers
+        run: make test-meta
+
+      - name: docs index examples must be covered by the integration suites
+        run: make test-doc-examples
+
+      - name: docs generation (sanity - the site builds run on Netlify)
+        run: |
+          make docs
+          make docs-admin
+
+  smoke:
+    # secret-gated live smoke suites; skipped with a notice when a secret is
+    # not configured (forks, PRs from outside). anthropic: reads plus one
+    # 16-token completion on the cheapest model; anthropic_admin: READ-ONLY.
+    runs-on: ubuntu-latest
+    needs: providers
+    if: github.event_name != 'pull_request' && github.event_name != 'schedule'
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      ANTHROPIC_ADMIN_KEY: ${{ secrets.ANTHROPIC_ADMIN_KEY }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: install dependencies
+        run: |
+          npm ci
+          pip install -r tests/requirements.txt
 
       - name: install stackql
+        uses: stackql/setup-stackql@v2
+
+      - name: live smoke - anthropic (local provider)
+        if: env.ANTHROPIC_API_KEY != ''
+        run: make smoke
+
+      - name: live smoke - anthropic skipped (no credentials)
+        if: env.ANTHROPIC_API_KEY == ''
+        run: echo "::notice title=anthropic live smoke skipped::The ANTHROPIC_API_KEY secret is not configured. Credential-free coverage still ran via the mock integration suite."
+
+      - name: live smoke - anthropic_admin (local provider, read-only)
+        if: env.ANTHROPIC_ADMIN_KEY != ''
+        run: make smoke-admin
+
+      - name: live smoke - anthropic_admin skipped (no credentials)
+        if: env.ANTHROPIC_ADMIN_KEY == ''
+        run: echo "::notice title=anthropic_admin live smoke skipped::The ANTHROPIC_ADMIN_KEY secret is not configured. Credential-free coverage still ran via the mock integration suite."
+
+  spec-drift:
+    # Re-check the pin against the bundled upstream spec on a schedule and
+    # on demand, and open an issue when it moves.
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: install dependencies
+        run: npm ci
+
+      - name: compare the bundled upstream spec against the pin
+        id: drift
         run: |
-          curl -sSL -o stackql.zip https://releases.stackql.io/stackql/latest/stackql_linux_amd64.zip
-          unzip -o stackql.zip && chmod +x stackql
-          echo "STACKQL=$PWD/stackql" >> "$GITHUB_ENV"
+          set +e
+          node factory/locate.mjs > locate.log 2>&1
+          rc=$?
+          set -e
+          cat locate.log
+          if [ "$rc" -eq 0 ]; then
+            echo "drift=false" >> "$GITHUB_OUTPUT"
+          elif [ "$rc" -eq 3 ]; then
+            echo "drift=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "upstream unreachable (rc=$rc)"; exit "$rc"
+          fi
 
-      - name: meta routes — anthropic (zero errors required)
-        run: node stackql_anthropic_provider/bin/test-meta-routes.cjs anthropic
-
-      - name: meta routes — anthropic_admin (zero errors required)
-        run: node stackql_anthropic_admin_provider/bin/test-meta-routes.cjs anthropic_admin
-
-      - name: mock smoke — anthropic
-        run: node stackql_anthropic_provider/tests/smoke.cjs
-
-      - name: mock smoke — anthropic_admin
-        run: node stackql_anthropic_provider/tests/smoke.cjs --manifest stackql_anthropic_admin_provider/tests/manifest.yaml
-
-      - name: docs index examples must be covered by the smoke suites
-        run: node factory/check-doc-examples.mjs
+      - name: open a drift issue
+        if: steps.drift.outputs.drift == 'true'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const log = fs.readFileSync('locate.log', 'utf8');
+            const title = 'Upstream Anthropic OpenAPI spec drifted from factory/spec-snapshot.json';
+            const { data: open } = await github.rest.issues.listForRepo({ owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: 'spec-drift' });
+            const body = [
+              'The bundled spec in anthropics/anthropic-sdk-python (scripts/mock-spec.json.gz) no longer matches the committed pin.',
+              '',
+              'Run `make refresh-spec`, review the diff (new ops must be mapped in factory/csv-review.mjs or excluded in factory/exclusions.yaml; re-verify factory/beta-flags.yaml against the PyPI anthropic package), then `make build && make test`.',
+              '',
+              '```', log.trim(), '```',
+            ].join('\n');
+            if (open.length) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: open[0].number, body });
+            } else {
+              await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title, body, labels: ['spec-drift'] });
+            }
 
   # No website jobs here: both microsites deploy via Netlify (per-site base
   # directories + selective-build ignore rules in each website/netlify.toml),
-  # and Netlify builds deploy previews on PRs — a CI site build would just
+  # and Netlify builds deploy previews on PRs - a CI site build would just
   # duplicate it. This repo never uses GitHub Pages (one Pages site per repo;
   # we have two sites).

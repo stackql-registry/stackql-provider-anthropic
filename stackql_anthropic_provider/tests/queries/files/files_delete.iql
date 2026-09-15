@@ -1,0 +1,2 @@
+DELETE FROM anthropic.files.files
+WHERE file_id = 'file_03';

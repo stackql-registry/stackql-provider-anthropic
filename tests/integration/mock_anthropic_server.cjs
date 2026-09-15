@@ -1,23 +1,32 @@
 #!/usr/bin/env node
-// Wire-contract-enforcing mock of api.anthropic.com for the smoke suite.
+// Wire-contract-enforcing mock of api.anthropic.com for the integration
+// suites of both providers (tests/integration/run_integration_tests.cjs).
 //
 // It REJECTS wire-contract violations rather than being permissive:
-//   - missing `x-api-key` header                        → 401
-//   - missing `anthropic-version` header                → 400
-//   - beta path (`beta=true` query) without a correct
-//     `anthropic-beta` header                           → 400
+//   - missing `x-api-key` header                        -> 401
+//   - missing `anthropic-version` header                -> 400
+//   - beta path (`beta=true` query) without the
+//     per-endpoint `anthropic-beta` flag                -> 400
+//     (beta paths the SDK sends no flag for - skills content download -
+//     are accepted without one, mirroring the live API)
+//   - `anthropic-workspace-id` header that is not a
+//     wrkspc_ id                                        -> 400 (as live)
 //
-// It also serves a 2-page cursor list on /v1/agents (page/next_page) to
-// prove stackql's auto-pagination walks, an after_id-style single page on
-// /v1/messages/batches and /v1/models, and a stateful agents store for the
-// INSERT/SELECT/UPDATE/EXEC-archive lifecycle.
+// It serves 2-page cursor lists on /v1/agents and /v1/dreams
+// (page/next_page) to prove stackql's auto-pagination walks, after_id-style
+// single pages on /v1/messages/batches and /v1/models, the GA files and
+// skills surfaces (cursor lists), a stateful agents store for the
+// INSERT/SELECT/UPDATE/EXEC-archive lifecycle, and a stateful dreams store
+// for INSERT/SELECT/EXEC-cancel/EXEC-archive. A workspace-scoped models
+// list (anthropic-workspace-id: wrkspc_01) returns a single model, so a
+// test can prove the header reached the wire from a WHERE clause.
 //
 // Admin endpoints (/v1/organizations/*) enforce the same contract for the
 // anthropic_admin provider and additionally answer the four "admin open
 // questions" empirically (report row shape, array query params, ending_at,
 // fast-mode header).
 //
-//   node mock-server.cjs [port]     (default 8990)
+//   node mock_anthropic_server.cjs [port]     (default 8990)
 //
 // GET /__requests returns the request journal (method, path, headers subset,
 // parsed query) so tests can assert on what actually hit the wire.
@@ -27,6 +36,9 @@ const { URL } = require('url');
 
 const port = Number(process.argv[2] || 8990);
 
+// Mirrors factory/beta-flags.yaml (anthropic==1.5.0). Prefixes mapped to
+// null are beta paths the SDK sends no flag for: the header is accepted but
+// not required.
 const BETA_FLAGS = {
   '/v1/agents': 'managed-agents-2026-04-01',
   '/v1/deployment_runs': 'managed-agents-2026-04-01',
@@ -34,10 +46,11 @@ const BETA_FLAGS = {
   '/v1/environments': 'managed-agents-2026-04-01',
   '/v1/sessions': 'managed-agents-2026-04-01',
   '/v1/vaults': 'managed-agents-2026-04-01',
-  '/v1/files': 'files-api-2025-04-14',
   '/v1/memory_stores': 'agent-memory-2026-07-22',
-  '/v1/skills': 'skills-2025-10-02',
-  '/v1/user_profiles': 'user-profiles-2026-03-24',
+  '/v1/user_profiles': 'user-profiles-2026-08-18',
+  '/v1/dreams': 'dreaming-2026-04-21',
+  '/v1/skills': null,
+  '/v1/files': null,
 };
 
 // ---- state ------------------------------------------------------------------
@@ -57,6 +70,45 @@ function seedAgent(name) {
 }
 for (let i = 1; i <= 5; i++) seedAgent(`seed-agent-${i}`);
 
+// GA files: 3 seeded, served 2 per cursor page.
+const files = new Map();
+for (let i = 1; i <= 3; i++) {
+  const id = `file_${String(i).padStart(2, '0')}`;
+  files.set(id, {
+    id, type: 'file', filename: `seed-file-${i}.txt`, mime_type: 'text/plain', size_bytes: 100 * i,
+    created_at: `2026-09-0${i}T00:00:00Z`, expires_at: null, downloadable: true,
+  });
+}
+
+// GA skills: one Anthropic-published, one custom.
+const skills = [
+  { type: 'skill', id: 'xlsx', display_name: 'xlsx', source: { type: 'anthropic' }, latest_version_id: 'skver_01', created_at: '2025-10-14T08:41:11Z', updated_at: '2026-09-14T21:00:33Z' },
+  { type: 'skill', id: 'skill_custom01', display_name: 'release-notes', source: { type: 'custom' }, latest_version_id: 'skver_02', created_at: '2026-09-01T00:00:00Z', updated_at: '2026-09-01T00:00:00Z' },
+];
+const skillVersion = (s) => ({
+  type: 'skill_version', id: s.latest_version_id, skill_id: s.id, name: s.display_name,
+  description: `${s.display_name} skill`, created_at: s.updated_at,
+});
+
+// dreams (research preview): 3 seeded, served 2 per cursor page; stateful
+// for the INSERT / SELECT / EXEC-cancel / EXEC-archive lifecycle.
+let dreamSeq = 0;
+const dreams = new Map();
+function seedDream({ inputs, instructions, model } = {}) {
+  dreamSeq += 1;
+  const id = `dream_${String(dreamSeq).padStart(2, '0')}`;
+  dreams.set(id, {
+    type: 'dream', id, status: 'running',
+    inputs: inputs || [{ type: 'memory_store', memory_store_id: 'memstore_01' }],
+    outputs: [{ type: 'memory_store', memory_store_id: `memstore_out_${String(dreamSeq).padStart(2, '0')}` }],
+    created_at: '2026-09-15T00:00:00Z', ended_at: null, archived_at: null, error: null,
+    model: model || { type: 'default' }, instructions: instructions ?? null, session_id: null,
+    usage: { input_tokens: 0, output_tokens: 0 }, output_behavior: { type: 'new_store' },
+  });
+  return dreams.get(id);
+}
+for (let i = 1; i <= 3; i++) seedDream({ instructions: `seed-dream-${i}` });
+
 const requests = [];
 
 // ---- helpers ------------------------------------------------------------------
@@ -69,11 +121,14 @@ const ok = (res, obj, code = 200) => {
   res.end(JSON.stringify(obj));
 };
 
+// Returns { known, flag }: `known` when the prefix is in the table (flag
+// may be null for no-default beta paths), so an unknown beta path still
+// needs SOME anthropic-beta header.
 function betaFlagFor(pathname) {
   for (const [prefix, flag] of Object.entries(BETA_FLAGS)) {
-    if (pathname === prefix || pathname.startsWith(`${prefix}/`)) return flag;
+    if (pathname === prefix || pathname.startsWith(`${prefix}/`)) return { known: true, flag };
   }
-  return null;
+  return { known: false, flag: null };
 }
 
 const server = http.createServer((req, res) => {
@@ -100,12 +155,20 @@ const server = http.createServer((req, res) => {
     return err(res, 400, 'invalid_request_error', 'missing anthropic-version header');
   }
   if (u.searchParams.get('beta') === 'true') {
-    const wanted = betaFlagFor(pathname);
+    const { known, flag: wanted } = betaFlagFor(pathname);
     const got = req.headers['anthropic-beta'];
-    if (!got || (wanted && !String(got).split(',').includes(wanted))) {
+    if (wanted && (!got || !String(got).split(',').includes(wanted))) {
       return err(res, 400, 'invalid_request_error',
         `beta path requires anthropic-beta: ${wanted}; got: ${got || '(none)'}`);
     }
+    if (!known && !got) {
+      return err(res, 400, 'invalid_request_error', 'beta path requires an anthropic-beta header');
+    }
+  }
+  // Live behaviour (verified 2026-09-15): a malformed workspace id is a 400.
+  const workspaceHeader = req.headers['anthropic-workspace-id'];
+  if (workspaceHeader !== undefined && !/^wrkspc_[A-Za-z0-9]+$/.test(String(workspaceHeader))) {
+    return err(res, 400, 'invalid_request_error', 'anthropic-workspace-id header must be a valid workspace ID.');
   }
 
   let body = '';
@@ -149,12 +212,17 @@ const server = http.createServer((req, res) => {
 
     // ---- models ---------------------------------------------------------------
     if (req.method === 'GET' && pathname === '/v1/models') {
+      const models = [
+        { type: 'model', id: 'claude-sonnet-5', display_name: 'Claude Sonnet 5', created_at: '2026-01-01T00:00:00Z' },
+        { type: 'model', id: 'claude-opus-4-8', display_name: 'Claude Opus 4.8', created_at: '2026-02-01T00:00:00Z' },
+      ];
+      // Workspace-scoped listing: proves a `"anthropic-workspace-id" = ...`
+      // WHERE condition reached the wire as the header (one row instead of
+      // two). Any other well-formed wrkspc_ id sees the full list.
+      const data = workspaceHeader === 'wrkspc_01' ? models.slice(0, 1) : models;
       return ok(res, {
-        data: [
-          { type: 'model', id: 'claude-sonnet-5', display_name: 'Claude Sonnet 5', created_at: '2026-01-01T00:00:00Z' },
-          { type: 'model', id: 'claude-opus-4-8', display_name: 'Claude Opus 4.8', created_at: '2026-02-01T00:00:00Z' },
-        ],
-        has_more: false, first_id: 'claude-sonnet-5', last_id: 'claude-opus-4-8',
+        data,
+        has_more: false, first_id: data[0].id, last_id: data[data.length - 1].id,
       });
     }
     if (req.method === 'GET' && pathname.startsWith('/v1/models/')) {
@@ -205,7 +273,96 @@ const server = http.createServer((req, res) => {
       }
     }
 
-    // ---- admin API (/v1/organizations/*) — used by the anthropic_admin suite --
+    // ---- files (GA; cursor list on page/next_page) -----------------------------
+    if (pathname === '/v1/files' && req.method === 'GET') {
+      const all = [...files.values()];
+      const page = u.searchParams.get('page');
+      const start = page ? Number(Buffer.from(page, 'base64url').toString()) : 0;
+      const slice = all.slice(start, start + 2);
+      const nextStart = start + 2;
+      return ok(res, { data: slice, next_page: nextStart < all.length ? Buffer.from(String(nextStart)).toString('base64url') : null });
+    }
+    if (pathname === '/v1/files' && req.method === 'POST') {
+      // multipart upload: EXEC-routed; the naive translator cannot express it
+      return err(res, 400, 'invalid_request_error', 'multipart/form-data upload is not exercised by the mock');
+    }
+    const fileMatch = pathname.match(/^\/v1\/files\/([^/]+)(\/content)?$/);
+    if (fileMatch) {
+      const f = files.get(fileMatch[1]);
+      if (!f) return err(res, 404, 'not_found_error', `no file ${fileMatch[1]}`);
+      if (fileMatch[2] && req.method === 'GET') {
+        res.writeHead(200, { 'content-type': 'application/octet-stream' });
+        return res.end(Buffer.from('mock file content'));
+      }
+      if (req.method === 'GET') return ok(res, f);
+      if (req.method === 'DELETE') { files.delete(f.id); return ok(res, { id: f.id, type: 'file_deleted' }); }
+    }
+
+    // ---- skills (GA lists/gets; multipart creates are EXEC-only) ---------------
+    if (pathname === '/v1/skills' && req.method === 'GET') {
+      const source = u.searchParams.get('source');
+      const data = source ? skills.filter((s) => s.source.type === source) : skills;
+      return ok(res, { data, next_page: null });
+    }
+    if (pathname === '/v1/skills' && req.method === 'POST') {
+      return err(res, 400, 'invalid_request_error', 'multipart/form-data skill create is not exercised by the mock');
+    }
+    const skillVersions = pathname.match(/^\/v1\/skills\/([^/]+)\/versions$/);
+    if (skillVersions && req.method === 'GET') {
+      const s = skills.find((x) => x.id === skillVersions[1]);
+      if (!s) return err(res, 404, 'not_found_error', `no skill ${skillVersions[1]}`);
+      return ok(res, { data: [skillVersion(s)], next_page: null });
+    }
+    const skillVersion1 = pathname.match(/^\/v1\/skills\/([^/]+)\/versions\/([^/]+)(\/content)?$/);
+    if (skillVersion1 && req.method === 'GET') {
+      const s = skills.find((x) => x.id === skillVersion1[1]);
+      if (!s) return err(res, 404, 'not_found_error', `no skill ${skillVersion1[1]}`);
+      if (skillVersion1[3]) {
+        // beta-keyed content download: no anthropic-beta flag required (as live)
+        res.writeHead(200, { 'content-type': 'application/zip' });
+        return res.end(Buffer.from('PK'));
+      }
+      return ok(res, skillVersion(s));
+    }
+    const skillMatch = pathname.match(/^\/v1\/skills\/([^/]+)$/);
+    if (skillMatch && req.method === 'GET') {
+      const s = skills.find((x) => x.id === skillMatch[1]);
+      if (!s) return err(res, 404, 'not_found_error', `no skill ${skillMatch[1]}`);
+      return ok(res, s);
+    }
+
+    // ---- dreams (beta; stateful lifecycle + 2-page cursor list) ----------------
+    if (pathname === '/v1/dreams' && req.method === 'GET') {
+      const includeArchived = u.searchParams.get('include_archived') === 'true';
+      const status = u.searchParams.get('statuses[]');
+      let all = [...dreams.values()].filter((d) => includeArchived || !d.archived_at);
+      if (status) all = all.filter((d) => d.status === status);
+      const page = u.searchParams.get('page');
+      const start = page ? Number(Buffer.from(page, 'base64url').toString()) : 0;
+      const slice = all.slice(start, start + 2);
+      const nextStart = start + 2;
+      return ok(res, { data: slice, next_page: nextStart < all.length ? Buffer.from(String(nextStart)).toString('base64url') : null });
+    }
+    if (pathname === '/v1/dreams' && req.method === 'POST') {
+      const d = seedDream({ inputs: parsed.inputs, instructions: parsed.instructions ?? null, model: parsed.model });
+      return ok(res, d);
+    }
+    const dreamMatch = pathname.match(/^\/v1\/dreams\/([^/]+)(\/cancel|\/archive)?$/);
+    if (dreamMatch) {
+      const d = dreams.get(dreamMatch[1]);
+      if (!d) return err(res, 404, 'not_found_error', `no dream ${dreamMatch[1]}`);
+      if (dreamMatch[2] === '/cancel' && req.method === 'POST') {
+        d.status = 'canceled'; d.ended_at = '2026-09-15T00:01:00Z';
+        return ok(res, d);
+      }
+      if (dreamMatch[2] === '/archive' && req.method === 'POST') {
+        d.archived_at = '2026-09-15T00:02:00Z';
+        return ok(res, d);
+      }
+      if (!dreamMatch[2] && req.method === 'GET') return ok(res, d);
+    }
+
+    // ---- admin API (/v1/organizations/*) - used by the anthropic_admin suite ---
     if (pathname.startsWith('/v1/organizations/')) {
       return handleAdmin(req, res, u, pathname, parsed);
     }

@@ -1,0 +1,2 @@
+SELECT id FROM anthropic.models.models
+WHERE "anthropic-workspace-id" = 'not-a-workspace';

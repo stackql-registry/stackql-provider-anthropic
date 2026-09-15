@@ -1,0 +1,3 @@
+SELECT id, display_name, JSON_EXTRACT(source, '$.type') AS source, latest_version_id, updated_at
+FROM anthropic.skills.skills
+ORDER BY updated_at DESC;
