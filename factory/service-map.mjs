@@ -1,4 +1,4 @@
-// Path → service taxonomy for the `anthropic` provider (12 services).
+// Path → service taxonomy for the `anthropic` provider (13 services).
 // The spec has no tags, so provider-utils `split` runs with
 // --svc-discriminator=function pointed at this module's default export.
 //
@@ -9,6 +9,7 @@ const PREFIX_MAP = [
   ['/v1/models', 'models'],
   ['/v1/complete', 'completions'],
   ['/v1/agents', 'agents'],
+  ['/v1/dreams', 'dreams'],
   ['/v1/deployment_runs', 'deployments'],
   ['/v1/deployments', 'deployments'],
   ['/v1/environments', 'environments'],

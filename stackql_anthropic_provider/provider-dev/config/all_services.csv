@@ -103,3 +103,21 @@ vaults.yaml,/v1/vaults/{vault_id}/credentials/{credential_id}?beta=true,BetaUpda
 vaults.yaml,/v1/vaults/{vault_id}/credentials/{credential_id}?beta=true,BetaDeleteCredential,beta_delete_credential,delete,BetaManagedAgentsDeletedCredential,,,credentials,delete,delete,,Delete Credential
 vaults.yaml,/v1/vaults/{vault_id}/credentials/{credential_id}/archive?beta=true,BetaArchiveCredential,beta_archive_credential,post,BetaManagedAgentsCredential,,,credentials,archive,exec,,Archive Credential
 vaults.yaml,/v1/vaults/{vault_id}/credentials/{credential_id}/mcp_oauth_validate?beta=true,BetaValidateCredential,beta_validate_credential,post,BetaManagedAgentsCredentialValidation,,,credentials,mcp_oauth_validate,exec,,Validate Credential
+dreams.yaml,/v1/dreams?beta=true,BetaCreateDream,beta_create_dream,post,BetaDream,,,dreams,create,insert,,Create a Dream
+dreams.yaml,/v1/dreams?beta=true,BetaListDreams,beta_list_dreams,get,BetaListDreamsResponse,,,dreams,list,select,$.data,List Dreams
+dreams.yaml,/v1/dreams/{dream_id}?beta=true,BetaGetDream,beta_get_dream,get,BetaDream,,,dreams,get,select,,Get a Dream
+dreams.yaml,/v1/dreams/{dream_id}/cancel?beta=true,BetaCancelDream,beta_cancel_dream,post,BetaDream,,,dreams,cancel,exec,,Cancel a Dream
+dreams.yaml,/v1/dreams/{dream_id}/archive?beta=true,BetaArchiveDream,beta_archive_dream,post,BetaDream,,,dreams,archive,exec,,Archive a Dream
+files.yaml,/v1/files,upload_file_v1_files_post,upload_file_v1_files_post,post,FileMetadataSchema,,,files,upload,exec,,Upload File
+files.yaml,/v1/files,list_files_v1_files_get,list_files_v1_files_get,get,FileListResponse,,,files,list,select,$.data,List Files
+files.yaml,/v1/files/{file_id},get_file_metadata_v1_files__file_id__get,get_file_metadata_v1_files__file_id__get,get,FileMetadataSchema,,,files,get,select,,Get File Metadata
+files.yaml,/v1/files/{file_id},delete_file_v1_files__file_id__delete,delete_file_v1_files__file_id__delete,delete,FileDeleteResponse,,,files,delete,delete,,Delete File
+files.yaml,/v1/files/{file_id}/content,download_file_v1_files__file_id__content_get,download_file_v1_files__file_id__content_get,get,,,,files,download,exec,,Download File
+skills.yaml,/v1/skills,create_skill_v1_skills_post,create_skill_v1_skills_post,post,Skill,,,skills,create,exec,,Create Skill
+skills.yaml,/v1/skills,list_skills_v1_skills_get,list_skills_v1_skills_get,get,ListSkillsResponse,,,skills,list,select,$.data,List Skills
+skills.yaml,/v1/skills/{skill_id},get_skill_v1_skills__skill_id__get,get_skill_v1_skills__skill_id__get,get,Skill,,,skills,get,select,,Get Skill
+skills.yaml,/v1/skills/{skill_id},delete_skill_v1_skills__skill_id__delete,delete_skill_v1_skills__skill_id__delete,delete,DeletedSkill,,,skills,delete,delete,,Delete Skill
+skills.yaml,/v1/skills/{skill_id}/versions,create_skill_version_v1_skills__skill_id__versions_post,create_skill_version_v1_skills__skill_id__versions_post,post,SkillVersion,,,versions,create,exec,,Create Skill Version
+skills.yaml,/v1/skills/{skill_id}/versions,list_skill_versions_v1_skills__skill_id__versions_get,list_skill_versions_v1_skills__skill_id__versions_get,get,ListSkillVersionsResponse,,,versions,list,select,$.data,List Skill Versions
+skills.yaml,/v1/skills/{skill_id}/versions/{version},get_skill_version_v1_skills__skill_id__versions__version__get,get_skill_version_v1_skills__skill_id__versions__version__get,get,SkillVersion,,,versions,get,select,,Get Skill Version
+skills.yaml,/v1/skills/{skill_id}/versions/{version},delete_skill_version_v1_skills__skill_id__versions__version__delete,delete_skill_version_v1_skills__skill_id__versions__version__delete,delete,DeletedSkillVersion,,,versions,delete,delete,,Delete Skill Version
