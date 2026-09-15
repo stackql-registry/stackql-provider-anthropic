@@ -1,0 +1,3 @@
+SELECT id, display_name, created_at
+FROM anthropic.models.models
+WHERE "anthropic-workspace-id" = 'wrkspc_01';

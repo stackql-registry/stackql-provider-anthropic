@@ -98,12 +98,29 @@ Successful response (OK)
           {
             "name": "id",
             "type": "string",
-            "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-sonnet-5)"
+            "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-fable-5-1)"
           },
           {
             "name": "speed",
             "type": "string",
             "description": "Inference speed mode. `fast` provides significantly faster output token generation at premium pricing. Defaults to `standard`. Not all models support `fast`; invalid combinations are rejected at create time. (standard, fast)"
+          },
+          {
+            "name": "effort",
+            "type": "object",
+            "description": "How hard Claude works on each inference call. One of `low`, `medium`, `high`, `xhigh`, `max`. Always present; resolved to the per-model default at save time when not supplied.",
+            "children": [
+              {
+                "name": "type",
+                "type": "string",
+                "description": " (low)"
+              }
+            ]
+          },
+          {
+            "name": "inference_geo",
+            "type": "string",
+            "description": "Geographic region for model inference. When unset, requests fall through to the workspace's default_inference_geo."
           }
         ]
       },
@@ -145,9 +162,14 @@ Successful response (OK)
             "description": "",
             "children": [
               {
+                "name": "type",
+                "type": "string",
+                "description": " (bash)"
+              },
+              {
                 "name": "name",
                 "type": "string",
-                "description": "Built-in agent tool identifier. (bash, edit, read, write, glob, grep, web_fetch, web_search)"
+                "description": " (bash)"
               },
               {
                 "name": "enabled",
@@ -158,6 +180,26 @@ Successful response (OK)
                 "name": "permission_policy",
                 "type": "object",
                 "description": "Permission policy for tool execution."
+              },
+              {
+                "name": "allowed_domains",
+                "type": "array",
+                "description": ""
+              },
+              {
+                "name": "blocked_domains",
+                "type": "array",
+                "description": ""
+              },
+              {
+                "name": "max_content_tokens",
+                "type": "integer (int32)",
+                "description": ""
+              },
+              {
+                "name": "user_location",
+                "type": "object",
+                "description": "Approximate user location for search result localization."
               }
             ]
           },
@@ -327,6 +369,45 @@ Successful response (OK)
             "name": "ephemeral_5m_input_tokens",
             "type": "integer (int32)",
             "description": "Tokens used to create 5-minute ephemeral cache entries."
+          }
+        ]
+      },
+      {
+        "name": "list_cost",
+        "type": "object",
+        "description": "Cumulative list cost of this thread across all turns, priced at public list rates. Absent until cost tracking is available for the thread. Each figure is rounded to the nearest cent independently and the session's aggregate `usage.list_cost` additionally includes session runtime, so per-thread costs do not sum exactly to the session figure; the session figure is authoritative and is what a budget is enforced against.",
+        "children": [
+          {
+            "name": "currency",
+            "type": "string",
+            "description": "Uppercase ISO-4217 currency code. `USD` is the only currency currently supported; the accepted set is closed and grows only when a new currency is priced. (USD)"
+          },
+          {
+            "name": "amount",
+            "type": "string",
+            "description": "Amount in minor units of the currency, as an integer decimal string with no leading zeros: \"2500\" is $25.00 and \"50\" is fifty cents. A string rather than a number so no float rounding is ever applied."
+          }
+        ]
+      },
+      {
+        "name": "active_seconds",
+        "type": "number (double)",
+        "description": "Cumulative time in seconds this thread spent in running status. Equal to `stats.active_seconds`; surfaced here so a thread's usage carries every quantity its cost is priced on."
+      },
+      {
+        "name": "server_tool_use",
+        "type": "object",
+        "description": "Cumulative server-executed tool usage across all turns of this thread. Absent until server-tool tracking is available for the thread.",
+        "children": [
+          {
+            "name": "web_search_requests",
+            "type": "integer (int32)",
+            "description": "Number of server-executed web search requests."
+          },
+          {
+            "name": "web_fetch_requests",
+            "type": "integer (int32)",
+            "description": "Number of server-executed web fetch requests."
           }
         ]
       }
@@ -392,12 +473,29 @@ Successful response (OK)
           {
             "name": "id",
             "type": "string",
-            "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-sonnet-5)"
+            "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-fable-5-1)"
           },
           {
             "name": "speed",
             "type": "string",
             "description": "Inference speed mode. `fast` provides significantly faster output token generation at premium pricing. Defaults to `standard`. Not all models support `fast`; invalid combinations are rejected at create time. (standard, fast)"
+          },
+          {
+            "name": "effort",
+            "type": "object",
+            "description": "How hard Claude works on each inference call. One of `low`, `medium`, `high`, `xhigh`, `max`. Always present; resolved to the per-model default at save time when not supplied.",
+            "children": [
+              {
+                "name": "type",
+                "type": "string",
+                "description": " (low)"
+              }
+            ]
+          },
+          {
+            "name": "inference_geo",
+            "type": "string",
+            "description": "Geographic region for model inference. When unset, requests fall through to the workspace's default_inference_geo."
           }
         ]
       },
@@ -439,9 +537,14 @@ Successful response (OK)
             "description": "",
             "children": [
               {
+                "name": "type",
+                "type": "string",
+                "description": " (bash)"
+              },
+              {
                 "name": "name",
                 "type": "string",
-                "description": "Built-in agent tool identifier. (bash, edit, read, write, glob, grep, web_fetch, web_search)"
+                "description": " (bash)"
               },
               {
                 "name": "enabled",
@@ -452,6 +555,26 @@ Successful response (OK)
                 "name": "permission_policy",
                 "type": "object",
                 "description": "Permission policy for tool execution."
+              },
+              {
+                "name": "allowed_domains",
+                "type": "array",
+                "description": ""
+              },
+              {
+                "name": "blocked_domains",
+                "type": "array",
+                "description": ""
+              },
+              {
+                "name": "max_content_tokens",
+                "type": "integer (int32)",
+                "description": ""
+              },
+              {
+                "name": "user_location",
+                "type": "object",
+                "description": "Approximate user location for search result localization."
               }
             ]
           },
@@ -623,6 +746,45 @@ Successful response (OK)
             "description": "Tokens used to create 5-minute ephemeral cache entries."
           }
         ]
+      },
+      {
+        "name": "list_cost",
+        "type": "object",
+        "description": "Cumulative list cost of this thread across all turns, priced at public list rates. Absent until cost tracking is available for the thread. Each figure is rounded to the nearest cent independently and the session's aggregate `usage.list_cost` additionally includes session runtime, so per-thread costs do not sum exactly to the session figure; the session figure is authoritative and is what a budget is enforced against.",
+        "children": [
+          {
+            "name": "currency",
+            "type": "string",
+            "description": "Uppercase ISO-4217 currency code. `USD` is the only currency currently supported; the accepted set is closed and grows only when a new currency is priced. (USD)"
+          },
+          {
+            "name": "amount",
+            "type": "string",
+            "description": "Amount in minor units of the currency, as an integer decimal string with no leading zeros: \"2500\" is $25.00 and \"50\" is fifty cents. A string rather than a number so no float rounding is ever applied."
+          }
+        ]
+      },
+      {
+        "name": "active_seconds",
+        "type": "number (double)",
+        "description": "Cumulative time in seconds this thread spent in running status. Equal to `stats.active_seconds`; surfaced here so a thread's usage carries every quantity its cost is priced on."
+      },
+      {
+        "name": "server_tool_use",
+        "type": "object",
+        "description": "Cumulative server-executed tool usage across all turns of this thread. Absent until server-tool tracking is available for the thread.",
+        "children": [
+          {
+            "name": "web_search_requests",
+            "type": "integer (int32)",
+            "description": "Number of server-executed web search requests."
+          },
+          {
+            "name": "web_fetch_requests",
+            "type": "integer (int32)",
+            "description": "Number of server-executed web fetch requests."
+          }
+        ]
       }
     ]
   }
@@ -649,21 +811,21 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-session_id"><code>session_id</code></a>, <a href="#parameter-thread_id"><code>thread_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-session_id"><code>session_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#archive"><CopyableCode code="archive" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-session_id"><code>session_id</code></a>, <a href="#parameter-thread_id"><code>thread_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 </tbody>
@@ -691,6 +853,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="thread_id" /></td>
     <td><code>string</code></td>
     <td>Path parameter thread_id (example: sthr_011CZkZVWa6oIjw0rgXZpnBt)</td>
+</tr>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
+    <td><code>string</code></td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
 </tr>
 </tbody>
 </table>
@@ -724,6 +891,7 @@ usage
 FROM anthropic.sessions.threads
 WHERE session_id = '{{ session_id }}' -- required
 AND thread_id = '{{ thread_id }}' -- required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -746,6 +914,7 @@ updated_at,
 usage
 FROM anthropic.sessions.threads
 WHERE session_id = '{{ session_id }}' -- required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -767,7 +936,8 @@ Successful response (OK)
 ```sql
 EXEC anthropic.sessions.threads.archive 
 @session_id='{{ session_id }}' --required, 
-@thread_id='{{ thread_id }}' --required
+@thread_id='{{ thread_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>

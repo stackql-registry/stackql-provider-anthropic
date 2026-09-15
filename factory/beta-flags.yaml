@@ -8,14 +8,19 @@
 #   grep -rn '"anthropic-beta": "' anthropic/resources/
 #
 # Re-verify whenever the vendored spec is bumped (factory/locate.mjs --pin).
-# Extracted from: anthropic 0.116.0 (2026-07-08).
-#
-# NOTE this table CORRECTS the earlier audit list in CLAUDE.md:
-#   - files        → files-api-2025-04-14      (not managed-agents)
-#   - skills       → skills-2025-10-02         (not managed-agents)
-#   - user_profiles→ user-profiles-2026-03-24  (not managed-agents)
+# Extracted from: anthropic 1.5.0 (2026-09-15). Changes since 0.116.0:
+#   - files and skills are GA in the SDK (top-level `files` / `skills`
+#     resources, no beta header); their `?beta=true` twins are excluded
+#     (factory/exclusions.yaml) the same way the beta twins of
+#     messages/batches/models are. The one beta-only op that survives
+#     (skill version content download) is served without a flag: the SDK's
+#     beta skills module sends no default and the endpoint routes without one
+#     (verified live 2026-09-15) - see `no_default` below.
+#   - user_profiles: user-profiles-2026-03-24 -> user-profiles-2026-08-18
+#   - dreams (new research-preview service): dreaming-2026-04-21
+#   - tunnels carry mcp-tunnels-2026-06-22 but stay excluded (OAuth-only)
 
-extracted_from: anthropic==0.116.0
+extracted_from: anthropic==1.5.0
 flags:
   /v1/agents: managed-agents-2026-04-01
   /v1/deployment_runs: managed-agents-2026-04-01
@@ -23,11 +28,20 @@ flags:
   /v1/environments: managed-agents-2026-04-01
   /v1/sessions: managed-agents-2026-04-01
   /v1/vaults: managed-agents-2026-04-01
-  /v1/files: files-api-2025-04-14
   /v1/memory_stores: agent-memory-2026-07-22
-  /v1/skills: skills-2025-10-02
-  /v1/user_profiles: user-profiles-2026-03-24
-  # Beta twins of GA messages/batches/models are excluded (see
+  /v1/user_profiles: user-profiles-2026-08-18
+  /v1/dreams: dreaming-2026-04-21
+  # Beta twins of GA messages/batches/models/files/skills are excluded (see
   # exclusions.yaml) so need no default here:
   #   /v1/messages?beta=true            token-counting-2024-11-01
   #   /v1/messages/batches?beta=true    message-batches-2024-09-24
+  #   /v1/files?beta=true               (SDK 1.5.0 sends no default flag)
+  #   /v1/skills?beta=true              (SDK 1.5.0 sends no default flag)
+
+# Beta (`?beta=true`) path prefixes whose ops keep the anthropic-beta header
+# OPTIONAL WITHOUT a default: the SDK sends no flag for them and the server
+# routes them without one. pre-pass.mjs accepts these instead of failing the
+# "beta op with no flag default" check.
+no_default:
+  - /v1/skills
+  - /v1/files

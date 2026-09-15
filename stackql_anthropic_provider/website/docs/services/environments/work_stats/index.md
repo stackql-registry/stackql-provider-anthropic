@@ -90,7 +90,7 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>Get statistics about the work queue for an environment.</td>
 </tr>
 </tbody>
@@ -113,6 +113,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="environment_id" /></td>
     <td><code>string</code></td>
     <td> (example: env_011CZkZ9X2dpNyB7HsEFoRfW)</td>
+</tr>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
+    <td><code>string</code></td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
 </tr>
 </tbody>
 </table>
@@ -138,6 +143,7 @@ type,
 workers_polling
 FROM anthropic.environments.work_stats
 WHERE environment_id = '{{ environment_id }}' -- required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>

@@ -105,12 +105,29 @@ Successful response (OK)
       {
         "name": "id",
         "type": "string",
-        "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-sonnet-5)"
+        "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-fable-5-1)"
       },
       {
         "name": "speed",
         "type": "string",
         "description": "Inference speed mode. `fast` provides significantly faster output token generation at premium pricing. Defaults to `standard`. Not all models support `fast`; invalid combinations are rejected at create time. (standard, fast)"
+      },
+      {
+        "name": "effort",
+        "type": "object",
+        "description": "How hard Claude works on each inference call. One of `low`, `medium`, `high`, `xhigh`, `max`. Always present; resolved to the per-model default at save time when not supplied.",
+        "children": [
+          {
+            "name": "type",
+            "type": "string",
+            "description": " (low)"
+          }
+        ]
+      },
+      {
+        "name": "inference_geo",
+        "type": "string",
+        "description": "Geographic region for model inference. When unset, requests fall through to the workspace's default_inference_geo."
       }
     ]
   },
@@ -143,6 +160,11 @@ Successful response (OK)
             "name": "version",
             "type": "integer (int32)",
             "description": ""
+          },
+          {
+            "name": "model",
+            "type": "string",
+            "description": "The advisor model id."
           }
         ]
       }
@@ -215,9 +237,14 @@ Successful response (OK)
         "description": "",
         "children": [
           {
+            "name": "type",
+            "type": "string",
+            "description": " (bash)"
+          },
+          {
             "name": "name",
             "type": "string",
-            "description": "Built-in agent tool identifier. (bash, edit, read, write, glob, grep, web_fetch, web_search)"
+            "description": " (bash)"
           },
           {
             "name": "enabled",
@@ -233,6 +260,53 @@ Successful response (OK)
                 "name": "type",
                 "type": "string",
                 "description": " (always_allow)"
+              }
+            ]
+          },
+          {
+            "name": "allowed_domains",
+            "type": "array",
+            "description": ""
+          },
+          {
+            "name": "blocked_domains",
+            "type": "array",
+            "description": ""
+          },
+          {
+            "name": "max_content_tokens",
+            "type": "integer (int32)",
+            "description": ""
+          },
+          {
+            "name": "user_location",
+            "type": "object",
+            "description": "Approximate user location for search result localization.",
+            "children": [
+              {
+                "name": "type",
+                "type": "string",
+                "description": "Location precision. Only \"approximate\" is supported. (approximate)"
+              },
+              {
+                "name": "city",
+                "type": "string",
+                "description": "City name."
+              },
+              {
+                "name": "region",
+                "type": "string",
+                "description": "Region or state name."
+              },
+              {
+                "name": "country",
+                "type": "string",
+                "description": "Two-letter ISO 3166-1 country code, uppercase."
+              },
+              {
+                "name": "timezone",
+                "type": "string",
+                "description": "IANA timezone identifier, e.g. \"America/Los_Angeles\"."
               }
             ]
           }
@@ -359,12 +433,29 @@ Successful response (OK)
       {
         "name": "id",
         "type": "string",
-        "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-sonnet-5)"
+        "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-fable-5-1)"
       },
       {
         "name": "speed",
         "type": "string",
         "description": "Inference speed mode. `fast` provides significantly faster output token generation at premium pricing. Defaults to `standard`. Not all models support `fast`; invalid combinations are rejected at create time. (standard, fast)"
+      },
+      {
+        "name": "effort",
+        "type": "object",
+        "description": "How hard Claude works on each inference call. One of `low`, `medium`, `high`, `xhigh`, `max`. Always present; resolved to the per-model default at save time when not supplied.",
+        "children": [
+          {
+            "name": "type",
+            "type": "string",
+            "description": " (low)"
+          }
+        ]
+      },
+      {
+        "name": "inference_geo",
+        "type": "string",
+        "description": "Geographic region for model inference. When unset, requests fall through to the workspace's default_inference_geo."
       }
     ]
   },
@@ -397,6 +488,11 @@ Successful response (OK)
             "name": "version",
             "type": "integer (int32)",
             "description": ""
+          },
+          {
+            "name": "model",
+            "type": "string",
+            "description": "The advisor model id."
           }
         ]
       }
@@ -469,9 +565,14 @@ Successful response (OK)
         "description": "",
         "children": [
           {
+            "name": "type",
+            "type": "string",
+            "description": " (bash)"
+          },
+          {
             "name": "name",
             "type": "string",
-            "description": "Built-in agent tool identifier. (bash, edit, read, write, glob, grep, web_fetch, web_search)"
+            "description": " (bash)"
           },
           {
             "name": "enabled",
@@ -487,6 +588,53 @@ Successful response (OK)
                 "name": "type",
                 "type": "string",
                 "description": " (always_allow)"
+              }
+            ]
+          },
+          {
+            "name": "allowed_domains",
+            "type": "array",
+            "description": ""
+          },
+          {
+            "name": "blocked_domains",
+            "type": "array",
+            "description": ""
+          },
+          {
+            "name": "max_content_tokens",
+            "type": "integer (int32)",
+            "description": ""
+          },
+          {
+            "name": "user_location",
+            "type": "object",
+            "description": "Approximate user location for search result localization.",
+            "children": [
+              {
+                "name": "type",
+                "type": "string",
+                "description": "Location precision. Only \"approximate\" is supported. (approximate)"
+              },
+              {
+                "name": "city",
+                "type": "string",
+                "description": "City name."
+              },
+              {
+                "name": "region",
+                "type": "string",
+                "description": "Region or state name."
+              },
+              {
+                "name": "country",
+                "type": "string",
+                "description": "Two-letter ISO 3166-1 country code, uppercase."
+              },
+              {
+                "name": "timezone",
+                "type": "string",
+                "description": "IANA timezone identifier, e.g. \"America/Los_Angeles\"."
               }
             ]
           }
@@ -569,35 +717,35 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-agent_id"><code>agent_id</code></a></td>
-    <td><a href="#parameter-version"><code>version</code></a></td>
+    <td><a href="#parameter-version"><code>version</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-include_archived"><code>include_archived</code></a></td>
+    <td><a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-include_archived"><code>include_archived</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-name"><code>name</code></a>, <a href="#parameter-model"><code>model</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
-    <td><a href="#parameter-agent_id"><code>agent_id</code></a>, <a href="#parameter-version"><code>version</code></a></td>
-    <td></td>
+    <td><a href="#parameter-agent_id"><code>agent_id</code></a></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#archive"><CopyableCode code="archive" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-agent_id"><code>agent_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 </tbody>
@@ -620,6 +768,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="agent_id" /></td>
     <td><code>string</code></td>
     <td>Path parameter agent_id (example: agent_011CZkYpogX7uDKUyvBTophP)</td>
+</tr>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
+    <td><code>string</code></td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
 </tr>
 <tr id="parameter-created_at[gte]">
     <td><CopyableCode code="created_at[gte]" /></td>
@@ -677,6 +830,7 @@ version
 FROM anthropic.agents.agents
 WHERE agent_id = '{{ agent_id }}' -- required
 AND version = '{{ version }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -705,6 +859,7 @@ FROM anthropic.agents.agents
 WHERE "created_at[gte]" = '{{ created_at[gte] }}'
 AND "created_at[lte]" = '{{ created_at[lte] }}'
 AND include_archived = '{{ include_archived }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -734,7 +889,8 @@ tools,
 mcp_servers,
 skills,
 metadata,
-multiagent
+multiagent,
+"anthropic-workspace-id"
 )
 SELECT 
 '{{ name }}' /* required */,
@@ -745,7 +901,8 @@ SELECT
 '{{ mcp_servers }}',
 '{{ skills }}',
 '{{ metadata }}',
-'{{ multiagent }}'
+'{{ multiagent }}',
+'{{ anthropic-workspace-id }}'
 RETURNING
 id,
 name,
@@ -777,8 +934,8 @@ version
     - name: model
       value: "{{ model }}"
       description: |
-        Model identifier. Accepts the [model string](https://platform.claude.com/docs/en/about-claude/models/overview#latest-models-comparison), e.g. \`claude-opus-4-6\`, or a \`model_config\` object for additional configuration control
-      valid_values: ['claude-sonnet-5']
+        Model identifier. Accepts the [model string](https://platform.claude.com/docs/en/about-claude/models/overview#latest-models-comparison), e.g. \`claude-opus-5\`, or a \`model_config\` object for additional configuration control
+      valid_values: ['claude-fable-5-1']
     - name: description
       value: "{{ description }}"
       description: |
@@ -830,6 +987,10 @@ version
         type: "{{ type }}"
         agents:
           - "{{ agents }}"
+    - name: anthropic-workspace-id
+      value: "{{ anthropic-workspace-id }}"
+      description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)
+      description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)
 `}</CodeBlock>
 
 </TabItem>
@@ -863,7 +1024,7 @@ metadata = '{{ metadata }}',
 multiagent = '{{ multiagent }}'
 WHERE 
 agent_id = '{{ agent_id }}' --required
-WHERE version = '{{ version }}' --required
+WHERE "anthropic-workspace-id" = '{{ anthropic-workspace-id}}'
 RETURNING
 id,
 name,
@@ -899,7 +1060,8 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.agents.agents.archive 
-@agent_id='{{ agent_id }}' --required
+@agent_id='{{ agent_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>

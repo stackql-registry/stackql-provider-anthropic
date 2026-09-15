@@ -58,7 +58,7 @@ Successful response (OK)
   {
     "name": "session_id",
     "type": "string",
-    "description": "Populated on success. Null on creation failure. Exactly one of session_id or error is non-null."
+    "description": "Populated on success. Null on creation failure. Exactly one of `session_id` or `error` is non-null."
   },
   {
     "name": "agent",
@@ -90,7 +90,7 @@ Successful response (OK)
   {
     "name": "error",
     "type": "object",
-    "description": "Populated on creation failure. Null on success. Exactly one of session_id or error is non-null.",
+    "description": "Populated on creation failure. Null on success. Exactly one of `session_id` or `error` is non-null.",
     "children": [
       {
         "name": "type",
@@ -117,7 +117,7 @@ Successful response (OK)
       {
         "name": "scheduled_at",
         "type": "string (date-time)",
-        "description": "The UTC instant at which the cron expression matched in the configured timezone, before jitter is applied. At most one run is recorded per (deployment_id, scheduled_at) pair."
+        "description": "The UTC instant at which the cron expression matched in the configured timezone, before jitter is applied. At most one run is recorded per (`deployment_id`, `scheduled_at`) pair."
       }
     ]
   },
@@ -146,7 +146,7 @@ Successful response (OK)
   {
     "name": "session_id",
     "type": "string",
-    "description": "Populated on success. Null on creation failure. Exactly one of session_id or error is non-null."
+    "description": "Populated on success. Null on creation failure. Exactly one of `session_id` or `error` is non-null."
   },
   {
     "name": "agent",
@@ -178,7 +178,7 @@ Successful response (OK)
   {
     "name": "error",
     "type": "object",
-    "description": "Populated on creation failure. Null on success. Exactly one of session_id or error is non-null.",
+    "description": "Populated on creation failure. Null on success. Exactly one of `session_id` or `error` is non-null.",
     "children": [
       {
         "name": "type",
@@ -205,7 +205,7 @@ Successful response (OK)
       {
         "name": "scheduled_at",
         "type": "string (date-time)",
-        "description": "The UTC instant at which the cron expression matched in the configured timezone, before jitter is applied. At most one run is recorded per (deployment_id, scheduled_at) pair."
+        "description": "The UTC instant at which the cron expression matched in the configured timezone, before jitter is applied. At most one run is recorded per (`deployment_id`, `scheduled_at`) pair."
       }
     ]
   },
@@ -237,14 +237,14 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-deployment_run_id"><code>deployment_run_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-deployment_id"><code>deployment_id</code></a>, <a href="#parameter-trigger_type"><code>trigger_type</code></a>, <a href="#parameter-has_error"><code>has_error</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-created_at[gt]"><code>created_at[gt]</code></a>, <a href="#parameter-created_at[lt]"><code>created_at[lt]</code></a></td>
+    <td><a href="#parameter-deployment_id"><code>deployment_id</code></a>, <a href="#parameter-trigger_type"><code>trigger_type</code></a>, <a href="#parameter-has_error"><code>has_error</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-created_at[gt]"><code>created_at[gt]</code></a>, <a href="#parameter-created_at[lt]"><code>created_at[lt]</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 </tbody>
@@ -267,6 +267,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="deployment_run_id" /></td>
     <td><code>string</code></td>
     <td>Path parameter deployment_run_id</td>
+</tr>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
+    <td><code>string</code></td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
 </tr>
 <tr id="parameter-created_at[gt]">
     <td><CopyableCode code="created_at[gt]" /></td>
@@ -291,12 +296,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-deployment_id">
     <td><CopyableCode code="deployment_id" /></td>
     <td><code>string</code></td>
-    <td>Filter to a specific deployment. Omit to list across all deployments in the workspace. Filtering by a non-existent deployment_id returns 200 with empty data.</td>
+    <td>Filter to a specific deployment. Omit to list across all deployments in the workspace. Filtering by a non-existent `deployment_id` returns 200 with empty data.</td>
 </tr>
 <tr id="parameter-has_error">
     <td><CopyableCode code="has_error" /></td>
     <td><code>boolean</code></td>
-    <td>Filter: true for runs with non-null error, false for runs with non-null session_id. Omit for all.</td>
+    <td>Filter: true for runs with non-null `error`, false for runs with non-null `session_id`. Omit for all.</td>
 </tr>
 <tr id="parameter-trigger_type">
     <td><CopyableCode code="trigger_type" /></td>
@@ -331,6 +336,7 @@ trigger_context,
 type
 FROM anthropic.deployments.deployment_runs
 WHERE deployment_run_id = '{{ deployment_run_id }}' -- required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -356,6 +362,7 @@ AND "created_at[gte]" = '{{ created_at[gte] }}'
 AND "created_at[lte]" = '{{ created_at[lte] }}'
 AND "created_at[gt]" = '{{ created_at[gt] }}'
 AND "created_at[lt]" = '{{ created_at[lt] }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>

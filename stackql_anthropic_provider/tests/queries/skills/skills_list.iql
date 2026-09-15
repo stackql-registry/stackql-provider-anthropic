@@ -1,0 +1,2 @@
+SELECT id, display_name, JSON_EXTRACT(source, '$.type') AS source
+FROM anthropic.skills.skills;

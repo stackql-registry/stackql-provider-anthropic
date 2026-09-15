@@ -91,6 +91,11 @@ The following fields are returned by `SELECT` queries:
     "description": "User-provided metadata key-value pairs associated with this work item"
   },
   {
+    "name": "secret",
+    "type": "string",
+    "description": "Credential payload used by the environment worker to execute this work item. May be populated when polling for work; null on all other retrieval paths."
+  },
+  {
     "name": "started_at",
     "type": "string",
     "description": "RFC 3339 timestamp when work execution started"
@@ -168,6 +173,11 @@ The following fields are returned by `SELECT` queries:
     "description": "User-provided metadata key-value pairs associated with this work item"
   },
   {
+    "name": "secret",
+    "type": "string",
+    "description": "Credential payload used by the environment worker to execute this work item. May be populated when polling for work; null on all other retrieval paths."
+  },
+  {
     "name": "started_at",
     "type": "string",
     "description": "RFC 3339 timestamp when work execution started"
@@ -215,7 +225,7 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a>, <a href="#parameter-work_id"><code>work_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>Note: these endpoints are called automatically by the pre-built environment worker provided in the SDKs and CLI, for orchestrating sessions with self-hosted sandbox environments. They are included here as a reference; you do not need to invoke them directly.<br /><br />Retrieve detailed information about a specific work item.</td>
 </tr>
 <tr>
@@ -229,7 +239,7 @@ The following methods are available for this resource:
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a>, <a href="#parameter-work_id"><code>work_id</code></a>, <a href="#parameter-metadata"><code>metadata</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>Note: these endpoints are called automatically by the pre-built environment worker provided in the SDKs and CLI, for orchestrating sessions with self-hosted sandbox environments. They are included here as a reference; you do not need to invoke them directly.<br /><br />Update work item metadata with merge semantics.</td>
 </tr>
 <tr>
@@ -257,7 +267,7 @@ The following methods are available for this resource:
     <td><a href="#stop"><CopyableCode code="stop" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a>, <a href="#parameter-work_id"><code>work_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>Note: these endpoints are called automatically by the pre-built environment worker provided in the SDKs and CLI, for orchestrating sessions with self-hosted sandbox environments. They are included here as a reference; you do not need to invoke them directly.<br /><br />Stop a work item, initiating graceful or forced shutdown.</td>
 </tr>
 </tbody>
@@ -285,6 +295,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="work_id" /></td>
     <td><code>string</code></td>
     <td></td>
+</tr>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
+    <td><code>string</code></td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
 </tr>
 <tr id="parameter-block_ms">
     <td><CopyableCode code="block_ms" /></td>
@@ -331,6 +346,7 @@ created_at,
 data,
 latest_heartbeat_at,
 metadata,
+secret,
 started_at,
 state,
 stop_requested_at,
@@ -339,6 +355,7 @@ type
 FROM anthropic.environments.work_items
 WHERE environment_id = '{{ environment_id }}' -- required
 AND work_id = '{{ work_id }}' -- required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -355,6 +372,7 @@ created_at,
 data,
 latest_heartbeat_at,
 metadata,
+secret,
 started_at,
 state,
 stop_requested_at,
@@ -388,6 +406,7 @@ WHERE
 environment_id = '{{ environment_id }}' --required
 WHERE work_id = '{{ work_id }}' --required
 AND metadata = '{{ metadata }}' --required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id}}'
 RETURNING
 id,
 environment_id,
@@ -396,6 +415,7 @@ created_at,
 data,
 latest_heartbeat_at,
 metadata,
+secret,
 started_at,
 state,
 stop_requested_at,
@@ -460,7 +480,8 @@ Note: these endpoints are called automatically by the pre-built environment work
 ```sql
 EXEC anthropic.environments.work_items.stop 
 @environment_id='{{ environment_id }}' --required, 
-@work_id='{{ work_id }}' --required
+@work_id='{{ work_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 @@json=
 '{
 "force": {{ force }}

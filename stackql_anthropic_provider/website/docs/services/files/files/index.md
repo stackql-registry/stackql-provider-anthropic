@@ -59,6 +59,11 @@ The following fields are returned by `SELECT` queries:
     "description": "Whether the file can be downloaded."
   },
   {
+    "name": "expires_at",
+    "type": "string (date-time)",
+    "description": "RFC 3339 datetime string representing when the file will expire and become unavailable for download. Null if the file does not expire. For files uploaded with `expires_in_seconds`, this is the upload time plus that value."
+  },
+  {
     "name": "filename",
     "type": "string",
     "description": "Original filename of the uploaded file."
@@ -67,23 +72,6 @@ The following fields are returned by `SELECT` queries:
     "name": "mime_type",
     "type": "string",
     "description": "MIME type of the file."
-  },
-  {
-    "name": "scope",
-    "type": "object",
-    "description": "The scope of this file, indicating the context in which it was created (e.g., a session).",
-    "children": [
-      {
-        "name": "id",
-        "type": "string",
-        "description": "The ID of the scoping resource (e.g., the session ID)."
-      },
-      {
-        "name": "type",
-        "type": "string",
-        "description": "The type of scope (e.g., `\"session\"`). (session)"
-      }
-    ]
   },
   {
     "name": "size_bytes",
@@ -116,6 +104,11 @@ The following fields are returned by `SELECT` queries:
     "description": "Whether the file can be downloaded."
   },
   {
+    "name": "expires_at",
+    "type": "string (date-time)",
+    "description": "RFC 3339 datetime string representing when the file will expire and become unavailable for download. Null if the file does not expire. For files uploaded with `expires_in_seconds`, this is the upload time plus that value."
+  },
+  {
     "name": "filename",
     "type": "string",
     "description": "Original filename of the uploaded file."
@@ -124,23 +117,6 @@ The following fields are returned by `SELECT` queries:
     "name": "mime_type",
     "type": "string",
     "description": "MIME type of the file."
-  },
-  {
-    "name": "scope",
-    "type": "object",
-    "description": "The scope of this file, indicating the context in which it was created (e.g., a session).",
-    "children": [
-      {
-        "name": "id",
-        "type": "string",
-        "description": "The ID of the scoping resource (e.g., the session ID)."
-      },
-      {
-        "name": "type",
-        "type": "string",
-        "description": "The type of scope (e.g., `\"session\"`). (session)"
-      }
-    ]
   },
   {
     "name": "size_bytes",
@@ -175,35 +151,35 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-file_id"><code>file_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-before_id"><code>before_id</code></a>, <a href="#parameter-after_id"><code>after_id</code></a>, <a href="#parameter-scope_id"><code>scope_id</code></a></td>
+    <td><a href="#parameter-ids[]"><code>ids[]</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-file_id"><code>file_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#upload"><CopyableCode code="upload" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-file"><code>file</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#download"><CopyableCode code="download" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-file_id"><code>file_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 </tbody>
@@ -227,20 +203,15 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>ID of the File.</td>
 </tr>
-<tr id="parameter-after_id">
-    <td><CopyableCode code="after_id" /></td>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
     <td><code>string</code></td>
-    <td>ID of the object to use as a cursor for pagination. When provided, returns the page of results immediately after this object.</td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
 </tr>
-<tr id="parameter-before_id">
-    <td><CopyableCode code="before_id" /></td>
+<tr id="parameter-ids[]">
+    <td><CopyableCode code="ids[]" /></td>
     <td><code>string</code></td>
-    <td>ID of the object to use as a cursor for pagination. When provided, returns the page of results immediately before this object.</td>
-</tr>
-<tr id="parameter-scope_id">
-    <td><CopyableCode code="scope_id" /></td>
-    <td><code>string</code></td>
-    <td>Filter by scope ID. Only returns files associated with the specified scope (e.g., a session ID).</td>
+    <td>Restrict the result set to Files whose `id` is in this list. At most 100 entries (after de-duplication). Mutually exclusive with `page` and `limit`. When supplied, the response is always a single page (`next_page` is null). IDs that do not resolve to a visible File — including deleted Files — are silently omitted.</td>
 </tr>
 </tbody>
 </table>
@@ -263,13 +234,14 @@ SELECT
 id,
 created_at,
 downloadable,
+expires_at,
 filename,
 mime_type,
-scope,
 size_bytes,
 type
 FROM anthropic.files.files
 WHERE file_id = '{{ file_id }}' -- required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -282,15 +254,14 @@ SELECT
 id,
 created_at,
 downloadable,
+expires_at,
 filename,
 mime_type,
-scope,
 size_bytes,
 type
 FROM anthropic.files.files
-WHERE before_id = '{{ before_id }}'
-AND after_id = '{{ after_id }}'
-AND scope_id = '{{ scope_id }}'
+WHERE "ids[]" = '{{ ids[] }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -312,6 +283,7 @@ No description available.
 ```sql
 DELETE FROM anthropic.files.files
 WHERE file_id = '{{ file_id }}' --required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -333,9 +305,11 @@ Successful Response
 
 ```sql
 EXEC anthropic.files.files.upload 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 @@json=
 '{
-"file": "{{ file }}"
+"file": "{{ file }}", 
+"expires_in_seconds": {{ expires_in_seconds }}
 }'
 ;
 ```
@@ -346,7 +320,8 @@ Successful Response
 
 ```sql
 EXEC anthropic.files.files.download 
-@file_id='{{ file_id }}' --required
+@file_id='{{ file_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>

@@ -53,7 +53,7 @@ Successful response (OK)
   {
     "name": "memory_id",
     "type": "string",
-    "description": "ID of the memory this version snapshots (a `mem_...` value). Remains valid after the memory is deleted; pass it as `memory_id` to [List memory versions](/en/api/beta/memory_stores/memory_versions/list) to retrieve the full lineage including the `deleted` row."
+    "description": "ID of the memory this version snapshots (a `mem_...` value). Remains valid after the memory is deleted; pass it as `memory_id` to [List memory versions](/en/api/beta/memory_stores/memory_versions/list) to retrieve the memory's retained versions, including the `deleted` row while the lineage is retained."
   },
   {
     "name": "memory_store_id",
@@ -83,7 +83,7 @@ Successful response (OK)
   {
     "name": "created_by",
     "type": "object",
-    "description": "Who performed this write: a `session_actor`, `api_actor`, or `user_actor`. Captured at write time and preserved through redaction.",
+    "description": "Who performed this write: one of `session_actor`, `api_actor`, `user_actor`, or `service_account_actor`; `null` when no writer is recorded. Captured at write time and preserved through redaction.",
     "children": [
       {
         "name": "type",
@@ -93,7 +93,7 @@ Successful response (OK)
       {
         "name": "session_id",
         "type": "string",
-        "description": "ID of the session that performed the write (a `sesn_...` value). Look up the session via [Retrieve a session](/en/api/sessions-retrieve) for further provenance."
+        "description": "ID of the session that performed the write (a `sesn_...` value). Look up the session via [Retrieve a session](/en/api/beta/sessions/retrieve) for further provenance."
       },
       {
         "name": "api_key_id",
@@ -104,6 +104,11 @@ Successful response (OK)
         "name": "user_id",
         "type": "string",
         "description": "ID of the user who performed the write (a `user_...` value)."
+      },
+      {
+        "name": "service_account_id",
+        "type": "string",
+        "description": "ID of the service account that performed the write (a `svac_...` value)."
       }
     ]
   },
@@ -125,7 +130,7 @@ Successful response (OK)
   {
     "name": "redacted_by",
     "type": "object",
-    "description": "Who redacted this version, or `null` if it has not been redacted. In practice always an `api_actor` or `user_actor` (agents do not have a redact capability).",
+    "description": "Who redacted this version, or `null` if it has not been redacted. In practice always an `api_actor`, `user_actor`, or `service_account_actor` (agents do not have a redact capability).",
     "children": [
       {
         "name": "type",
@@ -135,7 +140,7 @@ Successful response (OK)
       {
         "name": "session_id",
         "type": "string",
-        "description": "ID of the session that performed the write (a `sesn_...` value). Look up the session via [Retrieve a session](/en/api/sessions-retrieve) for further provenance."
+        "description": "ID of the session that performed the write (a `sesn_...` value). Look up the session via [Retrieve a session](/en/api/beta/sessions/retrieve) for further provenance."
       },
       {
         "name": "api_key_id",
@@ -146,6 +151,11 @@ Successful response (OK)
         "name": "user_id",
         "type": "string",
         "description": "ID of the user who performed the write (a `user_...` value)."
+      },
+      {
+        "name": "service_account_id",
+        "type": "string",
+        "description": "ID of the service account that performed the write (a `svac_...` value)."
       }
     ]
   },
@@ -169,7 +179,7 @@ Successful response (OK)
   {
     "name": "memory_id",
     "type": "string",
-    "description": "ID of the memory this version snapshots (a `mem_...` value). Remains valid after the memory is deleted; pass it as `memory_id` to [List memory versions](/en/api/beta/memory_stores/memory_versions/list) to retrieve the full lineage including the `deleted` row."
+    "description": "ID of the memory this version snapshots (a `mem_...` value). Remains valid after the memory is deleted; pass it as `memory_id` to [List memory versions](/en/api/beta/memory_stores/memory_versions/list) to retrieve the memory's retained versions, including the `deleted` row while the lineage is retained."
   },
   {
     "name": "memory_store_id",
@@ -199,7 +209,7 @@ Successful response (OK)
   {
     "name": "created_by",
     "type": "object",
-    "description": "Who performed this write: a `session_actor`, `api_actor`, or `user_actor`. Captured at write time and preserved through redaction.",
+    "description": "Who performed this write: one of `session_actor`, `api_actor`, `user_actor`, or `service_account_actor`; `null` when no writer is recorded. Captured at write time and preserved through redaction.",
     "children": [
       {
         "name": "type",
@@ -209,7 +219,7 @@ Successful response (OK)
       {
         "name": "session_id",
         "type": "string",
-        "description": "ID of the session that performed the write (a `sesn_...` value). Look up the session via [Retrieve a session](/en/api/sessions-retrieve) for further provenance."
+        "description": "ID of the session that performed the write (a `sesn_...` value). Look up the session via [Retrieve a session](/en/api/beta/sessions/retrieve) for further provenance."
       },
       {
         "name": "api_key_id",
@@ -220,6 +230,11 @@ Successful response (OK)
         "name": "user_id",
         "type": "string",
         "description": "ID of the user who performed the write (a `user_...` value)."
+      },
+      {
+        "name": "service_account_id",
+        "type": "string",
+        "description": "ID of the service account that performed the write (a `svac_...` value)."
       }
     ]
   },
@@ -241,7 +256,7 @@ Successful response (OK)
   {
     "name": "redacted_by",
     "type": "object",
-    "description": "Who redacted this version, or `null` if it has not been redacted. In practice always an `api_actor` or `user_actor` (agents do not have a redact capability).",
+    "description": "Who redacted this version, or `null` if it has not been redacted. In practice always an `api_actor`, `user_actor`, or `service_account_actor` (agents do not have a redact capability).",
     "children": [
       {
         "name": "type",
@@ -251,7 +266,7 @@ Successful response (OK)
       {
         "name": "session_id",
         "type": "string",
-        "description": "ID of the session that performed the write (a `sesn_...` value). Look up the session via [Retrieve a session](/en/api/sessions-retrieve) for further provenance."
+        "description": "ID of the session that performed the write (a `sesn_...` value). Look up the session via [Retrieve a session](/en/api/beta/sessions/retrieve) for further provenance."
       },
       {
         "name": "api_key_id",
@@ -262,6 +277,11 @@ Successful response (OK)
         "name": "user_id",
         "type": "string",
         "description": "ID of the user who performed the write (a `user_...` value)."
+      },
+      {
+        "name": "service_account_id",
+        "type": "string",
+        "description": "ID of the service account that performed the write (a `svac_...` value)."
       }
     ]
   },
@@ -293,21 +313,21 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a>, <a href="#parameter-memory_version_id"><code>memory_version_id</code></a></td>
-    <td><a href="#parameter-view"><code>view</code></a></td>
+    <td><a href="#parameter-view"><code>view</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a></td>
-    <td><a href="#parameter-memory_id"><code>memory_id</code></a>, <a href="#parameter-session_id"><code>session_id</code></a>, <a href="#parameter-api_key_id"><code>api_key_id</code></a>, <a href="#parameter-operation"><code>operation</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-view"><code>view</code></a></td>
+    <td><a href="#parameter-memory_id"><code>memory_id</code></a>, <a href="#parameter-session_id"><code>session_id</code></a>, <a href="#parameter-api_key_id"><code>api_key_id</code></a>, <a href="#parameter-service_account_id"><code>service_account_id</code></a>, <a href="#parameter-operation"><code>operation</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-view"><code>view</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#redact"><CopyableCode code="redact" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a>, <a href="#parameter-memory_version_id"><code>memory_version_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 </tbody>
@@ -336,6 +356,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Path parameter memory_version_id</td>
 </tr>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
+    <td><code>string</code></td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
+</tr>
 <tr id="parameter-api_key_id">
     <td><CopyableCode code="api_key_id" /></td>
     <td><code>string</code></td>
@@ -360,6 +385,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="operation" /></td>
     <td><code>string</code></td>
     <td>Query parameter for operation</td>
+</tr>
+<tr id="parameter-service_account_id">
+    <td><CopyableCode code="service_account_id" /></td>
+    <td><code>string</code></td>
+    <td>Query parameter for service_account_id</td>
 </tr>
 <tr id="parameter-session_id">
     <td><CopyableCode code="session_id" /></td>
@@ -406,6 +436,7 @@ FROM anthropic.memory_stores.memory_versions
 WHERE memory_store_id = '{{ memory_store_id }}' -- required
 AND memory_version_id = '{{ memory_version_id }}' -- required
 AND view = '{{ view }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -433,10 +464,12 @@ WHERE memory_store_id = '{{ memory_store_id }}' -- required
 AND memory_id = '{{ memory_id }}'
 AND session_id = '{{ session_id }}'
 AND api_key_id = '{{ api_key_id }}'
+AND service_account_id = '{{ service_account_id }}'
 AND operation = '{{ operation }}'
 AND "created_at[gte]" = '{{ created_at[gte] }}'
 AND "created_at[lte]" = '{{ created_at[lte] }}'
 AND view = '{{ view }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -458,7 +491,8 @@ Successful response (OK)
 ```sql
 EXEC anthropic.memory_stores.memory_versions.redact 
 @memory_store_id='{{ memory_store_id }}' --required, 
-@memory_version_id='{{ memory_version_id }}' --required
+@memory_version_id='{{ memory_version_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>

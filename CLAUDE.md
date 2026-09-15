@@ -4,7 +4,7 @@ This repo masters TWO StackQL providers from one pipeline ("the factory"):
 
 | Provider | Surface | Auth env var | Key type |
 |---|---|---|---|
-| `anthropic` | User/inference API (`/v1/messages`, models, batches, files, agents, sessions, skills, memory stores, vaults, ...) | `ANTHROPIC_API_KEY` | `sk-ant-api...` (workspace-scoped) |
+| `anthropic` | User/inference API (`/v1/messages`, models, batches, files, skills, agents, sessions, memory stores, dreams, vaults, ...) | `ANTHROPIC_API_KEY` | `sk-ant-api...` (workspace-scoped) |
 | `anthropic_admin` | Admin API (`/v1/organizations/*`: users, invites, workspaces, api_keys, usage/cost reports, rate limits, Claude Code analytics) | `ANTHROPIC_ADMIN_KEY` | `sk-ant-admin01-...` (org-scoped, admin-role-created) |
 
 The two key types are disjoint (neither can call the other's endpoints) but the wire auth
@@ -13,7 +13,9 @@ structure is identical: `x-api-key` + `anthropic-version` headers.
 Default branch: `main` (this is a PLAIN repo, not a fork — the `stackql-provider`
 default-branch convention applies only to forked SDK repos). Rules marked
 **(verified)** were empirically confirmed on the wire against stackql v0.10.542 during a
-prior build — do not re-litigate them.
+prior build and re-confirmed against v0.11.669 during the 2026-09 refresh — do not
+re-litigate them. `NOTES.md` carries the dated findings of each refresh; `Makefile`
+is the entry point (`make help`).
 
 ## Prior-art audit (do not redo)
 
@@ -21,37 +23,55 @@ prior build — do not re-litigate them.
   spec** and are in lockstep (116 configured endpoints each at audit time). Do not derive
   anything from SDK source code — SDK parameter names can be ALIASES of wire names
   (e.g. SDK `created_at_gte` is wire `created_at[gte]`). **The spec is canonical.**
-- The spec is downloadable: `anthropics/anthropic-sdk-python` → `.stats.yml` →
-  `openapi_spec_url` (Stainless storage, hash-named, updates per SDK release). At audit
-  time: 126 operations / 85 paths, OpenAPI 3.1.0, beta paths pre-baked as `?beta=true`
-  path keys, 521 anyOf / 227 oneOf / 161 allOf.
-- Spec ops (126) = SDK-configured (116) + 10 `/v1/tunnels` ops (excluded from both SDKs;
-  tunnels are managed via `workspace:manage_tunnels` OAuth, not API keys → we exclude too).
-- The Admin API is in NO spec and NO SDK. Its canonical source is the platform docs —
-  every reference page serves clean markdown at its `.md` URL (this is transcription,
-  not scraping).
+- The spec ships INSIDE the SDK repo: `anthropics/anthropic-sdk-python` →
+  `scripts/mock-spec.json.gz` (gzipped OpenAPI 3.1.0 JSON; beta paths pre-baked as
+  `?beta=true` path keys). Until 2026-09-03 (upstream commit `f9b0cf2`, "bundle the mock
+  server spec and update dev tooling") `.stats.yml` carried `openapi_spec_url` /
+  `openapi_spec_hash` pointing at a Stainless-hosted YAML; those fields are gone from the
+  Python, TypeScript, Go and Java SDK repos alike and `.stats.yml` now holds only
+  `configured_endpoints`. The pin is the sha256 of the DECOMPRESSED JSON (the gzip bytes
+  embed a timestamp). Vendored snapshot 2026-09-15: 244 operations / 165 paths
+  (audit-time 2026-07: 126 / 85), 1554 `{type: null}` members, 642 `const`.
+- Spec ops (244) = SDK-configured (201) + 10 `/v1/tunnels` ops (excluded from both SDKs;
+  tunnels are managed via `workspace:manage_tunnels` OAuth, not API keys → we exclude too)
+  + the `?beta=true` twins that the SDKs collapse onto GA resources + `/v1/complete`.
+- The Admin API has been IN the spec since 2026-09 (100 ops under `/v1/organizations/*`,
+  all beta-keyed) but remains in no SDK client surface. The `anthropic_admin` provider is
+  still docs-driven (hand-authored transcriptions of the platform reference pages, every
+  page serves clean markdown at its `.md` URL); the spec's admin ops are excluded from
+  `anthropic` by group in `factory/exclusions.yaml` (see Taxonomies).
 
 ## The factory pipeline
 
 ### `anthropic` (spec-driven, pattern 1 with custom passes)
 
 ```
-locate    read .stats.yml from anthropics/anthropic-sdk-python HEAD → openapi_spec_url;
-          alert if openapi_spec_hash changed since the committed snapshot
-download  fetch spec → vendor into stackql_anthropic_provider/provider-dev/downloaded/ (committed)
+locate    fetch anthropics/anthropic-sdk-python scripts/mock-spec.json.gz (+ .stats.yml for
+          configured_endpoints), gunzip, sha256 the JSON; compare with
+          factory/spec-snapshot.json (bundled_spec_sha256). Exit 3 on drift = guard 5;
+          `--pin` re-records the snapshot (make refresh-spec)
+download  same fetch, verified against the pin (fails without writing on mismatch), written
+          as YAML (js-yaml) to stackql_anthropic_provider/provider-dev/downloaded/ (committed)
 pre-pass  custom script:
             - downlevel OpenAPI 3.1 → 3.0 constructs (type arrays / null members) as needed
             - inject `anthropic-version` header param: required:false, default '2023-06-01'
-            - stamp per-endpoint `anthropic-beta` defaults from the beta-flag table (below)
-            - drop excluded ops: 2 SSE stream endpoints, 10 tunnels endpoints
+            - stamp per-endpoint `anthropic-beta` defaults from the beta-flag table (below);
+              prefixes under beta-flags.yaml `no_default` keep the header optional, no default
+            - drop excluded ops (factory/exclusions.yaml, 136 ops in 9 groups)
 split     monolithic spec → per-service specs using the path→service map (taxonomy below;
           the spec has no tags)
 normalize @stackql/provider-utils `normalize` (anyOf/oneOf→allOf rewrite + merge; opaque
           objects → string/JSON-blob columns). Shallow by design — nested unions belong
-          inside JSON columns.
+          inside JSON columns. Then factory/scrub-unions.mjs (residual unions, additionalProperties).
 analyze   @stackql/provider-utils mappings → `all_services.csv` (REVIEWED, committed,
-          append-only; this is where resource/method/verb surgery lives — see few-shots)
-generate  provider tree → provider-dev/openapi/src/anthropic/v00.00.00000/
+          append-only: analyze appends a derived row per NEW op, keyed filename::operationId)
+csv-review factory/csv-review.mjs applies the human review of those derived rows as RULES
+          (keyed filename::path::verb, one block per refresh); `--check` (make check-mappings,
+          CI) fails on an unreviewed or drifted row. This is where resource/method/verb
+          surgery lives — see few-shots. The 2026-07 bootstrap review is csv-review-bootstrap.mjs.
+generate  provider tree → provider-dev/openapi/src/anthropic/v00.00.00000/ (servers and
+          provider config come from provider-dev/config/{servers,provider_config}.json —
+          provider-utils 0.7.9 takes JSON|FILE and inline JSON does not survive cmd.exe quoting)
 post-pass custom script:
             - `requestBodyTranslate: {algorithm: naive}` + `request.mediaType` on every
               body-bearing method
@@ -94,8 +114,10 @@ meta routes → mock SELECTs). All findings empirical:
 - **Wire quirk**: stackql appends a bare `?` to request URLs when no query params are
   supplied (`POST /v1/messages?`). Harmless on real servers; mocks must parse the URL
   rather than string-match it.
-- provider-utils@0.7.6 needs `@jsr:registry=https://npm.jsr.io` in `.npmrc`
-  (dependency `@jsr/stackql__deno-openapi-dereferencer`).
+- provider-utils needs `@jsr:registry=https://npm.jsr.io` in `.npmrc`
+  (dependency `@jsr/stackql__deno-openapi-dereferencer`). Pinned `^0.7.9` since 2026-09
+  (with pgwire-lite `^1.0.2`): generate output for the admin provider was byte-identical
+  across 0.7.6 → 0.7.9; the docgen patch (`factory/patch-provider-utils.mjs`) still applies.
 - split's "Operations processed" log undercounts (prints 100, emits all 104 ops);
   count ops in the split output, not from the log.
 - **stackql v0.10.542 EXEC panic (upstream bug, worked around)**: EXEC prepare
@@ -148,12 +170,18 @@ The spec declares the `anthropic-beta` header but NOT the per-endpoint flag cons
 (that's Stainless config). Maintain a small checked-in table
 (`factory/beta-flags.yaml`), extracted at build time from the published PyPI `anthropic`
 package (`pip download anthropic` → grep resource modules for
-`extra_headers = {"anthropic-beta": "<flag>"`). **Verified against anthropic==0.116.0
-(2026-07-08)** — the audit-time list was wrong for three services. Actual table
-(checked into `factory/beta-flags.yaml`): `managed-agents-2026-04-01`
+`extra_headers = {"anthropic-beta": "<flag>"`). **Verified against anthropic==1.5.0
+(2026-09-15)** (0.116.0 on 2026-07-08 before that). Actual table (checked into
+`factory/beta-flags.yaml`): `managed-agents-2026-04-01`
 (agents/deployments/deployment_runs/environments/sessions/vaults),
-`agent-memory-2026-07-22` (memory_stores), `files-api-2025-04-14` (files),
-`skills-2025-10-02` (skills), `user-profiles-2026-03-24` (user_profiles).
+`agent-memory-2026-07-22` (memory_stores), `user-profiles-2026-08-18` (user_profiles,
+was `-2026-03-24`), `dreaming-2026-04-21` (dreams). Files and skills are GA in the SDK
+since 1.x (top-level resources, no flag) — the provider maps the GA `/v1/files` and
+`/v1/skills` paths and excludes their beta twins; the SDK's beta files/skills modules send
+no default flag any more, so the one surviving beta-only op (skill version content
+download) sits under `no_default` (header optional, no default; live-verified: the
+endpoint routes without a flag, and with the stale `skills-2025-10-02` flag it takes a
+different, older code path). Tunnels carry `mcp-tunnels-2026-06-22` but stay excluded.
 
 ### 5. No polymorphism; flat SQL-result-set rows
 
@@ -208,7 +236,11 @@ POSTs → EXEC (temporary policy 2026-07-09 until there is a strategy for multip
 rejects multipart dispatch with "media type not supported", so INSERT-mapping them
 just documents queries that can't run); JSONL `batches` results → EXEC. (Legacy
 `complete` was SELECT until the endpoint was hard-deprecated server-side and
-dropped — see Taxonomies.)
+dropped — see Taxonomies.) Caveat (2026-09-15, stackql v0.11.669): `SHOW METHODS`
+reports a `create`-named method that is in NO sqlVerbs list as `INSERT` (name-based
+inference; v0.10.542 said `EXEC`) — the documents still pin `skills.create` and
+`skills.versions.create` as exec-only (`insert: []`), the offline validation asserts the
+document and accepts either spelling from `SHOW METHODS`.
 
 ### 9. ONE select shape per resource — split divergent shapes into separate resources
 
@@ -281,14 +313,24 @@ client-side alias. Emit the bracketed wire names (backtick-quoted in SQL samples
 
 ## Taxonomies (agreed — changes need explicit confirmation)
 
-### `anthropic` — 11 services, 25 resources
+### `anthropic` — 12 services, 27 resources (+1 view), 108 methods
 
-messages (messages, token_counts, batches) · models (models) · agents (agents,
-versions) · deployments (deployments, deployment_runs) · environments (environments,
-work_items, work_stats) · files (files) · memory_stores (memory_stores, memories,
-memory_versions) · sessions (sessions, events, resources, threads, thread_events) ·
-skills (skills, versions) · user_profiles (user_profiles) · vaults (vaults,
-credentials).
+messages (messages, token_counts, batches) · models (models, view
+vw_model_capabilities) · agents (agents, versions) · deployments (deployments,
+deployment_runs) · environments (environments, work_items, work_stats) · files (files) ·
+memory_stores (memory_stores, memories, memory_versions) · sessions (sessions, events,
+resources, threads, thread_events) · skills (skills, versions) · user_profiles
+(user_profiles) · vaults (vaults, credentials) · dreams (dreams).
+
+Added 2026-09-15 (spec refresh, see NOTES.md): the `dreams` service (research-preview
+memory-consolidation jobs, `dreaming-2026-04-21`; list/get SELECT, create INSERT,
+cancel/archive EXEC; the endpoint returns 404 for keys not enrolled). Files and skills
+moved from their `?beta=true` paths to the GA paths with resources/methods/verbs
+unchanged (the GA files list is cursor-paginated where the beta one was after_id). The
+`anthropic-workspace-id` optional header now sits on ~110 ops; it is documented on the
+`anthropic` site (`scrub-docs --keep anthropic-workspace-id`) as the workspace selector
+and double-quoted in SQL: `WHERE "anthropic-workspace-id" = 'wrkspc_...'` (live: a
+malformed id is a 400 from the API).
 
 Dropped 2026-07-09 (user-confirmed): the `completions` service — `POST /v1/complete`
 is hard-deprecated server-side (400 "use /v1/messages" on every call, verified live).
@@ -296,8 +338,11 @@ Mapped to the `skip_this_resource` sentinel in the CSV (the provider-utils gener
 primitive for op exclusion) + listed in `factory/exclusions.yaml` under
 `hard_deprecated` so guard 1 balances.
 
-Excluded, documented: 2 SSE stream endpoints, 10 tunnels ops (OAuth-only), SDK-side
-conveniences (`parse`), beta duplicates of GA messages/batches/models (fold into GA).
+Excluded, documented (136 ops in `factory/exclusions.yaml`): 2 SSE stream endpoints, 10
+tunnels ops (OAuth-only), 10 beta duplicates of GA messages/batches/models, 13 beta
+duplicates of GA files/skills, `/v1/complete`, and the 100 Admin API ops (4 groups:
+served by `anthropic_admin`, WIF OAuth-only, enterprise key, not yet covered). SDK-side
+conveniences (`parse`) are not spec ops.
 
 ### `anthropic_admin` — 6 services, 11 resources (~24 ops)
 
@@ -319,6 +364,18 @@ Excluded, documented: WIF endpoints (service accounts / federation issuers / rul
 reject admin keys, need `org:admin` OAuth); Compliance / Spend Limits / Enterprise
 Analytics (third key type `sk-ant-api01-...` → future `anthropic_enterprise`). Note in
 docs: on Claude Platform on AWS only workspace CRUD works.
+
+Spec-vs-admin split (decided 2026-09-15, needs confirmation before changing): the bundled
+spec now models the Admin API as 100 `?beta=true`-keyed ops under `/v1/organizations/*`
+(operationIds `beta_*`, some with their own `anthropic-beta` flags). The admin provider
+was NOT re-platformed onto them — its 27 hand-authored ops are live-verified, GA-keyed
+and stable — so `factory/exclusions.yaml` drops all 100 from `anthropic` in four groups:
+`admin_served_by_anthropic_admin` (27, the current admin surface), `admin_wif_oauth_only`
+(26), `admin_enterprise_key` (21: compliance settings, spend limits, spend-limit increase
+requests, `/analytics/*`), `admin_uncovered` (26: external keys, RBAC groups/roles,
+organization-level tunnels — candidates for a future admin extension). Re-platforming
+the admin provider onto the spec would change every admin wire path (`?beta=true`
+suffix) and is a separate, confirmable decision.
 
 Admin open questions — RESOLVED empirically on the mock (2026-07-08), pinned:
 (a) **Report row shape: ship `$.data`.** stackql's objectKey DOES support
@@ -369,8 +426,11 @@ capability flags fanned out of the `capabilities` JSON column) — live-verified
    or better, relocate via CSV).
 4. **No-polymorphism scan**: zero anyOf/oneOf/allOf/additionalProperties in generated
    services.
-5. **`.stats.yml` drift check**: fail regen when upstream `openapi_spec_hash` differs
-   from the vendored snapshot (conscious bump required).
+5. **Upstream spec drift check** (`node factory/locate.mjs`, `make fetch-spec`): fail
+   when the sha256 of the decompressed bundled spec (anthropic-sdk-python
+   `scripts/mock-spec.json.gz`) differs from `factory/spec-snapshot.json`, or when the
+   snapshot predates the bundled-spec pin (exit 3; exit 2 only when upstream is
+   unreachable). Conscious bump: `make refresh-spec`, review, regen. Never a warning.
 6. **Zero-column selects**: every SELECT-routed method projects ≥1 column.
 7. **Docs examples are tested** (`factory/check-doc-examples.mjs`, CI step after the
    smoke jobs): every ` ```sql ` block on a provider's docs index (assembled from
@@ -383,15 +443,38 @@ capability flags fanned out of the `capabilities` JSON column) — live-verified
 
 ## Tests (both providers)
 
-- **Meta routes** (must pass): pgwire harness walks every service/resource/method
-  (SHOW SERVICES/RESOURCES/METHODS + DESCRIBE EXTENDED), owns the server lifecycle,
-  zero errors. Archetype: stackql-registry/stackql-provider-aws → `bin/test-meta-routes.cjs`.
-- **Smoke** (manifest-driven, per provider): mock mode default — a local mock of the API
-  that REJECTS wire-contract violations (missing `x-api-key` → 401, missing
-  `anthropic-version` → 400, beta path without `anthropic-beta` → 400) and serves a
-  2-page cursor list to prove pagination walks; the suite copies the generated registry
-  to a temp dir and rewrites `servers:` to the mock. Live mode gated on the provider's
-  env var; admin live tests are READ-ONLY (never mutate live orgs).
+Four layers, cheapest first, mirroring stackql-provider-pagerduty / -clickhouse
+(`make test` runs the first three; `make smoke*` is live):
+
+- **Offline validation** (`<provider>/tests/offline_validation.mjs`, `make test-offline`):
+  SHOW SERVICES/RESOURCES/METHODS + DESCRIBE EXTENDED over the local file registry,
+  asserting the expected surface (12/27+1 and 6/11), verb policy, header defaults,
+  pagination/pushdown counts, auth block. No server, no credentials.
+- **Integration** (`tests/integration/run_integration_tests.cjs --manifest
+  <provider>/tests/integration/manifest.yaml`, `make test-integration`): manifest-driven
+  suites against `tests/integration/mock_anthropic_server.cjs`, a local mock that REJECTS
+  wire-contract violations (missing `x-api-key` → 401, missing `anthropic-version` → 400,
+  beta path without the per-endpoint `anthropic-beta` flag → 400 except for `no_default`
+  prefixes, malformed `anthropic-workspace-id` → 400, non-admin key on
+  `/v1/organizations/*` → 401) and serves 2-page cursor lists (agents, files, dreams,
+  admin reports) so auto-pagination is proven; the runner copies the generated registry
+  to a temp dir and rewrites `servers:` to the mock. Queries are `.iql` files under
+  `<provider>/tests/queries` (shared with the live suite and the docs-example guard).
+- **Meta routes** (`<provider>/bin/test-meta-routes.cjs`, `make test-meta`): pgwire
+  harness walks every service/resource/method, owns the server lifecycle, zero errors.
+  Archetype: stackql-registry/stackql-provider-aws.
+- **Live smoke** (`tests/smoke.py --manifest <provider>/tests/manifest.yaml [--live]`,
+  `make smoke` / `smoke-admin` / `smoke-live` / `smoke-admin-live`; Python 3 + pyyaml +
+  jinja2; `--env-file .env`, see `.env.example`): Jinja2-rendered manifests, exports
+  between tests, `--live` pulls the PUBLISHED provider from the registry, breadcrumb
+  rollback driven by `config.rollback` rules (archives `stackql-smoke-*` agents).
+  anthropic: reads + one 16-token haiku completion (well under a cent); the managed
+  agents write lifecycle is gated on `SMOKE_AGENTS=1`, the workspace-scoped test on
+  `ANTHROPIC_WORKSPACE_ID`. anthropic_admin: READ-ONLY (never mutates live orgs);
+  `ANTHROPIC_ADMIN_API_KEY` is accepted as an alias of `ANTHROPIC_ADMIN_KEY`.
+  CI runs the live suites only where the secrets exist (skipped with a notice otherwise).
+- Windows hosts: run the stackql-backed layers under WSL (the binary is a Linux ELF);
+  the node pipeline itself runs on either side and produces byte-identical output.
 
 ## Microsites — two, Netlify
 
@@ -437,7 +520,10 @@ FUNCTIONAL headers (`Anthropic-Worker-ID`, `authorization` on environments/work_
 `anthropic-user-profile-id`; admin fast-mode `anthropic-beta` per resolved question
 (d)) — they still work on the wire, and scrub-docs `--keep h1,h2` re-documents them
 per provider if that's ever wanted. The provider index.md auth sections still describe
-the header MECHANISM (that's auth docs, not params).
+the header MECHANISM (that's auth docs, not params). Exception since 2026-09-15: the
+`anthropic` docgen runs scrub-docs with `--keep anthropic-workspace-id`, so the
+workspace selector (an optional header on ~110 ops in the 2026-09 spec) IS documented
+as a parameter and appears double-quoted in the SQL samples.
 
 Post-docgen enrichment (2026-07-09): `factory/enrich-select-docs.mjs` (chained BEFORE
 scrub-docs in the `docgen`/`docgen-admin` npm scripts — enrich adds body-param rows
@@ -473,10 +559,17 @@ stackql-registry/stackql-provider-aws (`stackql_aws_provider/website`, branch
   BUILD TIME (`yarn vendor-config` = rimraf + shallow-clone of
   stackql/docusaurus-config@main, wired as prestart/prebuild; `.shared-config/` is
   gitignored, never committed).
-- Docusaurus ^3.10.1 with faster/plugin-ideal-image/theme-mermaid + the archetype's
-  overrides/resolutions block. plugin-ideal-image pulls sharp 0.32 → binary download
-  breaks here; sharp pinned `^0.33` in BOTH overrides and resolutions (kept on top of
-  the archetype, which doesn't pin it).
+- Docusaurus ^3.10.2 (bumped 2026-09-15 from ^3.10.1) with
+  faster/plugin-ideal-image/theme-mermaid + the archetype's overrides/resolutions block.
+  plugin-ideal-image pulls sharp 0.32 → binary download breaks here; sharp pinned
+  `^0.33` in BOTH overrides and resolutions (kept on top of the archetype, which
+  doesn't pin it).
+- Both site configs post-mutate two shared-config settings after `createConfig`:
+  `config.presets[0][1].docs.showLastUpdateTime = true` (the shared config ships
+  `false`; git history stamps each page with its last regen date) and
+  `delete config.trailingSlash` (the shared config sets `false`, which emits
+  `<route>.html` and 404s the trailing-slash URL; the Docusaurus default emits
+  `<route>/index.html`, serving both forms). Keep both through every regen.
 - MONOREPO exception: createConfig derives projectName/editUrl as
   `stackql-provider-<name-sans-underscores>` — wrong for this repo. Both site configs
   post-mutate `config.projectName = 'stackql-provider-anthropic'` and the per-site
@@ -489,8 +582,12 @@ stackql-registry/stackql-provider-aws (`stackql_aws_provider/website`, branch
 
 ## Things NOT to do
 
-- Don't derive params/schemas from SDK source (alias trap). SDKs are only used for the
-  `.stats.yml` pointer and the beta-flag constants.
+- Don't derive params/schemas from SDK source (alias trap). The SDK repo is only used
+  for the bundled spec file (`scripts/mock-spec.json.gz`), the `.stats.yml` endpoint
+  count, and the beta-flag constants (PyPI package).
+- Don't weaken guard 5 to a warning; a moved upstream spec is a conscious re-pin.
+- Don't hand-edit `all_services.csv`: new rows come from analyze, their review is a rule
+  in `factory/csv-review.mjs`, and `make check-mappings` must stay green.
 - Don't enable auto-pagination on `after_id`-style lists.
 - Don't emit `required: true` for `anthropic-version`/`anthropic-beta`.
 - Don't hand-edit generated provider trees — fix the pass or the CSV and regen.
@@ -501,17 +598,28 @@ stackql-registry/stackql-provider-aws (`stackql_aws_provider/website`, branch
 ## Layout
 
 ```
-stackql-provider-anthropic/          (plain repo, default branch: stackql-provider)
-├── CLAUDE.md                        this file
-├── README.md
-├── factory/                         shared pipeline: locate/download/pre-pass/split,
-│                                    post-pass enrichment, guards, beta-flags.yaml
+stackql-provider-anthropic/          (plain repo, default branch: main)
+├── CLAUDE.md                        this file (rules); NOTES.md (dated refresh findings)
+├── Makefile                         entry point: fetch-spec / refresh-spec / build /
+│                                    check-mappings / test / smoke* / docs / website / all
+├── README.md  .env.example
+├── factory/                         shared pipeline: lib/bundled-spec.mjs, locate/download,
+│                                    pre-pass/service-map/scrub-unions, csv-review (rules),
+│                                    admin-split, post-pass, guards, check-doc-examples,
+│                                    beta-flags.yaml, exclusions.yaml, spec-snapshot.json
+├── tests/                           shared runners: smoke.py (live), requirements.txt,
+│                                    integration/{mock_anthropic_server.cjs,
+│                                    run_integration_tests.cjs}
 ├── stackql_anthropic_provider/
-│   ├── provider-dev/{downloaded,source,config,openapi,docgen}
-│   ├── bin/  tests/  website/
+│   ├── provider-dev/{downloaded,source,config,openapi,docgen,views}
+│   │                                (config: all_services.csv, servers.json, provider_config.json)
+│   ├── bin/  website/
+│   └── tests/{manifest.yaml (live), integration/manifest.yaml (mock),
+│              offline_validation.mjs, queries/}
 ├── stackql_anthropic_admin_provider/
 │   ├── provider-dev/{source,config,openapi,docgen}   (source = hand-authored)
-│   ├── bin/  tests/  website/
+│   ├── bin/  website/
+│   └── tests/{manifest.yaml, integration/manifest.yaml, offline_validation.mjs, queries/}
 └── netlify config                   mirror the databricks repo's pattern
 ```
 

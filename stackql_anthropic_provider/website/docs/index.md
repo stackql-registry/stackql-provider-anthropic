@@ -17,19 +17,19 @@ id: 'provider-intro'
 
 import CopyableCode from '@site/src/components/CopyableCode/CopyableCode';
 
-Run Claude inference, count tokens, and manage models, batches, files, agents, deployments, environments, sessions, skills, memory stores, user profiles and vaults on the Anthropic API using SQL.
+Run Claude inference, count tokens, and manage models, batches, files, skills, agents, deployments, environments, sessions, memory stores, dreams, user profiles and vaults on the Anthropic API using SQL.
 
 :::info
 
-For organization administration (users, invites, workspaces, API keys, usage/cost reports, rate limits, Claude Code analytics) use the [__`anthropic_admin`__](https://anthropic-admin-provider.stackql.io/) provider — it authenticates with a separate, org-scoped Admin key.
+For organization administration (users, invites, workspaces, API keys, usage/cost reports, rate limits, Claude Code analytics) use the [__`anthropic_admin`__](https://anthropic-admin-provider.stackql.io/) provider - it authenticates with a separate, org-scoped Admin key.
 
 :::
 
 
 :::info[Provider Summary]
 
-total services: __11__
-total resources: __37__
+total services: __12__
+total resources: __39__
 
 :::
 
@@ -50,6 +50,18 @@ The `anthropic` provider authenticates with a workspace-scoped Claude API key (`
 - <CopyableCode code="ANTHROPIC_API_KEY" /> - a Claude API key, created in the [Claude Console](https://platform.claude.com/settings/keys)
 
 The required `anthropic-version` header is sent automatically (default `2023-06-01`); beta endpoints automatically send the per-endpoint `anthropic-beta` flag. Either can be overridden per query by supplying the header as a `WHERE` clause parameter.
+
+## Workspace-scoped queries
+
+A key that can act on more than one workspace selects the workspace per query with the optional `anthropic-workspace-id` parameter (a `wrkspc_...` id, listed by the `anthropic_admin` provider's `workspaces` resource). It is sent as a header; the hyphenated name is double-quoted in SQL:
+
+```sql
+SELECT id, display_name, created_at
+FROM anthropic.models.models
+WHERE "anthropic-workspace-id" = 'wrkspc_01';
+```
+
+A key that belongs to one workspace can omit it.
 
 ## Inference as a result set
 
@@ -104,6 +116,26 @@ FROM anthropic.messages.batches
 ORDER BY created_at DESC;
 ```
 
+## Files and skills
+
+Uploaded files, newest first (the list is cursor-paginated and walked automatically):
+
+```sql
+SELECT id, filename, mime_type, size_bytes, created_at
+FROM anthropic.files.files
+ORDER BY created_at DESC;
+```
+
+Skills available to the workspace, with their origin (`anthropic` for the published skills, `custom` for your own) and latest version:
+
+```sql
+SELECT id, display_name, JSON_EXTRACT(source, '$.type') AS source, latest_version_id, updated_at
+FROM anthropic.skills.skills
+ORDER BY updated_at DESC;
+```
+
+Uploading a file or creating a skill version is a multipart request, which SQL cannot express; those methods are documented as `EXEC` and the rest of each resource (list, get, delete) is plain SQL.
+
 ## Agent inventory
 
 What agents exist, on which models, and how much tooling they carry:
@@ -140,17 +172,29 @@ WHERE agent_id = 'agent_01';
 EXEC anthropic.agents.agents.archive @agent_id = 'agent_01';
 ```
 
+## Dreams
+
+Dreams are asynchronous memory-consolidation jobs over a memory store (a research preview: the endpoint returns 404 for keys that are not enrolled). Their status and inputs are rows:
+
+```sql
+SELECT id, status, JSON_ARRAY_LENGTH(inputs) AS input_count, created_at, ended_at
+FROM anthropic.dreams.dreams
+ORDER BY created_at DESC;
+```
+
+
 ## Services
 <div class="row">
 <div class="providerDocColumn">
 <a href="/services/agents/">agents</a><br />
 <a href="/services/deployments/">deployments</a><br />
+<a href="/services/dreams/">dreams</a><br />
 <a href="/services/environments/">environments</a><br />
 <a href="/services/files/">files</a><br />
 <a href="/services/memory_stores/">memory_stores</a><br />
-<a href="/services/messages/">messages</a><br />
 </div>
 <div class="providerDocColumn">
+<a href="/services/messages/">messages</a><br />
 <a href="/services/models/">models</a><br />
 <a href="/services/sessions/">sessions</a><br />
 <a href="/services/skills/">skills</a><br />

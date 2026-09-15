@@ -355,49 +355,49 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-vault_id"><code>vault_id</code></a>, <a href="#parameter-credential_id"><code>credential_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-vault_id"><code>vault_id</code></a></td>
-    <td><a href="#parameter-include_archived"><code>include_archived</code></a></td>
+    <td><a href="#parameter-include_archived"><code>include_archived</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-vault_id"><code>vault_id</code></a>, <a href="#parameter-auth"><code>auth</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-vault_id"><code>vault_id</code></a>, <a href="#parameter-credential_id"><code>credential_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-vault_id"><code>vault_id</code></a>, <a href="#parameter-credential_id"><code>credential_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#archive"><CopyableCode code="archive" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-vault_id"><code>vault_id</code></a>, <a href="#parameter-credential_id"><code>credential_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#mcp_oauth_validate"><CopyableCode code="mcp_oauth_validate" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-vault_id"><code>vault_id</code></a>, <a href="#parameter-credential_id"><code>credential_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 </tbody>
@@ -425,6 +425,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="vault_id" /></td>
     <td><code>string</code></td>
     <td>Path parameter vault_id (example: vlt_011CZkZDLs7fYzm1hXNPeRjv)</td>
+</tr>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
+    <td><code>string</code></td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
 </tr>
 <tr id="parameter-include_archived">
     <td><CopyableCode code="include_archived" /></td>
@@ -461,6 +466,7 @@ updated_at
 FROM anthropic.vaults.credentials
 WHERE vault_id = '{{ vault_id }}' -- required
 AND credential_id = '{{ credential_id }}' -- required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -482,6 +488,7 @@ updated_at
 FROM anthropic.vaults.credentials
 WHERE vault_id = '{{ vault_id }}' -- required
 AND include_archived = '{{ include_archived }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -506,13 +513,15 @@ INSERT INTO anthropic.vaults.credentials (
 auth,
 display_name,
 metadata,
-vault_id
+vault_id,
+"anthropic-workspace-id"
 )
 SELECT 
 '{{ auth }}' /* required */,
 '{{ display_name }}',
 '{{ metadata }}',
-'{{ vault_id }}'
+'{{ vault_id }}',
+'{{ anthropic-workspace-id }}'
 RETURNING
 id,
 vault_id,
@@ -569,6 +578,10 @@ updated_at
       value: "{{ metadata }}"
       description: |
         Arbitrary key-value metadata to attach to the credential. Maximum 16 pairs, keys up to 64 chars, values up to 512 chars.
+    - name: anthropic-workspace-id
+      value: "{{ anthropic-workspace-id }}"
+      description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)
+      description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)
 `}</CodeBlock>
 
 </TabItem>
@@ -596,6 +609,7 @@ auth = '{{ auth }}'
 WHERE 
 vault_id = '{{ vault_id }}' --required
 WHERE credential_id = '{{ credential_id }}' --required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id}}'
 RETURNING
 id,
 vault_id,
@@ -627,6 +641,7 @@ No description available.
 DELETE FROM anthropic.vaults.credentials
 WHERE vault_id = '{{ vault_id }}' --required
 AND credential_id = '{{ credential_id }}' --required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -649,7 +664,8 @@ Successful response (OK)
 ```sql
 EXEC anthropic.vaults.credentials.archive 
 @vault_id='{{ vault_id }}' --required, 
-@credential_id='{{ credential_id }}' --required
+@credential_id='{{ credential_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -660,7 +676,8 @@ Successful response (OK)
 ```sql
 EXEC anthropic.vaults.credentials.mcp_oauth_validate 
 @vault_id='{{ vault_id }}' --required, 
-@credential_id='{{ credential_id }}' --required
+@credential_id='{{ credential_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>

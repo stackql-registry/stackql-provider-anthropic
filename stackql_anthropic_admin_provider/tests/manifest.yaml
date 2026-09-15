@@ -1,234 +1,127 @@
-# Smoke-test manifest for the stackql `anthropic_admin` provider.
+# Live smoke-test manifest for the stackql `anthropic_admin` provider
+# (tests/smoke.py).
 #
-# Runs through the SHARED runner + wire-contract-enforcing mock:
-#   node stackql_anthropic_provider/tests/smoke.cjs --manifest stackql_anthropic_admin_provider/tests/manifest.yaml
+#   python3 tests/smoke.py --env-file .env --manifest stackql_anthropic_admin_provider/tests/manifest.yaml
+#   python3 tests/smoke.py --env-file .env --manifest stackql_anthropic_admin_provider/tests/manifest.yaml --live
 #
-# The mock additionally enforces the disjoint admin key space (non
-# `sk-ant-admin` keys → 401 on /v1/organizations/*). Usage/cost reports are
-# served in 2 cursor pages to prove report pagination walks. Live mode
-# (--live, gated on ANTHROPIC_ADMIN_KEY) is READ-ONLY — it never mutates a
-# live organization.
+# READ-ONLY by policy: the suite never mutates a live organization (no
+# invites, no workspace writes, no member or key changes), so there are no
+# breadcrumbs and no rollback rules. The mock integration suite
+# (tests/integration/manifest.yaml) covers the write lifecycles.
+#
+# Needs an org-scoped Admin API key in ANTHROPIC_ADMIN_KEY (the variable the
+# provider reads); ANTHROPIC_ADMIN_API_KEY is accepted as an alias. Admin
+# calls carry no per-call charge.
 
 config:
+  provider: anthropic_admin
+  credentials_env_var: ANTHROPIC_ADMIN_KEY
+  credentials_env_aliases:
+    ANTHROPIC_ADMIN_KEY: [ANTHROPIC_ADMIN_API_KEY]
   registry_path: ../provider-dev/openapi
   queries_dir: queries
-  live_env_var: ANTHROPIC_ADMIN_KEY
-  mock_key: sk-ant-admin01-mock
-  mock_port: 8991
   query_timeout_seconds: 120
+  inter_request_delay_seconds: 0.25
 
 vars: {}
 
 tests:
-  # ---- key space enforcement ---------------------------------------------------
-  - name: admin_key_prefix_enforced
-    description: a non-admin key on an admin endpoint is rejected by the wire (mock 401)
-    file: organization/users_list.iql
-    env:
-      ANTHROPIC_ADMIN_KEY: sk-ant-api03-wrong-key-space
-    expect_error: "401"
-
-  # ---- organization -------------------------------------------------------------
+  # ----- organization ---------------------------------------------------------
   - name: org_get
-    description: /v1/organizations/me as a single-row resource
+    description: the organization behind the key (/v1/organizations/me as a single-row resource)
     file: organization/org_get.iql
     expect:
-      equals_rows: 1
-      contains: ["Mock Org"]
+      min_rows: 1
+      contains: ["organization"]
 
   - name: users_list
-    description: after_id entity list (no pagination config)
+    description: organization members (after_id entity list, no auto-pagination)
     file: organization/users_list.iql
     expect:
-      equals_rows: 2
-      contains: ["jo@example.com", "sam@example.com"]
-
-  - name: users_get
-    description: point SELECT by user_id
-    file: organization/users_get.iql
-    expect:
-      equals_rows: 1
-
-  # ---- invites lifecycle ---------------------------------------------------------
-  - name: invites_create
-    description: INSERT with eager id capture via RETURNING
-    file: organization/invites_create.iql
-    expect:
       min_rows: 1
-      contains: ["smoke@example.com", "pending"]
     exports:
-      - name: invite_id
+      - name: user_id
         column: id
 
-  - name: invites_get
-    description: point SELECT by exported invite id
-    file: organization/invites_get.iql
-    expect:
-      equals_rows: 1
-      contains: ["smoke@example.com"]
-
-  - name: invites_delete
-    description: DELETE by exported invite id
-    file: organization/invites_delete.iql
-    always_run: true
-
-  # ---- workspaces lifecycle -------------------------------------------------------
-  - name: workspaces_create
-    description: INSERT workspace, eager id via RETURNING
-    file: workspaces/workspaces_create.iql
+  - name: users_get
+    description: point SELECT by the exported user id
+    sql: >-
+      SELECT id, email, name, role FROM anthropic_admin.organization.users WHERE user_id = '{{ users_list.user_id }}'
     expect:
       min_rows: 1
-      contains: ["smoke-workspace"]
+      contains: ["{{ users_list.user_id }}"]
+
+  - name: invites_list
+    description: pending invites (an empty list is fine)
+    sql: >-
+      SELECT id, email, role, status, expires_at FROM anthropic_admin.organization.invites
+
+  # ----- workspaces -----------------------------------------------------------
+  - name: workspaces_list
+    description: workspaces (every organization has at least the default workspace)
+    sql: >-
+      SELECT id, name, archived_at, created_at FROM anthropic_admin.workspaces.workspaces
+    expect:
+      min_rows: 1
     exports:
       - name: workspace_id
         column: id
 
   - name: workspaces_get
-    description: point SELECT by exported workspace id
-    file: workspaces/workspaces_get.iql
+    description: point SELECT by the exported workspace id
+    sql: >-
+      SELECT id, name, display_color FROM anthropic_admin.workspaces.workspaces WHERE workspace_id = '{{ workspaces_list.workspace_id }}'
     expect:
-      equals_rows: 1
-      contains: ["smoke-workspace"]
-
-  - name: workspaces_update
-    description: UPDATE (POST) workspace name
-    file: workspaces/workspaces_update.iql
-
-  - name: workspaces_update_verify
-    description: re-read confirms the rename
-    file: workspaces/workspaces_get.iql
-    expect:
-      contains: ["smoke-workspace-renamed"]
-
-  - name: workspaces_archive
-    description: archive on the EXEC surface
-    file: workspaces/workspaces_archive.iql
-    always_run: true
+      min_rows: 1
+      contains: ["{{ workspaces_list.workspace_id }}"]
 
   - name: members_list
-    description: workspace members list by path param
-    file: workspaces/members_list.iql
-    expect:
-      min_rows: 1
-      contains: ["workspace_admin"]
+    description: members of the exported workspace (an empty list is fine)
+    sql: >-
+      SELECT user_id, workspace_id, workspace_role FROM anthropic_admin.workspaces.members WHERE workspace_id = '{{ workspaces_list.workspace_id }}'
 
-  - name: ws_rate_limits
-    description: workspace rate-limit overrides (limits carry org_limit)
-    file: workspaces/ws_rate_limits.iql
-    expect:
-      min_rows: 1
-      contains: ["org_limit"]
+  - name: workspace_rate_limits
+    description: rate-limit overrides on the exported workspace (cursor list; may be empty)
+    sql: >-
+      SELECT group_type, models, limits FROM anthropic_admin.workspaces.rate_limits WHERE workspace_id = '{{ workspaces_list.workspace_id }}'
 
-  # ---- reports (cursor pagination; open questions a/b pinned in CLAUDE.md) -------
-  - name: usage_paginated
-    description: usage report walks 2 cursor pages (row per bucket, results JSON column)
-    file: usage/usage_paginated.iql
-    expect:
-      equals_rows: 2
-      contains: ["uncached_input_tokens"]
-
-  - name: usage_group_by
-    description: bracketed wire param via double-quoted identifier ("group_by[]" = 'model')
-    file: usage/usage_group_by.iql
-    expect:
-      equals_rows: 2
-
-  - name: claude_code_report
-    description: Claude Code analytics report walks 2 cursor pages (flat records)
-    file: usage/claude_code.iql
-    expect:
-      equals_rows: 2
-      contains: ["num_sessions", "vscode"]
-
-  - name: cost_report
-    description: cost report bucket rows
-    file: cost/cost_report.iql
-    expect:
-      equals_rows: 2
-      contains: ["USD"]
-
-  # ---- rate limits -----------------------------------------------------------------
-  - name: rate_limits_list
-    description: org rate limits, one row per group
-    file: rate_limits/rate_limits_list.iql
-    expect:
-      equals_rows: 3
-      contains: ["model_group", "requests_per_minute"]
-
-  - name: rate_limits_model_filter
-    description: server-side model filter narrows to one group
-    file: rate_limits/rate_limits_model.iql
-    expect:
-      equals_rows: 1
-      contains: ["claude-sonnet-5"]
-
-  # ---- documented examples ----------------------------------------------------------
-  # VERBATIM SQL from the provider docs index
-  # (provider-dev/docgen/provider-data/anthropic_admin/headerContent2.txt), run
-  # here so the front page cannot drift from what the provider actually does.
-  - name: docs_usage_by_model
-    description: docs example — usage buckets fanned out of the results JSON column
-    file: examples/usage_by_model.iql
-    expect:
-      min_rows: 2
-      contains: ["claude-sonnet-5", "2026-07-01T00:00:00Z"]
-
-  - name: docs_cost_by_line_item
-    description: docs example — USD cost per line item
-    file: examples/cost_by_line_item.iql
-    expect:
-      min_rows: 2
-      contains: ["USD", "12.34"]
-
-  - name: docs_claude_code_activity
-    description: docs example — Claude Code analytics per actor and terminal
-    file: examples/claude_code_activity.iql
-    expect:
-      equals_rows: 2
-      contains: ["jo@example.com", "vscode"]
-
-  - name: docs_workspace_members
-    description: docs example — workspaces joined to their members
-    file: examples/workspace_members.iql
-    expect:
-      min_rows: 1
-      contains: ["default-workspace", "workspace_admin"]
-
-  - name: docs_api_key_hygiene
-    description: docs example — API key inventory with creator and key hint
+  # ----- api keys (list / get / update only - the API forbids create/delete) ---
+  - name: api_keys_list
+    description: API key inventory with creator and key hint
     file: examples/api_key_hygiene.iql
     expect:
-      equals_rows: 1
-      contains: ["ci-key", "sk-ant-api03-R2D...igAA"]
+      min_rows: 1
+    exports:
+      - name: api_key_id
+        column: id
 
-  - name: docs_rate_limits
-    description: docs example — rate limits fanned out of the limits JSON column
-    file: examples/rate_limits.iql
-    expect:
-      min_rows: 3
-      contains: ["requests_per_minute", "enqueued_batch_requests"]
-
-  # ---- live subset (READ-ONLY; never mutates a live org) ---------------------------
-  - name: live_org_get
-    description: real organization info
-    file: organization/org_get.iql
-    live: true
-    skip_mock: true
+  - name: api_keys_get
+    description: point SELECT by the exported key id
+    sql: >-
+      SELECT id, name, status, workspace_id, partial_key_hint FROM anthropic_admin.api_keys.api_keys WHERE api_key_id = '{{ api_keys_list.api_key_id }}'
     expect:
       min_rows: 1
+      contains: ["{{ api_keys_list.api_key_id }}"]
 
-  - name: live_users_list
-    description: real users list
-    file: organization/users_list.iql
-    live: true
-    skip_mock: true
-    expect:
-      min_rows: 1
+  # ----- reports and limits (cursor-paginated) --------------------------------
+  - name: usage_report
+    description: token usage over the last 7 days, one row per daily bucket, grouped by model
+    sql: >-
+      SELECT starting_at, ending_at, results FROM anthropic_admin.usage.usage_reports WHERE starting_at = '{{ days_ago_7_midnight_iso }}' AND bucket_width = '1d' AND "group_by[]" = 'model'
 
-  - name: live_rate_limits
-    description: real rate limits list
+  - name: cost_report
+    description: spend over the last 7 days, one row per daily bucket
+    sql: >-
+      SELECT starting_at, ending_at, results FROM anthropic_admin.cost.cost_reports WHERE starting_at = '{{ days_ago_7_midnight_iso }}' AND bucket_width = '1d'
+
+  - name: claude_code_report
+    description: Claude Code analytics for a recent day (empty when the org has no Claude Code data)
+    sql: >-
+      SELECT date, terminal_type, actor, core_metrics FROM anthropic_admin.usage.claude_code_reports WHERE starting_at = '{{ days_ago_7_date }}'
+
+  - name: rate_limits_list
+    description: organization rate limits, one row per model group
     file: rate_limits/rate_limits_list.iql
-    live: true
-    skip_mock: true
     expect:
       min_rows: 1
+      contains: ["requests_per_minute"]

@@ -1,0 +1,8 @@
+{
+  "auth": {
+    "type": "custom",
+    "location": "header",
+    "name": "x-api-key",
+    "credentialsenvvar": "ANTHROPIC_ADMIN_KEY"
+  }
+}

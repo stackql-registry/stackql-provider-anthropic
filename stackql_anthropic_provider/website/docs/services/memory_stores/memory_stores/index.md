@@ -155,42 +155,42 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-include_archived"><code>include_archived</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a></td>
+    <td><a href="#parameter-include_archived"><code>include_archived</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-name"><code>name</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#archive"><CopyableCode code="archive" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 </tbody>
@@ -213,6 +213,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="memory_store_id" /></td>
     <td><code>string</code></td>
     <td>Path parameter memory_store_id</td>
+</tr>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
+    <td><code>string</code></td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
 </tr>
 <tr id="parameter-created_at[gte]">
     <td><CopyableCode code="created_at[gte]" /></td>
@@ -257,6 +262,7 @@ type,
 updated_at
 FROM anthropic.memory_stores.memory_stores
 WHERE memory_store_id = '{{ memory_store_id }}' -- required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -278,6 +284,7 @@ FROM anthropic.memory_stores.memory_stores
 WHERE include_archived = '{{ include_archived }}'
 AND "created_at[gte]" = '{{ created_at[gte] }}'
 AND "created_at[lte]" = '{{ created_at[lte] }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -301,12 +308,14 @@ No description available.
 INSERT INTO anthropic.memory_stores.memory_stores (
 name,
 description,
-metadata
+metadata,
+"anthropic-workspace-id"
 )
 SELECT 
 '{{ name }}' /* required */,
 '{{ description }}',
-'{{ metadata }}'
+'{{ metadata }}',
+'{{ anthropic-workspace-id }}'
 RETURNING
 id,
 name,
@@ -336,6 +345,10 @@ updated_at
       value: "{{ metadata }}"
       description: |
         Arbitrary key-value tags for your own bookkeeping (such as the end user a store belongs to). Up to 16 pairs; keys 1–64 characters; values up to 512 characters. Not visible to the agent.
+    - name: anthropic-workspace-id
+      value: "{{ anthropic-workspace-id }}"
+      description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)
+      description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)
 `}</CodeBlock>
 
 </TabItem>
@@ -362,6 +375,7 @@ description = '{{ description }}',
 metadata = '{{ metadata }}'
 WHERE 
 memory_store_id = '{{ memory_store_id }}' --required
+WHERE "anthropic-workspace-id" = '{{ anthropic-workspace-id}}'
 RETURNING
 id,
 name,
@@ -391,6 +405,7 @@ No description available.
 ```sql
 DELETE FROM anthropic.memory_stores.memory_stores
 WHERE memory_store_id = '{{ memory_store_id }}' --required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -411,7 +426,8 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.memory_stores.memory_stores.archive 
-@memory_store_id='{{ memory_store_id }}' --required
+@memory_store_id='{{ memory_store_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>

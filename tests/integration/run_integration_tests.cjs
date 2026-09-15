@@ -1,32 +1,33 @@
 #!/usr/bin/env node
-// Manifest-driven smoke runner (architecture mirrors
-// stackql-provider-aws/tests/smoke.py, ported to Node).
+// Manifest-driven integration runner for BOTH providers against the
+// wire-contract-enforcing mock of api.anthropic.com
+// (tests/integration/mock_anthropic_server.cjs). No credentials, no
+// network: the generated registry is copied to a temp dir with every
+// service's `servers:` block rewritten to the mock, and the manifest runs
+// with a synthetic key. The mock REJECTS wire-contract violations (missing
+// x-api-key -> 401, missing anthropic-version -> 400, beta path without the
+// per-endpoint anthropic-beta flag -> 400, non-admin key on
+// /v1/organizations/* -> 401), so a passing run proves header, auth and body
+// behaviour, not just row plumbing.
 //
-// Modes:
-//   mock (default) — starts tests/mock/mock-server.cjs, copies the generated
-//     registry to a temp dir, rewrites each service's `servers:` block to the
-//     mock, and runs the manifest with a synthetic key. The mock REJECTS
-//     wire-contract violations, so a passing run proves headers/auth/body
-//     behaviour, not just row plumbing.
-//   live — gated on the provider env var (config.live_env_var); runs only
-//     manifest tests tagged `live: true`. Admin live tests are READ-ONLY.
-//
-//   node tests/smoke.cjs [--manifest tests/manifest.yaml] [--live]
+//   node tests/integration/run_integration_tests.cjs \
+//     --manifest stackql_anthropic_provider/tests/integration/manifest.yaml \
 //     [--only name1,name2] [--stackql PATH] [--verbose]
+//
+// The live suite is tests/smoke.py (manifest-driven as well, Jinja2
+// templates, `--live` for the published provider).
 //
 // Manifest schema (per test):
 //   name, description, file (relative to config.queries_dir)
 //   env:          extra env vars for this invocation
 //   expect:       { min_rows, contains: [..], not_contains: [..], equals_rows }
 //   expect_error: substring that must appear in stderr/stdout (test PASSES on it)
-//   exports:      [{ name, column }] — publish row[0][column] as {{test.name}}
+//   exports:      [{ name, column }] - publish row[0][column] as {{test.name}}
 //   always_run:   run even after an earlier failure (cleanup steps)
-//   live:         include in --live runs (default: mock-only)
-//   skip_mock:    exclude from mock runs
 //
 // Templates: {{ var }} placeholders resolve from manifest `vars` + exports.
 // Fatal patterns (config.fatal_patterns + built-ins) fail a test even when
-// expectations pass — stackql exits 0 on several hard failures.
+// expectations pass - stackql exits 0 on several hard failures.
 
 const fs = require('fs');
 const os = require('os');
@@ -34,7 +35,7 @@ const path = require('path');
 const { spawn, spawnSync } = require('child_process');
 const YAML = require('yaml');
 
-const baseDir = path.resolve(__dirname, '..');
+const repoRoot = path.resolve(__dirname, '..', '..');
 
 const DEFAULT_FATAL = [
   'duplicate column name',
@@ -45,6 +46,7 @@ const DEFAULT_FATAL = [
   'no such column',
   'cannot find matching operation',
   'unknown flag',
+  'parser error',
 ];
 
 function argOf(flag, dflt) {
@@ -53,20 +55,28 @@ function argOf(flag, dflt) {
 }
 const hasFlag = (f) => process.argv.includes(f);
 
-const manifestPath = argOf('--manifest', path.join(__dirname, 'manifest.yaml'));
-const live = hasFlag('--live');
+const manifestPath = argOf('--manifest', null);
+if (!manifestPath) {
+  console.error('usage: run_integration_tests.cjs --manifest <provider>/tests/integration/manifest.yaml [--only a,b] [--stackql PATH] [--verbose]');
+  process.exit(2);
+}
 const verbose = hasFlag('--verbose');
 const only = (argOf('--only', '') || '').split(',').filter(Boolean);
 
 const manifest = YAML.parse(fs.readFileSync(manifestPath, 'utf8'));
 const cfg = manifest.config || {};
+const credentialsEnvVar = cfg.credentials_env_var;
+if (!credentialsEnvVar) {
+  console.error('manifest config.credentials_env_var is required (the provider auth env var the mock key is injected into)');
+  process.exit(2);
+}
 
 // Resolve the stackql binary to an ABSOLUTE path. fs.existsSync resolves
 // bare names against the CWD while spawn() resolves them against PATH, so
 // relative candidates must be absolutized before spawning. Order:
-// --stackql / $STACKQL / config.stackql (path or PATH-resolved command) →
-// <provider>/stackql → ./stackql → `stackql` on PATH → download the latest
-// release into the provider dir.
+// --stackql / $STACKQL / config.stackql (path or PATH-resolved command) ->
+// <repo>/stackql -> ./stackql -> `stackql` on PATH -> download the latest
+// release into the repo root (Linux/macOS only).
 function resolveStackql() {
   const { execSync } = require('child_process');
   const tryPath = (p) => {
@@ -93,12 +103,12 @@ function resolveStackql() {
     if (resolved) return resolved;
     console.warn(`stackql candidate '${candidate}' does not resolve to a binary - falling back`);
   }
-  const local = tryPath(path.join(baseDir, 'stackql')) || tryPath(path.join(process.cwd(), 'stackql'));
+  const local = tryPath(path.join(repoRoot, 'stackql')) || tryPath(path.join(process.cwd(), 'stackql'));
   if (local) return local;
   const onPath = fromPathLookup('stackql');
   if (onPath) return onPath;
   if (process.platform !== 'linux' && process.platform !== 'darwin') {
-    console.error('stackql binary not found (set STACKQL, or place ./stackql in the provider dir)');
+    console.error('stackql binary not found (set STACKQL, or place ./stackql in the repo root)');
     process.exit(2);
   }
   const arch = process.arch === 'arm64' ? 'arm64' : 'amd64';
@@ -107,13 +117,13 @@ function resolveStackql() {
   try {
     execSync(
       `curl -sSL -o stackql.zip "${url}" && unzip -o stackql.zip stackql && rm -f stackql.zip && chmod +x stackql`,
-      { cwd: baseDir, stdio: ['ignore', 'inherit', 'inherit'] },
+      { cwd: repoRoot, stdio: ['ignore', 'inherit', 'inherit'] },
     );
   } catch (e) {
     console.error(`stackql download failed: ${e.message}`);
     process.exit(2);
   }
-  const downloaded = tryPath(path.join(baseDir, 'stackql'));
+  const downloaded = tryPath(path.join(repoRoot, 'stackql'));
   if (!downloaded) {
     console.error('stackql download did not produce a usable binary');
     process.exit(2);
@@ -121,37 +131,31 @@ function resolveStackql() {
   return downloaded;
 }
 const stackqlBin = resolveStackql();
-const queriesDir = path.resolve(path.dirname(manifestPath), cfg.queries_dir || 'queries');
+const queriesDir = path.resolve(path.dirname(manifestPath), cfg.queries_dir || '../queries');
 const mockPort = cfg.mock_port || 8990;
 const fatalPatterns = [...DEFAULT_FATAL, ...(cfg.fatal_patterns || [])];
 
-if (live && !process.env[cfg.live_env_var]) {
-  console.error(`--live requires ${cfg.live_env_var} to be set`);
-  process.exit(2);
-}
-
 // ---- registry ----------------------------------------------------------------
+// A TEST COPY of the generated registry with the vendor server rewritten to
+// the mock. provider-dev/** is never modified.
 function prepareRegistry() {
-  const srcReg = path.resolve(path.dirname(manifestPath), cfg.registry_path || '../provider-dev/openapi');
-  if (!live) {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'stackql-mock-reg-'));
-    fs.cpSync(srcReg, tmp, { recursive: true });
-    const stack = [tmp];
-    while (stack.length) {
-      const d = stack.pop();
-      for (const e of fs.readdirSync(d, { withFileTypes: true })) {
-        const p = path.join(d, e.name);
-        if (e.isDirectory()) stack.push(p);
-        else if (/\.ya?ml$/.test(e.name)) {
-          const text = fs.readFileSync(p, 'utf8');
-          const next = text.replace(/- url: https:\/\/api\.anthropic\.com/g, `- url: http://localhost:${mockPort}`);
-          if (next !== text) fs.writeFileSync(p, next);
-        }
+  const srcReg = path.resolve(path.dirname(manifestPath), cfg.registry_path || '../../provider-dev/openapi');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'stackql-mock-reg-'));
+  fs.cpSync(srcReg, tmp, { recursive: true });
+  const stack = [tmp];
+  while (stack.length) {
+    const d = stack.pop();
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) stack.push(p);
+      else if (/\.ya?ml$/.test(e.name)) {
+        const text = fs.readFileSync(p, 'utf8');
+        const next = text.replace(/- url: https:\/\/api\.anthropic\.com/g, `- url: http://localhost:${mockPort}`);
+        if (next !== text) fs.writeFileSync(p, next);
       }
     }
-    return tmp;
   }
-  return srcReg;
+  return tmp;
 }
 
 // ---- template + expectation helpers -------------------------------------------
@@ -186,15 +190,16 @@ function parseRows(stdout) {
 async function main() {
   const registry = prepareRegistry();
 
-  let mockChild = null;
-  if (!live) {
-    mockChild = spawn(process.execPath, [path.join(__dirname, 'mock', 'mock-server.cjs'), String(mockPort)], { stdio: verbose ? 'inherit' : 'ignore' });
-    await new Promise((res) => setTimeout(res, 600));
-    process.on('exit', () => { try { mockChild.kill(); } catch { /* gone */ } });
-    // synthetic credential for the mock (the mock enforces presence, and
-    // sk-ant-admin prefix for admin routes; per-test env can override)
-    process.env[cfg.live_env_var] = cfg.mock_key || 'sk-ant-mock-key';
-  }
+  const mockChild = spawn(process.execPath, [path.join(__dirname, 'mock_anthropic_server.cjs'), String(mockPort)], { stdio: verbose ? 'inherit' : 'ignore' });
+  await new Promise((res) => setTimeout(res, 600));
+  process.on('exit', () => { try { mockChild.kill(); } catch { /* gone */ } });
+  // synthetic credential for the mock (the mock enforces presence, and the
+  // sk-ant-admin prefix for admin routes; per-test env can override)
+  process.env[credentialsEnvVar] = cfg.mock_key || 'sk-ant-mock-key';
+
+  console.log(`stackql:  ${stackqlBin}`);
+  console.log(`manifest: ${manifestPath}`);
+  console.log(`mock:     http://localhost:${mockPort} (${credentialsEnvVar}=${process.env[credentialsEnvVar]})`);
 
   const vars = { ...(manifest.vars || {}), mock_port: String(mockPort) };
   const results = [];
@@ -202,8 +207,6 @@ async function main() {
 
   for (const t of manifest.tests || []) {
     if (only.length && !only.includes(t.name)) continue;
-    if (live && !t.live) continue;
-    if (!live && t.skip_mock) continue;
     if (failed && !t.always_run) {
       results.push({ name: t.name, status: 'SKIP', detail: 'earlier failure' });
       continue;
@@ -264,7 +267,7 @@ async function main() {
     const status = problems.length ? 'FAIL' : 'PASS';
     if (status === 'FAIL') failed = true;
     results.push({ name: t.name, status, detail: problems.join('; '), ms: Date.now() - t0 });
-    console.log(`${status === 'PASS' ? '✅' : '❌'} ${t.name} (${Date.now() - t0}ms)${problems.length ? ' — ' + problems.join('; ') : ''}`);
+    console.log(`${status === 'PASS' ? 'PASS' : 'FAIL'}  ${t.name} (${Date.now() - t0}ms)${problems.length ? ' - ' + problems.join('; ') : ''}`);
     if (verbose && status === 'FAIL') console.log(combined.slice(0, 1500));
   }
 

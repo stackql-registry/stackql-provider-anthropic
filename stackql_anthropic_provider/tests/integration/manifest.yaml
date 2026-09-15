@@ -1,0 +1,303 @@
+# Integration (mock) manifest for the stackql `anthropic` provider.
+#
+#   node tests/integration/run_integration_tests.cjs --manifest stackql_anthropic_provider/tests/integration/manifest.yaml
+#
+# tests/integration/mock_anthropic_server.cjs enforces the wire contract
+# (401 without x-api-key, 400 without anthropic-version, 400 on beta paths
+# without the right anthropic-beta flag, 400 on a malformed
+# anthropic-workspace-id) - every green test below therefore proves
+# header/auth behaviour, not just row plumbing. The agents, files and dreams
+# lists are served in 2 cursor pages (page/next_page) so the *_paginated
+# tests prove auto-pagination walks; the batches and models lists are
+# after_id-style (last_id populated on the final page) so a wrongly-stamped
+# pagination config would hang/loop them.
+#
+# The live suite is tests/manifest.yaml (tests/smoke.py).
+
+config:
+  registry_path: ../../provider-dev/openapi
+  queries_dir: ../queries
+  credentials_env_var: ANTHROPIC_API_KEY
+  mock_key: sk-ant-mock-key
+  mock_port: 8990
+  query_timeout_seconds: 120
+
+vars:
+  model: claude-sonnet-5
+  agent_name: stackql-smoke-agent
+  dream_instructions: stackql-smoke-dream
+
+tests:
+  # ---- credential handling ---------------------------------------------------
+  - name: auth_env_required
+    description: empty credentials env var must fail client-side, never hit the wire
+    file: auth/missing_key.iql
+    env:
+      ANTHROPIC_API_KEY: ""
+    expect_error: "credentials error"
+
+  # ---- inference as result sets (GA surface) ---------------------------------
+  - name: messages_infer
+    description: POST-as-SELECT; naive body translate fans messages out to a JSON array
+    file: messages/infer.iql
+    expect:
+      min_rows: 1
+      contains: ["mock completion", "assistant"]
+
+  - name: token_counts
+    description: divergent-shape resource split (few-shot 1) - {input_tokens} row
+    file: messages/count_tokens.iql
+    expect:
+      min_rows: 1
+      contains: ["37"]
+
+  # ---- after_id lists: NO pagination config (would loop on last_id) ----------
+  - name: batches_list
+    description: after_id-style list returns one page and terminates
+    file: messages/batches_list.iql
+    expect:
+      equals_rows: 2
+      contains: ["msgbatch_01", "msgbatch_02"]
+
+  - name: models_list
+    description: GA models list (after_id style)
+    file: models/models_list.iql
+    expect:
+      equals_rows: 2
+      contains: ["claude-sonnet-5", "claude-opus-4-8"]
+
+  - name: models_get
+    description: single model by path param
+    file: models/models_get.iql
+    expect:
+      equals_rows: 1
+      contains: ["claude-sonnet-5"]
+
+  # ---- workspace scoping via the anthropic-workspace-id header ---------------
+  # The header is an optional param on almost every op (2026-09 spec). The
+  # mock returns ONE model for wrkspc_01 and 400s any non-wrkspc_ value (as
+  # the live API does), so green proves the WHERE condition became the header.
+  - name: models_workspace_scoped
+    description: '"anthropic-workspace-id" WHERE condition reaches the wire as the header (1 row, not 2)'
+    file: examples/workspace_models.iql
+    expect:
+      equals_rows: 1
+      contains: ["claude-sonnet-5"]
+      not_contains: ["claude-opus-4-8"]
+
+  - name: models_workspace_invalid
+    description: a malformed workspace id is rejected by the wire (mock mirrors the live 400)
+    file: auth/bad_workspace.iql
+    expect_error: "valid workspace ID"
+
+  # ---- files (GA since 2026-09; cursor pagination) ----------------------------
+  - name: files_list_paginated
+    description: 3 seeded files over 2 cursor pages (2+1) - proves the walk on the GA list
+    file: files/files_list.iql
+    expect:
+      equals_rows: 3
+      contains: ["seed-file-1.txt", "seed-file-3.txt"]
+
+  - name: files_get
+    description: file metadata by path param
+    file: files/files_get.iql
+    expect:
+      equals_rows: 1
+      contains: ["seed-file-2.txt"]
+
+  - name: files_delete
+    description: DELETE by file_id
+    file: files/files_delete.iql
+
+  - name: files_list_after_delete
+    description: the deleted file drops out of the list (back to 2)
+    file: files/files_list.iql
+    expect:
+      equals_rows: 2
+      not_contains: ["seed-file-3.txt"]
+
+  # ---- skills (GA since 2026-09) ----------------------------------------------
+  - name: skills_list
+    description: skills list with the source type projected out of the JSON column
+    file: skills/skills_list.iql
+    expect:
+      equals_rows: 2
+      contains: ["xlsx", "release-notes", "custom"]
+
+  - name: skills_get
+    description: single skill by path param
+    file: skills/skills_get.iql
+    expect:
+      equals_rows: 1
+      contains: ["xlsx"]
+
+  - name: skill_versions_list
+    description: versions of a skill (path param + cursor list)
+    file: skills/skill_versions.iql
+    expect:
+      equals_rows: 1
+      contains: ["skver_01"]
+
+  - name: skill_version_download
+    description: the beta-keyed content download dispatches WITHOUT an anthropic-beta flag (as live)
+    file: skills/skill_version_download.iql
+
+  # ---- cursor pagination + beta headers (agents lifecycle) -------------------
+  # Any request here without anthropic-beta: managed-agents-2026-04-01 is
+  # rejected by the mock, so green == the per-endpoint default was injected.
+  - name: agents_list_paginated
+    description: 5 seeded agents over 2 cursor pages (3+2) - proves the walk
+    file: agents/agents_list.iql
+    expect:
+      equals_rows: 5
+      contains: ["seed-agent-1", "seed-agent-5"]
+
+  - name: agents_insert
+    description: INSERT with eager id capture via RETURNING
+    file: agents/agents_insert.iql
+    expect:
+      min_rows: 1
+      contains: ["{{ agent_name }}"]
+    exports:
+      - name: agent_id
+        column: id
+
+  - name: agents_get
+    description: point SELECT by exported id
+    file: agents/agents_get.iql
+    expect:
+      equals_rows: 1
+      contains: ["{{ agent_name }}", "{{ agents_insert.agent_id }}"]
+
+  - name: agents_update
+    description: UPDATE (POST) with required body field `version`
+    file: agents/agents_update.iql
+
+  - name: agents_update_verify
+    description: re-read confirms the description changed and version bumped
+    file: agents/agents_get.iql
+    expect:
+      contains: ["updated by smoke suite"]
+
+  - name: agents_archive
+    description: lifecycle op on the EXEC surface
+    file: agents/agents_archive.iql
+    always_run: true
+
+  - name: agents_list_after_archive
+    description: archived agent drops out of the list (back to 5)
+    file: agents/agents_list.iql
+    expect:
+      equals_rows: 5
+      not_contains: ["{{ agent_name }}"]
+
+  # ---- dreams (research preview, beta dreaming-2026-04-21) --------------------
+  # Same beta-header proof as agents: the mock rejects any dreams request
+  # without the dreaming flag.
+  - name: dreams_list_paginated
+    description: 3 seeded dreams over 2 cursor pages (2+1)
+    file: dreams/dreams_list.iql
+    expect:
+      equals_rows: 3
+      contains: ["seed-dream-1", "seed-dream-3"]
+
+  - name: dreams_insert
+    description: INSERT (all body fields optional) with eager id capture via RETURNING
+    file: dreams/dreams_insert.iql
+    expect:
+      min_rows: 1
+      contains: ["{{ dream_instructions }}", "running"]
+    exports:
+      - name: dream_id
+        column: id
+
+  - name: dreams_get
+    description: point SELECT by exported id
+    file: dreams/dreams_get.iql
+    expect:
+      equals_rows: 1
+      contains: ["{{ dreams_insert.dream_id }}"]
+
+  - name: dreams_cancel
+    description: cancel on the EXEC surface
+    file: dreams/dreams_cancel.iql
+
+  - name: dreams_cancel_verify
+    description: re-read shows the canceled status
+    file: dreams/dreams_get.iql
+    expect:
+      contains: ["canceled"]
+
+  - name: dreams_archive
+    description: archive on the EXEC surface
+    file: dreams/dreams_archive.iql
+    always_run: true
+
+  - name: dreams_list_after_archive
+    description: archived dream drops out of the list (back to 3)
+    file: dreams/dreams_list.iql
+    expect:
+      equals_rows: 3
+      not_contains: ["{{ dream_instructions }}"]
+
+  # ---- documented examples ----------------------------------------------------
+  # These files are the VERBATIM SQL published in the provider docs index
+  # (provider-dev/docgen/provider-data/anthropic/headerContent2.txt). They run
+  # here so the front page cannot drift from what the provider actually does
+  # (factory/check-doc-examples.mjs enforces the pairing). Read-only, and
+  # last in the list - the lifecycles above are finished.
+  - name: docs_inference
+    description: docs example - ask Claude, read the reply out of the content array
+    file: examples/inference.iql
+    expect:
+      min_rows: 1
+      contains: ["mock completion"]
+
+  - name: docs_token_budget
+    description: docs example - count tokens before spending them
+    file: examples/token_budget.iql
+    expect:
+      equals_rows: 1
+      contains: ["37"]
+
+  - name: docs_model_capabilities
+    description: docs example - the vw_model_capabilities view
+    file: examples/model_capabilities.iql
+    expect:
+      equals_rows: 2
+      contains: ["claude-sonnet-5", "claude-opus-4-8"]
+
+  - name: docs_batch_triage
+    description: docs example - batch progress from the request_counts JSON column
+    file: examples/batch_triage.iql
+    expect:
+      equals_rows: 2
+      contains: ["msgbatch_01", "in_progress"]
+
+  - name: docs_files_inventory
+    description: docs example - files inventory (cursor-paginated GA list)
+    file: examples/files_inventory.iql
+    expect:
+      min_rows: 2
+      contains: ["seed-file-1.txt"]
+
+  - name: docs_skills_inventory
+    description: docs example - skills with their source and latest version
+    file: examples/skills_inventory.iql
+    expect:
+      equals_rows: 2
+      contains: ["xlsx", "skver_02"]
+
+  - name: docs_agent_inventory
+    description: docs example - agent inventory across the cursor-paginated list
+    file: examples/agent_inventory.iql
+    expect:
+      equals_rows: 5
+      contains: ["seed-agent-1"]
+
+  - name: docs_dreams
+    description: docs example - dreams (memory consolidation jobs) and their status
+    file: examples/dreams.iql
+    expect:
+      equals_rows: 3
+      contains: ["running"]

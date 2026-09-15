@@ -1,0 +1,2 @@
+SELECT id, filename, size_bytes
+FROM anthropic.files.files;

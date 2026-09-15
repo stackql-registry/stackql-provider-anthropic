@@ -1,0 +1,3 @@
+SELECT id, skill_id, name
+FROM anthropic.skills.versions
+WHERE skill_id = 'xlsx';

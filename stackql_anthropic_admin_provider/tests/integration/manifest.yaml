@@ -1,0 +1,210 @@
+# Integration (mock) manifest for the stackql `anthropic_admin` provider.
+#
+# Runs through the SHARED runner + wire-contract-enforcing mock:
+#   node tests/integration/run_integration_tests.cjs --manifest stackql_anthropic_admin_provider/tests/integration/manifest.yaml
+#
+# The mock additionally enforces the disjoint admin key space (non
+# `sk-ant-admin` keys -> 401 on /v1/organizations/*). Usage/cost reports are
+# served in 2 cursor pages to prove report pagination walks.
+#
+# The live suite is tests/manifest.yaml (tests/smoke.py) and is READ-ONLY:
+# it never mutates a live organization.
+
+config:
+  registry_path: ../../provider-dev/openapi
+  queries_dir: ../queries
+  credentials_env_var: ANTHROPIC_ADMIN_KEY
+  mock_key: sk-ant-admin01-mock
+  mock_port: 8991
+  query_timeout_seconds: 120
+
+vars: {}
+
+tests:
+  # ---- key space enforcement ---------------------------------------------------
+  - name: admin_key_prefix_enforced
+    description: a non-admin key on an admin endpoint is rejected by the wire (mock 401)
+    file: organization/users_list.iql
+    env:
+      ANTHROPIC_ADMIN_KEY: sk-ant-api03-wrong-key-space
+    expect_error: "401"
+
+  # ---- organization -------------------------------------------------------------
+  - name: org_get
+    description: /v1/organizations/me as a single-row resource
+    file: organization/org_get.iql
+    expect:
+      equals_rows: 1
+      contains: ["Mock Org"]
+
+  - name: users_list
+    description: after_id entity list (no pagination config)
+    file: organization/users_list.iql
+    expect:
+      equals_rows: 2
+      contains: ["jo@example.com", "sam@example.com"]
+
+  - name: users_get
+    description: point SELECT by user_id
+    file: organization/users_get.iql
+    expect:
+      equals_rows: 1
+
+  # ---- invites lifecycle ---------------------------------------------------------
+  - name: invites_create
+    description: INSERT with eager id capture via RETURNING
+    file: organization/invites_create.iql
+    expect:
+      min_rows: 1
+      contains: ["smoke@example.com", "pending"]
+    exports:
+      - name: invite_id
+        column: id
+
+  - name: invites_get
+    description: point SELECT by exported invite id
+    file: organization/invites_get.iql
+    expect:
+      equals_rows: 1
+      contains: ["smoke@example.com"]
+
+  - name: invites_delete
+    description: DELETE by exported invite id
+    file: organization/invites_delete.iql
+    always_run: true
+
+  # ---- workspaces lifecycle -------------------------------------------------------
+  - name: workspaces_create
+    description: INSERT workspace, eager id via RETURNING
+    file: workspaces/workspaces_create.iql
+    expect:
+      min_rows: 1
+      contains: ["smoke-workspace"]
+    exports:
+      - name: workspace_id
+        column: id
+
+  - name: workspaces_get
+    description: point SELECT by exported workspace id
+    file: workspaces/workspaces_get.iql
+    expect:
+      equals_rows: 1
+      contains: ["smoke-workspace"]
+
+  - name: workspaces_update
+    description: UPDATE (POST) workspace name
+    file: workspaces/workspaces_update.iql
+
+  - name: workspaces_update_verify
+    description: re-read confirms the rename
+    file: workspaces/workspaces_get.iql
+    expect:
+      contains: ["smoke-workspace-renamed"]
+
+  - name: workspaces_archive
+    description: archive on the EXEC surface
+    file: workspaces/workspaces_archive.iql
+    always_run: true
+
+  - name: members_list
+    description: workspace members list by path param
+    file: workspaces/members_list.iql
+    expect:
+      min_rows: 1
+      contains: ["workspace_admin"]
+
+  - name: ws_rate_limits
+    description: workspace rate-limit overrides (limits carry org_limit)
+    file: workspaces/ws_rate_limits.iql
+    expect:
+      min_rows: 1
+      contains: ["org_limit"]
+
+  # ---- reports (cursor pagination; open questions a/b pinned in CLAUDE.md) -------
+  - name: usage_paginated
+    description: usage report walks 2 cursor pages (row per bucket, results JSON column)
+    file: usage/usage_paginated.iql
+    expect:
+      equals_rows: 2
+      contains: ["uncached_input_tokens"]
+
+  - name: usage_group_by
+    description: bracketed wire param via double-quoted identifier ("group_by[]" = 'model')
+    file: usage/usage_group_by.iql
+    expect:
+      equals_rows: 2
+
+  - name: claude_code_report
+    description: Claude Code analytics report walks 2 cursor pages (flat records)
+    file: usage/claude_code.iql
+    expect:
+      equals_rows: 2
+      contains: ["num_sessions", "vscode"]
+
+  - name: cost_report
+    description: cost report bucket rows
+    file: cost/cost_report.iql
+    expect:
+      equals_rows: 2
+      contains: ["USD"]
+
+  # ---- rate limits -----------------------------------------------------------------
+  - name: rate_limits_list
+    description: org rate limits, one row per group
+    file: rate_limits/rate_limits_list.iql
+    expect:
+      equals_rows: 3
+      contains: ["model_group", "requests_per_minute"]
+
+  - name: rate_limits_model_filter
+    description: server-side model filter narrows to one group
+    file: rate_limits/rate_limits_model.iql
+    expect:
+      equals_rows: 1
+      contains: ["claude-sonnet-5"]
+
+  # ---- documented examples ----------------------------------------------------------
+  # VERBATIM SQL from the provider docs index
+  # (provider-dev/docgen/provider-data/anthropic_admin/headerContent2.txt), run
+  # here so the front page cannot drift from what the provider actually does.
+  - name: docs_usage_by_model
+    description: docs example — usage buckets fanned out of the results JSON column
+    file: examples/usage_by_model.iql
+    expect:
+      min_rows: 2
+      contains: ["claude-sonnet-5", "2026-07-01T00:00:00Z"]
+
+  - name: docs_cost_by_line_item
+    description: docs example — USD cost per line item
+    file: examples/cost_by_line_item.iql
+    expect:
+      min_rows: 2
+      contains: ["USD", "12.34"]
+
+  - name: docs_claude_code_activity
+    description: docs example — Claude Code analytics per actor and terminal
+    file: examples/claude_code_activity.iql
+    expect:
+      equals_rows: 2
+      contains: ["jo@example.com", "vscode"]
+
+  - name: docs_workspace_members
+    description: docs example — workspaces joined to their members
+    file: examples/workspace_members.iql
+    expect:
+      min_rows: 1
+      contains: ["default-workspace", "workspace_admin"]
+
+  - name: docs_api_key_hygiene
+    description: docs example — API key inventory with creator and key hint
+    file: examples/api_key_hygiene.iql
+    expect:
+      equals_rows: 1
+      contains: ["ci-key", "sk-ant-api03-R2D...igAA"]
+
+  - name: docs_rate_limits
+    description: docs example - rate limits fanned out of the limits JSON column
+    file: examples/rate_limits.iql
+    expect:
+      min_rows: 3
+      contains: ["requests_per_minute", "enqueued_batch_requests"]

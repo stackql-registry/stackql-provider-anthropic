@@ -58,7 +58,7 @@ Successful response (OK)
   {
     "name": "memory_version_id",
     "type": "string",
-    "description": "ID of the `memory_version` representing this memory's current content (a `memver_...` value). This is the authoritative head pointer; `memory_version` objects do not carry an `is_latest` flag, so compare against this field instead. Enumerate the full history via [List memory versions](/en/api/beta/memory_stores/memory_versions/list)."
+    "description": "ID of the `memory_version` representing this memory's current content (a `memver_...` value). This is the authoritative head pointer; `memory_version` objects do not carry an `is_latest` flag, so compare against this field instead. Enumerate the history via [List memory versions](/en/api/beta/memory_stores/memory_versions/list)."
   },
   {
     "name": "content",
@@ -115,7 +115,7 @@ Successful response (OK)
   {
     "name": "memory_version_id",
     "type": "string",
-    "description": "ID of the `memory_version` representing this memory's current content (a `memver_...` value). This is the authoritative head pointer; `memory_version` objects do not carry an `is_latest` flag, so compare against this field instead. Enumerate the full history via [List memory versions](/en/api/beta/memory_stores/memory_versions/list)."
+    "description": "ID of the `memory_version` representing this memory's current content (a `memver_...` value). This is the authoritative head pointer; `memory_version` objects do not carry an `is_latest` flag, so compare against this field instead. Enumerate the history via [List memory versions](/en/api/beta/memory_stores/memory_versions/list)."
   },
   {
     "name": "content",
@@ -175,35 +175,35 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a>, <a href="#parameter-memory_id"><code>memory_id</code></a></td>
-    <td><a href="#parameter-view"><code>view</code></a></td>
+    <td><a href="#parameter-view"><code>view</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a></td>
-    <td><a href="#parameter-path_prefix"><code>path_prefix</code></a>, <a href="#parameter-depth"><code>depth</code></a>, <a href="#parameter-view"><code>view</code></a></td>
+    <td><a href="#parameter-path_prefix"><code>path_prefix</code></a>, <a href="#parameter-depth"><code>depth</code></a>, <a href="#parameter-view"><code>view</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a>, <a href="#parameter-path"><code>path</code></a>, <a href="#parameter-content"><code>content</code></a></td>
-    <td><a href="#parameter-view"><code>view</code></a></td>
+    <td><a href="#parameter-view"><code>view</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a>, <a href="#parameter-memory_id"><code>memory_id</code></a></td>
-    <td><a href="#parameter-view"><code>view</code></a></td>
+    <td><a href="#parameter-view"><code>view</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-memory_store_id"><code>memory_store_id</code></a>, <a href="#parameter-memory_id"><code>memory_id</code></a></td>
-    <td><a href="#parameter-expected_content_sha256"><code>expected_content_sha256</code></a></td>
+    <td><a href="#parameter-expected_content_sha256"><code>expected_content_sha256</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 </tbody>
@@ -231,6 +231,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="memory_store_id" /></td>
     <td><code>string</code></td>
     <td>Path parameter memory_store_id</td>
+</tr>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
+    <td><code>string</code></td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
 </tr>
 <tr id="parameter-depth">
     <td><CopyableCode code="depth" /></td>
@@ -284,6 +289,7 @@ FROM anthropic.memory_stores.memories
 WHERE memory_store_id = '{{ memory_store_id }}' -- required
 AND memory_id = '{{ memory_id }}' -- required
 AND view = '{{ view }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -308,6 +314,7 @@ WHERE memory_store_id = '{{ memory_store_id }}' -- required
 AND path_prefix = '{{ path_prefix }}'
 AND depth = '{{ depth }}'
 AND view = '{{ view }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -332,13 +339,15 @@ INSERT INTO anthropic.memory_stores.memories (
 path,
 content,
 memory_store_id,
-view
+view,
+"anthropic-workspace-id"
 )
 SELECT 
 '{{ path }}' /* required */,
 '{{ content }}' /* required */,
 '{{ memory_store_id }}',
-'{{ view }}'
+'{{ view }}',
+'{{ anthropic-workspace-id }}'
 RETURNING
 id,
 memory_store_id,
@@ -364,7 +373,7 @@ updated_at
     - name: path
       value: "{{ path }}"
       description: |
-        Hierarchical path for the new memory, e.g. \`/projects/foo/notes.md\`. Must start with \`/\`, contain at least one non-empty segment, and be at most 1,024 bytes. Must not contain empty segments, \`.\` or \`..\` segments, control or format characters, and must be NFC-normalized. Paths are case-sensitive.
+        Hierarchical path for the new memory, e.g. \`/projects/foo/notes.md\`. Must start with \`/\`, contain at least one non-empty segment, and be at most 1,024 bytes. Must not contain empty segments, \`.\` or \`..\` segments, control or format characters, or the Unicode line and paragraph separators (U+2028, U+2029), and must be NFC-normalized. Paths are case-sensitive.
     - name: content
       value: "{{ content }}"
       description: |
@@ -373,6 +382,10 @@ updated_at
       value: "{{ view }}"
       description: Query parameter for view
       description: Query parameter for view
+    - name: anthropic-workspace-id
+      value: "{{ anthropic-workspace-id }}"
+      description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)
+      description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)
 `}</CodeBlock>
 
 </TabItem>
@@ -401,6 +414,7 @@ WHERE
 memory_store_id = '{{ memory_store_id }}' --required
 WHERE memory_id = '{{ memory_id }}' --required
 AND view = '{{ view}}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id}}'
 RETURNING
 id,
 memory_store_id,
@@ -434,6 +448,7 @@ DELETE FROM anthropic.memory_stores.memories
 WHERE memory_store_id = '{{ memory_store_id }}' --required
 AND memory_id = '{{ memory_id }}' --required
 AND expected_content_sha256 = '{{ expected_content_sha256 }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>

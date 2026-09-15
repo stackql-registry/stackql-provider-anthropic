@@ -117,17 +117,21 @@ spec.openapi = '3.0.3';
 // ---- 3. header defaults -----------------------------------------------------
 const betaFlagsDoc = YAML.parse(fs.readFileSync(path.join(here, 'beta-flags.yaml'), 'utf8'));
 const betaFlags = Object.entries(betaFlagsDoc.flags);
+// Beta path prefixes the SDK sends NO flag for (the header stays optional
+// without a default; the server routes them without one).
+const betaNoDefault = betaFlagsDoc.no_default || [];
+
+const prefixMatches = (pathKey, prefix) =>
+  pathKey === prefix || pathKey.startsWith(`${prefix}/`) || pathKey.startsWith(`${prefix}?`);
 
 function betaFlagFor(pathKey) {
   for (const [prefix, flag] of betaFlags) {
-    if (pathKey === prefix || pathKey.startsWith(`${prefix}/`) || pathKey.startsWith(`${prefix}?`)) {
-      return flag;
-    }
+    if (prefixMatches(pathKey, prefix)) return flag;
   }
   return null;
 }
 
-let versionStamped = 0, betaStamped = 0;
+let versionStamped = 0, betaStamped = 0, betaNoDefaultCount = 0;
 const betaMisses = [];
 for (const [pathKey, item] of Object.entries(spec.paths)) {
   for (const [method, op] of Object.entries(item)) {
@@ -147,7 +151,8 @@ for (const [pathKey, item] of Object.entries(spec.paths)) {
     if (pathKey.includes('beta=true')) {
       const beta = params.find((p) => p.name === 'anthropic-beta' && p.in === 'header');
       const flag = betaFlagFor(pathKey);
-      if (!beta || !flag) {
+      const noDefault = betaNoDefault.some((prefix) => prefixMatches(pathKey, prefix));
+      if (!beta || (!flag && !noDefault)) {
         betaMisses.push(`${method.toUpperCase()} ${pathKey} (param:${!!beta} flag:${flag})`);
         continue;
       }
@@ -156,8 +161,13 @@ for (const [pathKey, item] of Object.entries(spec.paths)) {
       // The spec models this schema as `type: string` with a stray `items`
       // member (Stainless artifact); drop it so 3.0 validators stay happy.
       delete beta.schema.items;
-      beta.schema.default = flag;
-      betaStamped++;
+      if (flag) {
+        beta.schema.default = flag;
+        betaStamped++;
+      } else {
+        delete beta.schema.default;
+        betaNoDefaultCount++;
+      }
     }
   }
 }
@@ -174,6 +184,7 @@ const opCount = Object.values(spec.paths).reduce(
 console.log(`pre-pass: dropped ${dropped} excluded ops; ${opCount} ops remain`);
 console.log(`pre-pass: downlevel — ${stats.nullMembers} null union members stripped, ` +
   `${stats.consts} const→enum, ${stats.exclusives} exclusive bounds converted`);
+console.log(`pre-pass: ${betaNoDefaultCount} beta ops keep anthropic-beta optional with no default (beta-flags.yaml no_default)`);
 console.log(`pre-pass: stamped anthropic-version default on ${versionStamped} ops, ` +
   `anthropic-beta defaults on ${betaStamped} beta ops`);
 console.log(`wrote ${outPath}`);
