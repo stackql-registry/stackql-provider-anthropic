@@ -192,6 +192,20 @@ this branch). New index sections: workspace-scoped queries, files and skills, dr
 the admin index links workspace ids to the workspace header. Both builds clean, no
 broken links.
 
+Netlify skipped both production deploys after PR #4 merged (2026-09-15). The
+per-site `[context.production] ignore` rule was `git diff --quiet $CACHED_COMMIT_REF
+$COMMIT_REF -- <provider dir> ../../factory`. Netlify defines `CACHED_COMMIT_REF` as the
+last commit it built in ANY context; the last builds were the PR's deploy previews
+(`5693036`), and the merge commit `1701e91` has the identical tree (main had no other
+commits), so the diff was empty, the command exited 0 and Netlify cancelled the builds
+as "no changes". Evidence: the deploy preview served the dreams page while production
+still served the July build (dreams page 404, trailing-slash URLs still 301).
+Reproduced locally: exit 0 against `5693036`, exit 1 against the merge's first parent.
+Fix: the rule now chains a second diff against `$COMMIT_REF^1` with `&&`, so a build is
+skipped only when both the last-built diff and the first-parent diff are empty; a git
+error (exit 128) is non-zero and builds, the safe direction. Build-hook-triggered
+deploys bypass the ignore command entirely.
+
 ## 7. Follow-ups
 
 - Confirm the admin split decision (section 2). If the admin provider should take the
