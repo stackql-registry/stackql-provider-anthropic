@@ -489,6 +489,12 @@ directories, selective builds. CI carries NO website jobs (removed 2026-07-09): 
 builds both sites (deploy previews on PRs), so a CI site build would duplicate it —
 don't re-add one. Admin site auth docs: Admin key, admin-role-created,
 org accounts only; cross-link the `anthropic` site (and vice versa).
+Per-site `[context.production] ignore` rules keep production builds selective. They
+MUST diff against BOTH `$CACHED_COMMIT_REF` and `$COMMIT_REF^1` (chained with `&&`, skip
+only when both are empty): Netlify's `CACHED_COMMIT_REF` is the last commit it built in
+any context, so after a PR's deploy previews a merge commit with the same tree diffs
+empty and the single-diff form cancelled both production deploys of PR #4 (2026-09-15,
+NOTES.md section 6). Build hooks bypass the ignore command if a deploy must be forced.
 
 Known docgen bug — PATCHED LOCALLY (2026-07-08): provider-utils includes
 `requestBody.required` in "Required Params" only for insert/update/replace/exec access

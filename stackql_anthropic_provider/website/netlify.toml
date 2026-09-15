@@ -8,10 +8,19 @@
 [build.environment]
   NODE_VERSION = "22"
 
-# Selective builds: skip when neither this provider's tree nor this site
-# changed since the last deploy.
 [build.processing]
   skip_processing = false
 
+# Selective production builds: skip when neither this provider's tree nor the
+# shared factory changed. Two diffs, skipped only when BOTH are empty (exit 0):
+#   1. against $CACHED_COMMIT_REF - Netlify's "last commit we built", in ANY
+#      context. After a PR's deploy previews build, a merge commit with the
+#      same tree as the PR head diffs empty against it and this check alone
+#      cancelled the production deploys of PR #4 (2026-09-15).
+#   2. against the commit's first parent - for a merge commit that is main
+#      before the merge, so the PR's own changes are always seen.
+# The ignore command runs from the base directory, hence the ../../ paths. A
+# git error (exit 128, e.g. a parent missing from a shallow clone) is
+# non-zero and lets the build proceed, which is the safe direction.
 [context.production]
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ../../stackql_anthropic_provider ../../factory"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ../../stackql_anthropic_provider ../../factory && git diff --quiet $COMMIT_REF^1 $COMMIT_REF -- ../../stackql_anthropic_provider ../../factory"
