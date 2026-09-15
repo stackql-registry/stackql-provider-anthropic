@@ -49,33 +49,40 @@ The following fields are returned by `SELECT` queries:
     "description": "Unique identifier for the skill.<br /><br />The format and length of IDs may change over time."
   },
   {
-    "name": "created_at",
+    "name": "latest_version_id",
     "type": "string",
+    "description": "ID of the newest Skill Version — what `latest` references resolve to. Always set: a Skill holds at least one version."
+  },
+  {
+    "name": "display_name",
+    "type": "string",
+    "description": "Human-readable, single-line label for the Skill. Maximum 255 characters.<br />Always set: derived from the SKILL.md frontmatter `name` when omitted at<br />creation. Not unique."
+  },
+  {
+    "name": "created_at",
+    "type": "string (date-time)",
     "description": "ISO 8601 timestamp of when the skill was created."
   },
   {
-    "name": "display_title",
-    "type": "string",
-    "description": "Display title for the skill.<br /><br />This is a human-readable label that is not included in the prompt sent to the model."
-  },
-  {
-    "name": "latest_version",
-    "type": "string",
-    "description": "The latest version identifier for the skill.<br /><br />This represents the most recent version of the skill that has been created."
-  },
-  {
     "name": "source",
-    "type": "string",
-    "description": "Source of the skill.<br /><br />This may be one of the following values:<br />* `\"custom\"`: the skill was created by a user<br />* `\"anthropic\"`: the skill was created by Anthropic"
+    "type": "object",
+    "description": "Where the Skill comes from.<br /><br />Possible values:<br />* `\"custom\"`: authored by the platform user; private to their workspace<br />* `\"anthropic\"`: published by Anthropic; shared and read-only<br />* `\"anthropic_example\"`: Anthropic-published sample Skill<br />* `\"plugin\"`: resolved from an installed plugin",
+    "children": [
+      {
+        "name": "type",
+        "type": "string",
+        "description": "Where the Skill comes from.<br /><br />Possible values:<br />* `\"custom\"`: authored by the platform user; private to their workspace<br />* `\"anthropic\"`: published by Anthropic; shared and read-only<br />* `\"anthropic_example\"`: Anthropic-published sample Skill<br />* `\"plugin\"`: resolved from an installed plugin (custom, anthropic, anthropic_example, plugin)"
+      }
+    ]
   },
   {
     "name": "type",
     "type": "string",
-    "description": "Object type.<br /><br />For Skills, this is always `\"skill\"`."
+    "description": "Object type.<br /><br />For Skills, this is always `\"skill\"`. (skill)"
   },
   {
     "name": "updated_at",
-    "type": "string",
+    "type": "string (date-time)",
     "description": "ISO 8601 timestamp of when the skill was last updated."
   }
 ]} />
@@ -89,33 +96,40 @@ The following fields are returned by `SELECT` queries:
     "description": "Unique identifier for the skill.<br /><br />The format and length of IDs may change over time."
   },
   {
-    "name": "created_at",
+    "name": "latest_version_id",
     "type": "string",
+    "description": "ID of the newest Skill Version — what `latest` references resolve to. Always set: a Skill holds at least one version."
+  },
+  {
+    "name": "display_name",
+    "type": "string",
+    "description": "Human-readable, single-line label for the Skill. Maximum 255 characters.<br />Always set: derived from the SKILL.md frontmatter `name` when omitted at<br />creation. Not unique."
+  },
+  {
+    "name": "created_at",
+    "type": "string (date-time)",
     "description": "ISO 8601 timestamp of when the skill was created."
   },
   {
-    "name": "display_title",
-    "type": "string",
-    "description": "Display title for the skill.<br /><br />This is a human-readable label that is not included in the prompt sent to the model."
-  },
-  {
-    "name": "latest_version",
-    "type": "string",
-    "description": "The latest version identifier for the skill.<br /><br />This represents the most recent version of the skill that has been created."
-  },
-  {
     "name": "source",
-    "type": "string",
-    "description": "Source of the skill.<br /><br />This may be one of the following values:<br />* `\"custom\"`: the skill was created by a user<br />* `\"anthropic\"`: the skill was created by Anthropic"
+    "type": "object",
+    "description": "Where the Skill comes from.<br /><br />Possible values:<br />* `\"custom\"`: authored by the platform user; private to their workspace<br />* `\"anthropic\"`: published by Anthropic; shared and read-only<br />* `\"anthropic_example\"`: Anthropic-published sample Skill<br />* `\"plugin\"`: resolved from an installed plugin",
+    "children": [
+      {
+        "name": "type",
+        "type": "string",
+        "description": "Where the Skill comes from.<br /><br />Possible values:<br />* `\"custom\"`: authored by the platform user; private to their workspace<br />* `\"anthropic\"`: published by Anthropic; shared and read-only<br />* `\"anthropic_example\"`: Anthropic-published sample Skill<br />* `\"plugin\"`: resolved from an installed plugin (custom, anthropic, anthropic_example, plugin)"
+      }
+    ]
   },
   {
     "name": "type",
     "type": "string",
-    "description": "Object type.<br /><br />For Skills, this is always `\"skill\"`."
+    "description": "Object type.<br /><br />For Skills, this is always `\"skill\"`. (skill)"
   },
   {
     "name": "updated_at",
-    "type": "string",
+    "type": "string (date-time)",
     "description": "ISO 8601 timestamp of when the skill was last updated."
   }
 ]} />
@@ -141,28 +155,28 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-skill_id"><code>skill_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-source"><code>source</code></a></td>
+    <td><a href="#parameter-source"><code>source</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-skill_id"><code>skill_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-files"><code>files</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 </tbody>
@@ -185,6 +199,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="skill_id" /></td>
     <td><code>string</code></td>
     <td>Unique identifier for the skill.  The format and length of IDs may change over time.</td>
+</tr>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
+    <td><code>string</code></td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
 </tr>
 <tr id="parameter-source">
     <td><CopyableCode code="source" /></td>
@@ -210,14 +229,15 @@ Successful Response
 ```sql
 SELECT
 id,
+latest_version_id,
+display_name,
 created_at,
-display_title,
-latest_version,
 source,
 type,
 updated_at
 FROM anthropic.skills.skills
 WHERE skill_id = '{{ skill_id }}' -- required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -228,14 +248,15 @@ Successful Response
 ```sql
 SELECT
 id,
+latest_version_id,
+display_name,
 created_at,
-display_title,
-latest_version,
 source,
 type,
 updated_at
 FROM anthropic.skills.skills
 WHERE source = '{{ source }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -257,6 +278,7 @@ No description available.
 ```sql
 DELETE FROM anthropic.skills.skills
 WHERE skill_id = '{{ skill_id }}' --required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -277,10 +299,11 @@ Successful Response
 
 ```sql
 EXEC anthropic.skills.skills.create 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 @@json=
 '{
 "files": "{{ files }}", 
-"display_title": "{{ display_title }}"
+"display_name": "{{ display_name }}"
 }'
 ;
 ```

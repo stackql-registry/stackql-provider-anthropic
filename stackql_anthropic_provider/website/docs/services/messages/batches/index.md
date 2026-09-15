@@ -225,42 +225,42 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-message_batch_id"><code>message_batch_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>This endpoint is idempotent and can be used to poll for Message Batch completion. To access the results of a Message Batch, make a request to the `results_url` field in the response.<br /><br />Learn more about the Message Batches API in our [user guide](https://platform.claude.com/docs/en/build-with-claude/batch-processing)</td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-before_id"><code>before_id</code></a>, <a href="#parameter-after_id"><code>after_id</code></a></td>
+    <td><a href="#parameter-before_id"><code>before_id</code></a>, <a href="#parameter-after_id"><code>after_id</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>List all Message Batches within a Workspace. Most recently created batches are returned first.<br /><br />Learn more about the Message Batches API in our [user guide](https://platform.claude.com/docs/en/build-with-claude/batch-processing)</td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-requests"><code>requests</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>Send a batch of Message creation requests.<br /><br />The Message Batches API can be used to process multiple Messages API requests at once. Once a Message Batch is created, it begins processing immediately. Batches can take up to 24 hours to complete.<br /><br />Learn more about the Message Batches API in our [user guide](https://platform.claude.com/docs/en/build-with-claude/batch-processing)</td>
 </tr>
 <tr>
     <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-message_batch_id"><code>message_batch_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>Delete a Message Batch.<br /><br />Message Batches can only be deleted once they've finished processing. If you'd like to delete an in-progress batch, you must first cancel it.<br /><br />Learn more about the Message Batches API in our [user guide](https://platform.claude.com/docs/en/build-with-claude/batch-processing)</td>
 </tr>
 <tr>
     <td><a href="#cancel"><CopyableCode code="cancel" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-message_batch_id"><code>message_batch_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>Batches may be canceled any time before processing ends. Once cancellation is initiated, the batch enters a `canceling` state, at which time the system may complete any in-progress, non-interruptible requests before finalizing cancellation.<br /><br />The number of canceled requests is specified in `request_counts`. To determine which requests were canceled, check the individual results within the batch. Note that cancellation may not result in any canceled requests if they were non-interruptible.<br /><br />Learn more about the Message Batches API in our [user guide](https://platform.claude.com/docs/en/build-with-claude/batch-processing)</td>
 </tr>
 <tr>
     <td><a href="#results"><CopyableCode code="results" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-message_batch_id"><code>message_batch_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>Streams the results of a Message Batch as a `.jsonl` file.<br /><br />Each line in the file is a JSON object containing the result of a single request in the Message Batch. Results are not guaranteed to be in the same order as requests. Use the `custom_id` field to match results to requests.<br /><br />Learn more about the Message Batches API in our [user guide](https://platform.claude.com/docs/en/build-with-claude/batch-processing)</td>
 </tr>
 </tbody>
@@ -288,6 +288,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="after_id" /></td>
     <td><code>string</code></td>
     <td>ID of the object to use as a cursor for pagination. When provided, returns the page of results immediately after this object.</td>
+</tr>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
+    <td><code>string</code></td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
 </tr>
 <tr id="parameter-before_id">
     <td><CopyableCode code="before_id" /></td>
@@ -324,6 +329,7 @@ results_url,
 type
 FROM anthropic.messages.batches
 WHERE message_batch_id = '{{ message_batch_id }}' -- required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -346,6 +352,7 @@ type
 FROM anthropic.messages.batches
 WHERE before_id = '{{ before_id }}'
 AND after_id = '{{ after_id }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -367,10 +374,12 @@ Send a batch of Message creation requests.<br /><br />The Message Batches API ca
 
 ```sql
 INSERT INTO anthropic.messages.batches (
-requests
+requests,
+"anthropic-workspace-id"
 )
 SELECT 
-'{{ requests }}' /* required */
+'{{ requests }}' /* required */,
+'{{ anthropic-workspace-id }}'
 RETURNING
 id,
 archived_at,
@@ -401,7 +410,12 @@ type
               - content: "{{ content }}"
                 role: "{{ role }}"
             cache_control: "{{ cache_control }}"
-            container: "{{ container }}"
+            container:
+              id: "{{ id }}"
+              skills:
+                - skill_id: "{{ skill_id }}"
+                  type: "{{ type }}"
+                  version: "{{ version }}"
             inference_geo: "{{ inference_geo }}"
             max_tokens: {{ max_tokens }}
             metadata:
@@ -429,6 +443,10 @@ type
               - "{{ tools }}"
             top_k: {{ top_k }}
             top_p: {{ top_p }}
+    - name: anthropic-workspace-id
+      value: "{{ anthropic-workspace-id }}"
+      description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)
+      description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)
 `}</CodeBlock>
 
 </TabItem>
@@ -450,6 +468,7 @@ Delete a Message Batch.<br /><br />Message Batches can only be deleted once they
 ```sql
 DELETE FROM anthropic.messages.batches
 WHERE message_batch_id = '{{ message_batch_id }}' --required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -471,7 +490,8 @@ Batches may be canceled any time before processing ends. Once cancellation is in
 
 ```sql
 EXEC anthropic.messages.batches.cancel 
-@message_batch_id='{{ message_batch_id }}' --required
+@message_batch_id='{{ message_batch_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -481,7 +501,8 @@ Streams the results of a Message Batch as a `.jsonl` file.<br /><br />Each line 
 
 ```sql
 EXEC anthropic.messages.batches.results 
-@message_batch_id='{{ message_batch_id }}' --required
+@message_batch_id='{{ message_batch_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>

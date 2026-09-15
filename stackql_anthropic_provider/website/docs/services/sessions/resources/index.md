@@ -68,7 +68,7 @@ Successful response (OK)
   {
     "name": "access",
     "type": "string",
-    "description": "Access mode for the mounted store. Defaults to read_write. read_only mounts the store as a read-only filesystem. (read_write, read_only)"
+    "description": "Access mode for the mounted store. Defaults to `read_write`. `read_only` mounts the store as a read-only filesystem. (read_write, read_only)"
   },
   {
     "name": "checkout",
@@ -157,7 +157,7 @@ Successful response (OK)
   {
     "name": "access",
     "type": "string",
-    "description": "Access mode for the mounted store. Defaults to read_write. read_only mounts the store as a read-only filesystem. (read_write, read_only)"
+    "description": "Access mode for the mounted store. Defaults to `read_write`. `read_only` mounts the store as a read-only filesystem. (read_write, read_only)"
   },
   {
     "name": "checkout",
@@ -239,35 +239,35 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-session_id"><code>session_id</code></a>, <a href="#parameter-resource_id"><code>resource_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-session_id"><code>session_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-session_id"><code>session_id</code></a>, <a href="#parameter-resource_id"><code>resource_id</code></a>, <a href="#parameter-authorization_token"><code>authorization_token</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-session_id"><code>session_id</code></a>, <a href="#parameter-resource_id"><code>resource_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#add"><CopyableCode code="add" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-session_id"><code>session_id</code></a>, <a href="#parameter-type"><code>type</code></a>, <a href="#parameter-file_id"><code>file_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 </tbody>
@@ -295,6 +295,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="session_id" /></td>
     <td><code>string</code></td>
     <td>Path parameter session_id (example: sesn_011CZkZAtmR3yMPDzynEDxu7)</td>
+</tr>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
+    <td><code>string</code></td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
 </tr>
 </tbody>
 </table>
@@ -330,6 +335,7 @@ url
 FROM anthropic.sessions.resources
 WHERE session_id = '{{ session_id }}' -- required
 AND resource_id = '{{ resource_id }}' -- required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -354,6 +360,7 @@ updated_at,
 url
 FROM anthropic.sessions.resources
 WHERE session_id = '{{ session_id }}' -- required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -380,6 +387,7 @@ WHERE
 session_id = '{{ session_id }}' --required
 WHERE resource_id = '{{ resource_id }}' --required
 AND authorization_token = '{{ authorization_token }}' --required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id}}'
 RETURNING
 id,
 name,
@@ -415,6 +423,7 @@ No description available.
 DELETE FROM anthropic.sessions.resources
 WHERE session_id = '{{ session_id }}' --required
 AND resource_id = '{{ resource_id }}' --required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -435,7 +444,8 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.sessions.resources.add 
-@session_id='{{ session_id }}' --required
+@session_id='{{ session_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 @@json=
 '{
 "type": "{{ type }}", 

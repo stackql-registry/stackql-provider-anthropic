@@ -157,12 +157,29 @@ Successful response (OK)
           {
             "name": "id",
             "type": "string",
-            "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-sonnet-5)"
+            "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-fable-5-1)"
           },
           {
             "name": "speed",
             "type": "string",
             "description": "Inference speed mode. `fast` provides significantly faster output token generation at premium pricing. Defaults to `standard`. Not all models support `fast`; invalid combinations are rejected at create time. (standard, fast)"
+          },
+          {
+            "name": "effort",
+            "type": "object",
+            "description": "How hard Claude works on each inference call. One of `low`, `medium`, `high`, `xhigh`, `max`. Always present; resolved to the per-model default at save time when not supplied.",
+            "children": [
+              {
+                "name": "type",
+                "type": "string",
+                "description": " (low)"
+              }
+            ]
+          },
+          {
+            "name": "inference_geo",
+            "type": "string",
+            "description": "Geographic region for model inference. When unset, requests fall through to the workspace's default_inference_geo."
           }
         ]
       },
@@ -204,9 +221,14 @@ Successful response (OK)
             "description": "",
             "children": [
               {
+                "name": "type",
+                "type": "string",
+                "description": " (bash)"
+              },
+              {
                 "name": "name",
                 "type": "string",
-                "description": "Built-in agent tool identifier. (bash, edit, read, write, glob, grep, web_fetch, web_search)"
+                "description": " (bash)"
               },
               {
                 "name": "enabled",
@@ -217,6 +239,26 @@ Successful response (OK)
                 "name": "permission_policy",
                 "type": "object",
                 "description": "Permission policy for tool execution."
+              },
+              {
+                "name": "allowed_domains",
+                "type": "array",
+                "description": ""
+              },
+              {
+                "name": "blocked_domains",
+                "type": "array",
+                "description": ""
+              },
+              {
+                "name": "max_content_tokens",
+                "type": "integer (int32)",
+                "description": ""
+              },
+              {
+                "name": "user_location",
+                "type": "object",
+                "description": "Approximate user location for search result localization."
               }
             ]
           },
@@ -375,6 +417,35 @@ Successful response (OK)
     ]
   },
   {
+    "name": "budget",
+    "type": "object",
+    "description": "The session's budget after the update: the new budget when set or replaced, or null when the update removed it. Present only when the update changed the budget.",
+    "children": [
+      {
+        "name": "type",
+        "type": "string",
+        "description": " (limit)"
+      },
+      {
+        "name": "max_list_cost",
+        "type": "object",
+        "description": "Maximum list cost the session may accrue. List price is used regardless of any negotiated discount, so the cap fires at or before the actual charge.",
+        "children": [
+          {
+            "name": "currency",
+            "type": "string",
+            "description": "Uppercase ISO-4217 currency code. `USD` is the only currency currently supported; the accepted set is closed and grows only when a new currency is priced. (USD)"
+          },
+          {
+            "name": "amount",
+            "type": "string",
+            "description": "Amount in minor units of the currency, as an integer decimal string with no leading zeros: \"2500\" is $25.00 and \"50\" is fifty cents. A string rather than a number so no float rounding is ever applied."
+          }
+        ]
+      }
+    ]
+  },
+  {
     "name": "content",
     "type": "array",
     "description": "Array of content blocks comprising the user message.",
@@ -491,6 +562,35 @@ Successful response (OK)
     "name": "evaluated_permission",
     "type": "string",
     "description": "The evaluated permission policy for this tool invocation. (allow, ask, deny)"
+  },
+  {
+    "name": "evaluation",
+    "type": "object",
+    "description": "Which resolved permission_policy produced evaluated_permission: always_allow, always_ask, or auto (with the server's per-invocation judgement). Absent only when the server refused the call before any policy applied (for example, the named tool is not enabled in the session); such a refusal has evaluated_permission deny. An event recorded before this field existed reads as the arm its evaluated_permission implies (always_allow for allow, always_ask for ask).",
+    "children": [
+      {
+        "name": "type",
+        "type": "string",
+        "description": " (always_allow)"
+      },
+      {
+        "name": "evaluated_permission",
+        "type": "object",
+        "description": "The server's judgement for this invocation.",
+        "children": [
+          {
+            "name": "type",
+            "type": "string",
+            "description": " (allow)"
+          },
+          {
+            "name": "reason_code",
+            "type": "string",
+            "description": "The judgement's grounds in registry-bound terms, for client branching and audit rather than end-user display. Open registry; currently \"indeterminate\" (no judgement was reached). Clients must tolerate values outside this set."
+          }
+        ]
+      }
+    ]
   },
   {
     "name": "explanation",
@@ -668,14 +768,14 @@ The following methods are available for this resource:
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-session_id"><code>session_id</code></a></td>
-    <td><a href="#parameter-order"><code>order</code></a>, <a href="#parameter-types[]"><code>types[]</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[gt]"><code>created_at[gt]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-created_at[lt]"><code>created_at[lt]</code></a></td>
+    <td><a href="#parameter-order"><code>order</code></a>, <a href="#parameter-types[]"><code>types[]</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[gt]"><code>created_at[gt]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-created_at[lt]"><code>created_at[lt]</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#send"><CopyableCode code="send" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-session_id"><code>session_id</code></a>, <a href="#parameter-events"><code>events</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 </tbody>
@@ -699,30 +799,35 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Path parameter session_id (example: sesn_011CZkZAtmR3yMPDzynEDxu7)</td>
 </tr>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
+    <td><code>string</code></td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
+</tr>
 <tr id="parameter-created_at[gt]">
     <td><CopyableCode code="created_at[gt]" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Return events created after this time (exclusive).</td>
+    <td>Return events created after this time (exclusive). Compared against the event's `processed_at` value.</td>
 </tr>
 <tr id="parameter-created_at[gte]">
     <td><CopyableCode code="created_at[gte]" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Return events created at or after this time (inclusive).</td>
+    <td>Return events created at or after this time (inclusive). Compared against the event's `processed_at` value.</td>
 </tr>
 <tr id="parameter-created_at[lt]">
     <td><CopyableCode code="created_at[lt]" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Return events created before this time (exclusive).</td>
+    <td>Return events created before this time (exclusive). Compared against the event's `processed_at` value.</td>
 </tr>
 <tr id="parameter-created_at[lte]">
     <td><CopyableCode code="created_at[lte]" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Return events created at or before this time (inclusive).</td>
+    <td>Return events created at or before this time (inclusive). Compared against the event's `processed_at` value.</td>
 </tr>
 <tr id="parameter-order">
     <td><CopyableCode code="order" /></td>
     <td><code>string</code></td>
-    <td>Sort direction for results, ordered by created_at. Defaults to asc (chronological).</td>
+    <td>Sort direction for results, ordered by the event's `processed_at`. Defaults to `asc` (chronological).</td>
 </tr>
 <tr id="parameter-types[]">
     <td><CopyableCode code="types[]" /></td>
@@ -762,11 +867,13 @@ from_agent_name,
 mcp_server_name,
 to_agent_name,
 agent,
+budget,
 content,
 deny_message,
 description,
 error,
 evaluated_permission,
+evaluation,
 explanation,
 input,
 is_error,
@@ -789,6 +896,7 @@ AND "created_at[gte]" = '{{ created_at[gte] }}'
 AND "created_at[gt]" = '{{ created_at[gt] }}'
 AND "created_at[lte]" = '{{ created_at[lte] }}'
 AND "created_at[lt]" = '{{ created_at[lt] }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -809,7 +917,8 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.sessions.events.send 
-@session_id='{{ session_id }}' --required
+@session_id='{{ session_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 @@json=
 '{
 "events": "{{ events }}"

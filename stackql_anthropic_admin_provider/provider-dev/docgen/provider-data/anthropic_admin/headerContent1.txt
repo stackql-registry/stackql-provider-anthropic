@@ -22,6 +22,6 @@ Manage Anthropic organization members, invites, workspaces, workspace members, A
 
 :::info
 
-For the user/inference surface (messages, models, batches, files, agents, sessions, skills, memory stores, vaults) use the [__`anthropic`__](https://anthropic-provider.stackql.io/) provider — it authenticates with a separate, workspace-scoped API key.
+For the user/inference surface (messages, models, batches, files, skills, agents, sessions, memory stores, dreams, vaults) use the [__`anthropic`__](https://anthropic-provider.stackql.io/) provider - it authenticates with a separate, workspace-scoped API key.
 
 :::

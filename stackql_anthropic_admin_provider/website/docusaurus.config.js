@@ -35,6 +35,14 @@ const registryLogo = {
 config.themeConfig.navbar.logo = { ...registryLogo };
 config.themeConfig.footer.logo = { ...registryLogo };
 
+// Date-stamp every doc page ("Last updated on ..."), matching the main
+// stackql.io site. The shared config ships showLastUpdateTime: false, and
+// .shared-config is wiped and re-cloned on every build (vendor-config), so
+// the flip must live here post-createConfig. Timestamps come from git
+// history; the docs tree is committed after every regen, so pages stamp
+// with their last regeneration date.
+config.presets[0][1].docs.showLastUpdateTime = true;
+
 // URL form. Keep the Docusaurus default (pages emitted as <route>/index.html)
 // regardless of the shared config's trailingSlash setting, so GitHub Pages
 // serves both /services/x/y and /services/x/y/. A trailingSlash: false site

@@ -16,6 +16,18 @@ The `anthropic` provider authenticates with a workspace-scoped Claude API key (`
 
 The required `anthropic-version` header is sent automatically (default `2023-06-01`); beta endpoints automatically send the per-endpoint `anthropic-beta` flag. Either can be overridden per query by supplying the header as a `WHERE` clause parameter.
 
+## Workspace-scoped queries
+
+A key that can act on more than one workspace selects the workspace per query with the optional `anthropic-workspace-id` parameter (a `wrkspc_...` id, listed by the `anthropic_admin` provider's `workspaces` resource). It is sent as a header; the hyphenated name is double-quoted in SQL:
+
+```sql
+SELECT id, display_name, created_at
+FROM anthropic.models.models
+WHERE "anthropic-workspace-id" = 'wrkspc_01';
+```
+
+A key that belongs to one workspace can omit it.
+
 ## Inference as a result set
 
 Asking Claude a question is a `SELECT`. The reply comes back as a row, with the text in the `content` array and the token spend in `usage`:
@@ -69,6 +81,26 @@ FROM anthropic.messages.batches
 ORDER BY created_at DESC;
 ```
 
+## Files and skills
+
+Uploaded files, newest first (the list is cursor-paginated and walked automatically):
+
+```sql
+SELECT id, filename, mime_type, size_bytes, created_at
+FROM anthropic.files.files
+ORDER BY created_at DESC;
+```
+
+Skills available to the workspace, with their origin (`anthropic` for the published skills, `custom` for your own) and latest version:
+
+```sql
+SELECT id, display_name, JSON_EXTRACT(source, '$.type') AS source, latest_version_id, updated_at
+FROM anthropic.skills.skills
+ORDER BY updated_at DESC;
+```
+
+Uploading a file or creating a skill version is a multipart request, which SQL cannot express; those methods are documented as `EXEC` and the rest of each resource (list, get, delete) is plain SQL.
+
 ## Agent inventory
 
 What agents exist, on which models, and how much tooling they carry:
@@ -103,4 +135,14 @@ WHERE agent_id = 'agent_01';
 
 -- archive
 EXEC anthropic.agents.agents.archive @agent_id = 'agent_01';
+```
+
+## Dreams
+
+Dreams are asynchronous memory-consolidation jobs over a memory store (a research preview: the endpoint returns 404 for keys that are not enrolled). Their status and inputs are rows:
+
+```sql
+SELECT id, status, JSON_ARRAY_LENGTH(inputs) AS input_count, created_at, ended_at
+FROM anthropic.dreams.dreams
+ORDER BY created_at DESC;
 ```

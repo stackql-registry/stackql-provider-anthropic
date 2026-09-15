@@ -147,7 +147,7 @@ The following fields are returned by `SELECT` queries:
   {
     "name": "description",
     "type": "string",
-    "description": "User-provided description for the environment"
+    "description": "User-provided description for the environment; null when unset"
   },
   {
     "name": "metadata",
@@ -278,7 +278,7 @@ The following fields are returned by `SELECT` queries:
   {
     "name": "description",
     "type": "string",
-    "description": "User-provided description for the environment"
+    "description": "User-provided description for the environment; null when unset"
   },
   {
     "name": "metadata",
@@ -323,42 +323,42 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>Retrieve a specific environment by ID.</td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-include_archived"><code>include_archived</code></a></td>
+    <td><a href="#parameter-include_archived"><code>include_archived</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>List environments with pagination support.</td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-name"><code>name</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>Create a new environment with the specified configuration.</td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>Update an existing environment's configuration.</td>
 </tr>
 <tr>
     <td><a href="#delete"><CopyableCode code="delete" /></a></td>
     <td><CopyableCode code="delete" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>Delete an environment by ID. Returns a confirmation of the deletion.</td>
 </tr>
 <tr>
     <td><a href="#archive"><CopyableCode code="archive" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-environment_id"><code>environment_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>Archive an environment by ID. Archived environments cannot be used to create new sessions.</td>
 </tr>
 </tbody>
@@ -381,6 +381,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="environment_id" /></td>
     <td><code>string</code></td>
     <td> (example: env_011CZkZ9X2dpNyB7HsEFoRfW)</td>
+</tr>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
+    <td><code>string</code></td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
 </tr>
 <tr id="parameter-include_archived">
     <td><CopyableCode code="include_archived" /></td>
@@ -417,6 +422,7 @@ type,
 updated_at
 FROM anthropic.environments.environments
 WHERE environment_id = '{{ environment_id }}' -- required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -438,6 +444,7 @@ type,
 updated_at
 FROM anthropic.environments.environments
 WHERE include_archived = '{{ include_archived }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -463,14 +470,16 @@ config,
 description,
 metadata,
 name,
-scope
+scope,
+"anthropic-workspace-id"
 )
 SELECT 
 '{{ config }}',
 '{{ description }}',
 '{{ metadata }}',
 '{{ name }}' /* required */,
-'{{ scope }}'
+'{{ scope }}',
+'{{ anthropic-workspace-id }}'
 RETURNING
 id,
 name,
@@ -509,8 +518,12 @@ updated_at
     - name: scope
       value: "{{ scope }}"
       description: |
-        The visibility scope for this environment. 'organization' makes the environment visible to all accounts. 'account' restricts visibility to the owning account only. Only applicable for self-hosted environments. If not specified, defaults based on organization type.
+        The visibility scope for this environment. 'organization' makes the environment visible to all accounts. 'account' restricts visibility to the owning account only. API organizations support only 'organization'; 'account' is rejected. If not specified, defaults based on organization type.
       valid_values: ['organization', 'account']
+    - name: anthropic-workspace-id
+      value: "{{ anthropic-workspace-id }}"
+      description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)
+      description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)
 `}</CodeBlock>
 
 </TabItem>
@@ -539,6 +552,7 @@ name = '{{ name }}',
 scope = '{{ scope }}'
 WHERE 
 environment_id = '{{ environment_id }}' --required
+WHERE "anthropic-workspace-id" = '{{ anthropic-workspace-id}}'
 RETURNING
 id,
 name,
@@ -570,6 +584,7 @@ Delete an environment by ID. Returns a confirmation of the deletion.
 ```sql
 DELETE FROM anthropic.environments.environments
 WHERE environment_id = '{{ environment_id }}' --required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -590,7 +605,8 @@ Archive an environment by ID. Archived environments cannot be used to create new
 
 ```sql
 EXEC anthropic.environments.environments.archive 
-@environment_id='{{ environment_id }}' --required
+@environment_id='{{ environment_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>

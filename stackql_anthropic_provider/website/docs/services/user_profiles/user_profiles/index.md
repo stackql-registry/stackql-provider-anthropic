@@ -53,12 +53,17 @@ Successful response (OK)
   {
     "name": "name",
     "type": "string",
-    "description": "Display name of the entity this profile represents. For `resold` this is the resold-to company's name."
+    "description": "Real-world name of the entity this profile represents (company or individual). For a company the platform resells Claude access to (`access_type` `passthrough`) this is that company's name."
   },
   {
     "name": "external_id",
     "type": "string",
-    "description": "Platform's own identifier for this user. Not enforced unique."
+    "description": "Platform's own identifier for this user. Not enforced unique. Present under the `user-profiles-2026-03-24` and `user-profiles-2026-08-18` beta headers; under `user-profiles-2026-09-04` the value is `external_user_details.reference_id`."
+  },
+  {
+    "name": "access_type",
+    "type": "string",
+    "description": "How the platform uses the API for this entity: `application` (default) or `passthrough`. Present under the `user-profiles-2026-08-18` and later beta headers. (application, passthrough)"
   },
   {
     "name": "created_at",
@@ -66,14 +71,56 @@ Successful response (OK)
     "description": "When this user profile was created, in RFC 3339 format."
   },
   {
+    "name": "external_user_details",
+    "type": "object",
+    "description": "Details about the entity this profile represents, as the platform states them; not verified by Anthropic. Present under the `user-profiles-2026-09-04` beta header, with every field present and `null` until the platform supplies a value; the earlier beta headers serve `reference_id` as the top-level `external_id`, and `user-profiles-2026-08-18` serves `onboarded_at` as `external_user_onboarded_at`.",
+    "children": [
+      {
+        "name": "reference_id",
+        "type": "string",
+        "description": "The platform's own reference for the entity. `null` until the platform supplies one."
+      },
+      {
+        "name": "onboarded_at",
+        "type": "string (date-time)",
+        "description": "When the entity opened its account with the platform, as stated by the platform, in RFC 3339 format (UTC). `null` until the platform supplies one."
+      },
+      {
+        "name": "account_status",
+        "type": "string",
+        "description": "The status of the entity's account on the platform: `active`, `suspended` or `blocked`. `null` until the platform supplies one. (active, suspended, blocked)"
+      },
+      {
+        "name": "entity_type",
+        "type": "string",
+        "description": "What kind of entity the profile represents: `individual`, `business`, `non_profit` or `government`. `null` until the platform supplies one. (individual, business, non_profit, government)"
+      },
+      {
+        "name": "country",
+        "type": "string",
+        "description": "The country the platform associates with the entity, as an ISO 3166-1 alpha-2 code. `null` until the platform supplies one."
+      },
+      {
+        "name": "name_hash",
+        "type": "string",
+        "description": "The platform-computed hash of the entity's name. `null` until the platform supplies one."
+      },
+      {
+        "name": "email_hash",
+        "type": "string",
+        "description": "The platform-computed hash of the entity's email address. `null` until the platform supplies one."
+      }
+    ]
+  },
+  {
+    "name": "external_user_onboarded_at",
+    "type": "string (date-time)",
+    "description": "When the entity this profile represents opened its account with the platform, as stated by the platform, in RFC 3339 format (UTC). `null` until the platform supplies one. Present under the `user-profiles-2026-08-18` beta header; under `user-profiles-2026-09-04` the value is `external_user_details.onboarded_at`."
+  },
+  {
     "name": "metadata",
     "type": "object",
     "description": "Arbitrary key-value metadata. Maximum 16 pairs, keys up to 64 chars, values up to 512 chars."
-  },
-  {
-    "name": "relationship",
-    "type": "string",
-    "description": "How the entity relates to the platform. `external` (default), `resold`, or `internal`. (external, resold, internal)"
   },
   {
     "name": "trust_grants",
@@ -105,12 +152,17 @@ Successful response (OK)
   {
     "name": "name",
     "type": "string",
-    "description": "Display name of the entity this profile represents. For `resold` this is the resold-to company's name."
+    "description": "Real-world name of the entity this profile represents (company or individual). For a company the platform resells Claude access to (`access_type` `passthrough`) this is that company's name."
   },
   {
     "name": "external_id",
     "type": "string",
-    "description": "Platform's own identifier for this user. Not enforced unique."
+    "description": "Platform's own identifier for this user. Not enforced unique. Present under the `user-profiles-2026-03-24` and `user-profiles-2026-08-18` beta headers; under `user-profiles-2026-09-04` the value is `external_user_details.reference_id`."
+  },
+  {
+    "name": "access_type",
+    "type": "string",
+    "description": "How the platform uses the API for this entity: `application` (default) or `passthrough`. Present under the `user-profiles-2026-08-18` and later beta headers. (application, passthrough)"
   },
   {
     "name": "created_at",
@@ -118,14 +170,56 @@ Successful response (OK)
     "description": "When this user profile was created, in RFC 3339 format."
   },
   {
+    "name": "external_user_details",
+    "type": "object",
+    "description": "Details about the entity this profile represents, as the platform states them; not verified by Anthropic. Present under the `user-profiles-2026-09-04` beta header, with every field present and `null` until the platform supplies a value; the earlier beta headers serve `reference_id` as the top-level `external_id`, and `user-profiles-2026-08-18` serves `onboarded_at` as `external_user_onboarded_at`.",
+    "children": [
+      {
+        "name": "reference_id",
+        "type": "string",
+        "description": "The platform's own reference for the entity. `null` until the platform supplies one."
+      },
+      {
+        "name": "onboarded_at",
+        "type": "string (date-time)",
+        "description": "When the entity opened its account with the platform, as stated by the platform, in RFC 3339 format (UTC). `null` until the platform supplies one."
+      },
+      {
+        "name": "account_status",
+        "type": "string",
+        "description": "The status of the entity's account on the platform: `active`, `suspended` or `blocked`. `null` until the platform supplies one. (active, suspended, blocked)"
+      },
+      {
+        "name": "entity_type",
+        "type": "string",
+        "description": "What kind of entity the profile represents: `individual`, `business`, `non_profit` or `government`. `null` until the platform supplies one. (individual, business, non_profit, government)"
+      },
+      {
+        "name": "country",
+        "type": "string",
+        "description": "The country the platform associates with the entity, as an ISO 3166-1 alpha-2 code. `null` until the platform supplies one."
+      },
+      {
+        "name": "name_hash",
+        "type": "string",
+        "description": "The platform-computed hash of the entity's name. `null` until the platform supplies one."
+      },
+      {
+        "name": "email_hash",
+        "type": "string",
+        "description": "The platform-computed hash of the entity's email address. `null` until the platform supplies one."
+      }
+    ]
+  },
+  {
+    "name": "external_user_onboarded_at",
+    "type": "string (date-time)",
+    "description": "When the entity this profile represents opened its account with the platform, as stated by the platform, in RFC 3339 format (UTC). `null` until the platform supplies one. Present under the `user-profiles-2026-08-18` beta header; under `user-profiles-2026-09-04` the value is `external_user_details.onboarded_at`."
+  },
+  {
     "name": "metadata",
     "type": "object",
     "description": "Arbitrary key-value metadata. Maximum 16 pairs, keys up to 64 chars, values up to 512 chars."
-  },
-  {
-    "name": "relationship",
-    "type": "string",
-    "description": "How the entity relates to the platform. `external` (default), `resold`, or `internal`. (external, resold, internal)"
   },
   {
     "name": "trust_grants",
@@ -172,7 +266,7 @@ The following methods are available for this resource:
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-order"><code>order</code></a></td>
+    <td><a href="#parameter-order"><code>order</code></a>, <a href="#parameter-order_by"><code>order_by</code></a></td>
     <td></td>
 </tr>
 <tr>
@@ -222,6 +316,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Query parameter for order</td>
 </tr>
+<tr id="parameter-order_by">
+    <td><CopyableCode code="order_by" /></td>
+    <td><code>string</code></td>
+    <td>Query parameter for order_by</td>
+</tr>
 </tbody>
 </table>
 
@@ -243,9 +342,11 @@ SELECT
 id,
 name,
 external_id,
+access_type,
 created_at,
+external_user_details,
+external_user_onboarded_at,
 metadata,
-relationship,
 trust_grants,
 type,
 updated_at
@@ -263,14 +364,17 @@ SELECT
 id,
 name,
 external_id,
+access_type,
 created_at,
+external_user_details,
+external_user_onboarded_at,
 metadata,
-relationship,
 trust_grants,
 type,
 updated_at
 FROM anthropic.user_profiles.user_profiles
 WHERE order = '{{ order }}'
+AND order_by = '{{ order_by }}'
 ;
 ```
 </TabItem>
@@ -294,21 +398,27 @@ No description available.
 INSERT INTO anthropic.user_profiles.user_profiles (
 external_id,
 name,
-relationship,
+access_type,
+external_user_onboarded_at,
+external_user_details,
 metadata
 )
 SELECT 
 '{{ external_id }}',
 '{{ name }}',
-'{{ relationship }}',
+'{{ access_type }}',
+'{{ external_user_onboarded_at }}',
+'{{ external_user_details }}',
 '{{ metadata }}'
 RETURNING
 id,
 name,
 external_id,
+access_type,
 created_at,
+external_user_details,
+external_user_onboarded_at,
 metadata,
-relationship,
 trust_grants,
 type,
 updated_at
@@ -323,16 +433,31 @@ updated_at
     - name: external_id
       value: "{{ external_id }}"
       description: |
-        Platform's own identifier for this user. Not enforced unique. Maximum 255 characters.
+        Platform's own identifier for this user. Not enforced unique. Maximum 255 characters. Accepted under the \`user-profiles-2026-03-24\` and \`user-profiles-2026-08-18\` beta headers; under \`user-profiles-2026-09-04\` send \`external_user_details.reference_id\` instead.
     - name: name
       value: "{{ name }}"
       description: |
-        Display name of the entity this profile represents. Required when relationship is \`resold\` (the resold-to company's name); optional otherwise. Maximum 255 characters.
-    - name: relationship
-      value: "{{ relationship }}"
+        Optional for all profiles. Real-world name of the entity this profile represents (company or individual); for a company the platform resells Claude access to (\`access_type\` \`passthrough\`), that company's name where known. Maximum 255 characters.
+    - name: access_type
+      value: "{{ access_type }}"
       description: |
-        How the entity relates to the platform. \`external\` (default): an individual end-user. \`resold\`: a company the platform resells Claude access to. \`internal\`: the platform's own usage.
-      valid_values: ['external', 'resold', 'internal']
+        How the platform uses the API for this entity. \`application\` (default): the profile represents an individual end-user of the platform's product. \`passthrough\`: the profile identifies a company the platform resells Claude access to.
+      valid_values: ['application', 'passthrough']
+    - name: external_user_onboarded_at
+      value: "{{ external_user_onboarded_at }}"
+      description: |
+        When the entity this profile represents opened its account with the platform, in RFC 3339 format: for an \`application\` profile, when the end-user signed up; for a \`passthrough\` profile, when the company became the platform's customer. Must be a complete timestamp no more than 1 minute in the future. Optional. Accepted under the \`user-profiles-2026-08-18\` beta header; under \`user-profiles-2026-09-04\` send \`external_user_details.onboarded_at\` instead.
+    - name: external_user_details
+      description: |
+        Details about the entity this profile represents, as the platform states them. Every field is optional. Accepted under the \`user-profiles-2026-09-04\` beta header only.
+      value:
+        reference_id: "{{ reference_id }}"
+        onboarded_at: "{{ onboarded_at }}"
+        account_status: "{{ account_status }}"
+        entity_type: "{{ entity_type }}"
+        country: "{{ country }}"
+        name_hash: "{{ name_hash }}"
+        email_hash: "{{ email_hash }}"
     - name: metadata
       value: "{{ metadata }}"
       description: |
@@ -361,16 +486,20 @@ SET
 external_id = '{{ external_id }}',
 metadata = '{{ metadata }}',
 name = '{{ name }}',
-relationship = '{{ relationship }}'
+access_type = '{{ access_type }}',
+external_user_onboarded_at = '{{ external_user_onboarded_at }}',
+external_user_details = '{{ external_user_details }}'
 WHERE 
 user_profile_id = '{{ user_profile_id }}' --required
 RETURNING
 id,
 name,
 external_id,
+access_type,
 created_at,
+external_user_details,
+external_user_onboarded_at,
 metadata,
-relationship,
 trust_grants,
 type,
 updated_at;

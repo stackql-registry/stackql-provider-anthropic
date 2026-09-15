@@ -88,6 +88,35 @@ Successful response (OK)
     "description": "Time the deployment was archived. Null if not archived."
   },
   {
+    "name": "budget",
+    "type": "object",
+    "description": "Spend ceiling stamped onto each session created from this deployment. Absent when no budget is set.",
+    "children": [
+      {
+        "name": "type",
+        "type": "string",
+        "description": " (limit)"
+      },
+      {
+        "name": "max_list_cost",
+        "type": "object",
+        "description": "Maximum list cost the session may accrue. List price is used regardless of any negotiated discount, so the cap fires at or before the actual charge.",
+        "children": [
+          {
+            "name": "currency",
+            "type": "string",
+            "description": "Uppercase ISO-4217 currency code. `USD` is the only currency currently supported; the accepted set is closed and grows only when a new currency is priced. (USD)"
+          },
+          {
+            "name": "amount",
+            "type": "string",
+            "description": "Amount in minor units of the currency, as an integer decimal string with no leading zeros: \"2500\" is $25.00 and \"50\" is fifty cents. A string rather than a number so no float rounding is ever applied."
+          }
+        ]
+      }
+    ]
+  },
+  {
     "name": "created_at",
     "type": "string (date-time)",
     "description": "Time the deployment was created."
@@ -208,7 +237,7 @@ Successful response (OK)
   {
     "name": "paused_reason",
     "type": "object",
-    "description": "Why the deployment is paused. Non-null exactly when status is paused; null otherwise.",
+    "description": "Why the deployment is `paused`. Non-null exactly when `status` is `paused`; null otherwise.",
     "children": [
       {
         "name": "type",
@@ -284,7 +313,7 @@ Successful response (OK)
       {
         "name": "access",
         "type": "string",
-        "description": "Access mode for the mounted store. Defaults to read_write. read_only mounts the store as a read-only filesystem. (read_write, read_only)"
+        "description": "Access mode for the mounted store. Defaults to `read_write`. `read_only` mounts the store as a read-only filesystem. (read_write, read_only)"
       },
       {
         "name": "instructions",
@@ -395,6 +424,35 @@ Successful response (OK)
     "description": "Time the deployment was archived. Null if not archived."
   },
   {
+    "name": "budget",
+    "type": "object",
+    "description": "Spend ceiling stamped onto each session created from this deployment. Absent when no budget is set.",
+    "children": [
+      {
+        "name": "type",
+        "type": "string",
+        "description": " (limit)"
+      },
+      {
+        "name": "max_list_cost",
+        "type": "object",
+        "description": "Maximum list cost the session may accrue. List price is used regardless of any negotiated discount, so the cap fires at or before the actual charge.",
+        "children": [
+          {
+            "name": "currency",
+            "type": "string",
+            "description": "Uppercase ISO-4217 currency code. `USD` is the only currency currently supported; the accepted set is closed and grows only when a new currency is priced. (USD)"
+          },
+          {
+            "name": "amount",
+            "type": "string",
+            "description": "Amount in minor units of the currency, as an integer decimal string with no leading zeros: \"2500\" is $25.00 and \"50\" is fifty cents. A string rather than a number so no float rounding is ever applied."
+          }
+        ]
+      }
+    ]
+  },
+  {
     "name": "created_at",
     "type": "string (date-time)",
     "description": "Time the deployment was created."
@@ -515,7 +573,7 @@ Successful response (OK)
   {
     "name": "paused_reason",
     "type": "object",
-    "description": "Why the deployment is paused. Non-null exactly when status is paused; null otherwise.",
+    "description": "Why the deployment is `paused`. Non-null exactly when `status` is `paused`; null otherwise.",
     "children": [
       {
         "name": "type",
@@ -591,7 +649,7 @@ Successful response (OK)
       {
         "name": "access",
         "type": "string",
-        "description": "Access mode for the mounted store. Defaults to read_write. read_only mounts the store as a read-only filesystem. (read_write, read_only)"
+        "description": "Access mode for the mounted store. Defaults to `read_write`. `read_only` mounts the store as a read-only filesystem. (read_write, read_only)"
       },
       {
         "name": "instructions",
@@ -675,56 +733,56 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-deployment_id"><code>deployment_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-agent_id"><code>agent_id</code></a>, <a href="#parameter-status"><code>status</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-include_archived"><code>include_archived</code></a></td>
+    <td><a href="#parameter-agent_id"><code>agent_id</code></a>, <a href="#parameter-status"><code>status</code></a>, <a href="#parameter-created_at[gte]"><code>created_at[gte]</code></a>, <a href="#parameter-created_at[lte]"><code>created_at[lte]</code></a>, <a href="#parameter-include_archived"><code>include_archived</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-name"><code>name</code></a>, <a href="#parameter-agent"><code>agent</code></a>, <a href="#parameter-environment_id"><code>environment_id</code></a>, <a href="#parameter-initial_events"><code>initial_events</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-deployment_id"><code>deployment_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#archive"><CopyableCode code="archive" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-deployment_id"><code>deployment_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#pause"><CopyableCode code="pause" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-deployment_id"><code>deployment_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#unpause"><CopyableCode code="unpause" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-deployment_id"><code>deployment_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#run"><CopyableCode code="run" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-deployment_id"><code>deployment_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 </tbody>
@@ -753,6 +811,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><code>string</code></td>
     <td>Filter by agent ID.</td>
 </tr>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
+    <td><code>string</code></td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
+</tr>
 <tr id="parameter-created_at[gte]">
     <td><CopyableCode code="created_at[gte]" /></td>
     <td><code>string (date-time)</code></td>
@@ -771,7 +834,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-status">
     <td><CopyableCode code="status" /></td>
     <td><code>string</code></td>
-    <td>Filter by status: active or paused. Omit for both. To include archived deployments, use include_archived instead; the two cannot be combined.</td>
+    <td>Filter by status: `active` or `paused`. Omit for both. To include archived deployments, use `include_archived` instead; the two cannot be combined.</td>
 </tr>
 </tbody>
 </table>
@@ -796,6 +859,7 @@ name,
 environment_id,
 agent,
 archived_at,
+budget,
 created_at,
 description,
 initial_events,
@@ -809,6 +873,7 @@ updated_at,
 vault_ids
 FROM anthropic.deployments.deployments
 WHERE deployment_id = '{{ deployment_id }}' -- required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -823,6 +888,7 @@ name,
 environment_id,
 agent,
 archived_at,
+budget,
 created_at,
 description,
 initial_events,
@@ -840,6 +906,7 @@ AND status = '{{ status }}'
 AND "created_at[gte]" = '{{ created_at[gte] }}'
 AND "created_at[lte]" = '{{ created_at[lte] }}'
 AND include_archived = '{{ include_archived }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -869,7 +936,9 @@ vault_ids,
 initial_events,
 resources,
 metadata,
-schedule
+schedule,
+budget,
+"anthropic-workspace-id"
 )
 SELECT 
 '{{ name }}' /* required */,
@@ -880,13 +949,16 @@ SELECT
 '{{ initial_events }}' /* required */,
 '{{ resources }}',
 '{{ metadata }}',
-'{{ schedule }}'
+'{{ schedule }}',
+'{{ budget }}',
+'{{ anthropic-workspace-id }}'
 RETURNING
 id,
 name,
 environment_id,
 agent,
 archived_at,
+budget,
 created_at,
 description,
 initial_events,
@@ -966,6 +1038,18 @@ vault_ids
         type: "{{ type }}"
         expression: "{{ expression }}"
         timezone: "{{ timezone }}"
+    - name: budget
+      description: |
+        Enforced spend ceiling stamped onto each session created from this deployment, copied at session-creation time. Omit to leave sessions uncapped. The deployment agent's model must have a public list price, or the request is rejected; a multiagent roster is re-validated in full when each fire copies the cap, which fails closed the same way.
+      value:
+        type: "{{ type }}"
+        max_list_cost:
+          currency: "{{ currency }}"
+          amount: "{{ amount }}"
+    - name: anthropic-workspace-id
+      value: "{{ anthropic-workspace-id }}"
+      description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)
+      description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)
 `}</CodeBlock>
 
 </TabItem>
@@ -995,15 +1079,18 @@ vault_ids = '{{ vault_ids }}',
 initial_events = '{{ initial_events }}',
 resources = '{{ resources }}',
 metadata = '{{ metadata }}',
-schedule = '{{ schedule }}'
+schedule = '{{ schedule }}',
+budget = '{{ budget }}'
 WHERE 
 deployment_id = '{{ deployment_id }}' --required
+WHERE "anthropic-workspace-id" = '{{ anthropic-workspace-id}}'
 RETURNING
 id,
 name,
 environment_id,
 agent,
 archived_at,
+budget,
 created_at,
 description,
 initial_events,
@@ -1037,7 +1124,8 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.deployments.deployments.archive 
-@deployment_id='{{ deployment_id }}' --required
+@deployment_id='{{ deployment_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -1047,7 +1135,8 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.deployments.deployments.pause 
-@deployment_id='{{ deployment_id }}' --required
+@deployment_id='{{ deployment_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -1057,7 +1146,8 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.deployments.deployments.unpause 
-@deployment_id='{{ deployment_id }}' --required
+@deployment_id='{{ deployment_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -1067,7 +1157,8 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.deployments.deployments.run 
-@deployment_id='{{ deployment_id }}' --required
+@deployment_id='{{ deployment_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
