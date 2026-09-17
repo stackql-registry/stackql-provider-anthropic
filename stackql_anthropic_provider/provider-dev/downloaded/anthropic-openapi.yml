@@ -20725,6 +20725,17 @@ paths:
               description: Optional header to specify the beta version(s) you want to use.
               items:
                 $ref: '#/components/schemas/AnthropicBeta'
+        - name: anthropic-workspace-id
+          in: header
+          required: false
+          schema:
+            type: string
+            x-stainless-param: workspace_id
+          description: |-
+            Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).
+
+            Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace.
+          example: wrkspc_011CZkZaBF1tNoB5wlCeusgy
     get:
       operationId: BetaListUserProfiles
       summary: List User Profiles
@@ -20778,6 +20789,17 @@ paths:
           schema:
             $ref: '#/components/schemas/BetaUserProfileListOrderBy'
           description: Query parameter for order_by
+        - name: anthropic-workspace-id
+          in: header
+          required: false
+          schema:
+            type: string
+            x-stainless-param: workspace_id
+          description: |-
+            Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).
+
+            Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace.
+          example: wrkspc_011CZkZaBF1tNoB5wlCeusgy
       responses:
         '200':
           description: Successful response (OK)
@@ -20915,6 +20937,17 @@ paths:
             type: string
           description: Path parameter user_profile_id
           example: uprof_011CZkZCu8hGbp5mYRQgUmz9
+        - name: anthropic-workspace-id
+          in: header
+          required: false
+          schema:
+            type: string
+            x-stainless-param: workspace_id
+          description: |-
+            Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).
+
+            Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace.
+          example: wrkspc_011CZkZaBF1tNoB5wlCeusgy
       responses:
         '200':
           description: Successful response (OK)
@@ -21046,6 +21079,17 @@ paths:
             type: string
           description: Path parameter user_profile_id
           example: uprof_011CZkZCu8hGbp5mYRQgUmz9
+        - name: anthropic-workspace-id
+          in: header
+          required: false
+          schema:
+            type: string
+            x-stainless-param: workspace_id
+          description: |-
+            Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).
+
+            Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace.
+          example: wrkspc_011CZkZaBF1tNoB5wlCeusgy
       requestBody:
         required: true
         content:
@@ -21184,6 +21228,17 @@ paths:
             type: string
           description: Path parameter user_profile_id
           example: uprof_011CZkZCu8hGbp5mYRQgUmz9
+        - name: anthropic-workspace-id
+          in: header
+          required: false
+          schema:
+            type: string
+            x-stainless-param: workspace_id
+          description: |-
+            Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).
+
+            Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace.
+          example: wrkspc_011CZkZaBF1tNoB5wlCeusgy
       responses:
         '200':
           description: Successful response (OK)
@@ -43643,6 +43698,31 @@ components:
         - type
       title: Compact20260112
       type: object
+    BetaCompactionCapability:
+      properties:
+        summarize:
+          $ref: '#/components/schemas/BetaCapabilitySupport'
+          description: Whether the summarize compaction type is supported.
+        supported:
+          type: boolean
+          title: Supported
+          description: Whether this capability is supported by the model.
+      type: object
+      required:
+        - summarize
+        - supported
+      title: CompactionCapability
+      description: |-
+        Compaction capability details: whether the model accepts the top-level
+        `compaction` request parameter, with one entry per supported
+        `compaction.type` value.
+    BetaCompactionConfig:
+      discriminator:
+        mapping:
+          summarize: '#/components/schemas/BetaSummarizeCompaction'
+        propertyName: type
+      oneOf:
+        - $ref: '#/components/schemas/BetaSummarizeCompaction'
     BetaCompactionContentBlockDelta:
       properties:
         content:
@@ -44550,6 +44630,7 @@ components:
             - $ref: '#/components/schemas/BetaResponseCompactionBlock'
               x-anthropic-beta-required:
                 - compact-2026-01-12
+                - compact-2026-09-04
             - $ref: '#/components/schemas/BetaResponseFallbackBlock'
               x-anthropic-beta-required:
                 - server-side-fallback-2026-06-01
@@ -44667,6 +44748,16 @@ components:
             - type: 'null'
           description: Top-level cache control automatically applies a cache_control marker to the last cacheable block in the request.
           title: Cache Control
+        compaction:
+          anyOf:
+            - $ref: '#/components/schemas/BetaCompactionConfig'
+            - type: 'null'
+          description: |-
+            Compaction configuration.
+
+            When set on `POST /v1/messages`, the request is a compaction request: the conversation in `messages` is summarized and the response holds only the resulting `compaction` block (`stop_reason` `"compaction"`), which later requests send first in `messages` in place of the messages it summarizes. `POST /v1/messages/count_tokens` accepts this parameter and ignores it: the count it returns is for the conversation in `messages` as sent. Cannot be combined with `context_management`.
+          x-anthropic-beta-required:
+            - compact-2026-09-04
         context_management:
           anyOf:
             - $ref: '#/components/schemas/BetaContextManagementConfig'
@@ -44924,6 +45015,7 @@ components:
           x-anthropic-beta-required:
             - context-management-2025-06-27
             - compact-2026-01-12
+            - compact-2026-09-04
         input_tokens:
           type: integer
           title: Input Tokens
@@ -45049,6 +45141,16 @@ components:
             - type: 'null'
           description: Top-level cache control automatically applies a cache_control marker to the last cacheable block in the request.
           title: Cache Control
+        compaction:
+          anyOf:
+            - $ref: '#/components/schemas/BetaCompactionConfig'
+            - type: 'null'
+          description: |-
+            Compaction configuration.
+
+            When set on `POST /v1/messages`, the request is a compaction request: the conversation in `messages` is summarized and the response holds only the resulting `compaction` block (`stop_reason` `"compaction"`), which later requests send first in `messages` in place of the messages it summarizes. `POST /v1/messages/count_tokens` accepts this parameter and ignores it: the count it returns is for the conversation in `messages` as sent. Cannot be combined with `context_management`.
+          x-anthropic-beta-required:
+            - compact-2026-09-04
         container:
           anyOf:
             - $ref: '#/components/schemas/BetaContainerParams'
@@ -45207,9 +45309,9 @@ components:
             Whether to incrementally stream the response using server-sent events.
 
             See [streaming](https://platform.claude.com/docs/en/build-with-claude/streaming) for details.
+          example: false
           title: Stream
           type: boolean
-          example: false
         system:
           anyOf:
             - type: string
@@ -45241,7 +45343,7 @@ components:
           minimum: 0
           title: Temperature
           type: number
-          x-stainless-deprecation-message: Deprecated. Models released after Claude Opus 4.6 do not support setting temperature. A value of 1.0 of will be accepted for backwards compatibility, all other values will be rejected with a 400 error.
+          x-stainless-deprecation-message: Deprecated. Models released after Claude Opus 4.6 do not support setting temperature. A value of 1.0 will be accepted for backwards compatibility, all other values will be rejected with a 400 error.
           x-stainless-skip:
             - python
         thinking:
@@ -46359,10 +46461,12 @@ components:
       description: |-
         Token usage for the fallback-model attempt of a server-side fallback request.
 
-        Produced in place of a `message` entry for whichever hop served the
-        response. A declined hop produces the existing `message` entry. Whether
-        a fallback model served the response is signalled by the presence of this
-        entry in `usage.iterations`.
+        The terminal entry of a fallback-served turn: when a fallback hop's
+        output is the returned message, the entry for the iteration that
+        completed it carries this type in place of `message`. A declined hop
+        and the serving hop's earlier tool-loop iterations produce `message`
+        entries. Whether a fallback model served the response is signalled by
+        the presence of this entry in `usage.iterations`.
       properties:
         cache_creation:
           anyOf:
@@ -46631,6 +46735,8 @@ components:
       type: object
     BetaInputMessage:
       additionalProperties: false
+      discriminator:
+        propertyName: role
       properties:
         clear_at:
           anyOf:
@@ -46649,12 +46755,12 @@ components:
               x-stainless-skip:
                 - go
                 - cli
-            - items:
+            - example:
+                - text: What is a quaternion?
+                  type: text
+              items:
                 $ref: '#/components/schemas/BetaInputContentBlock'
               type: array
-              example:
-                - type: text
-                  text: What is a quaternion?
           title: Content
         output_config:
           anyOf:
@@ -46674,8 +46780,6 @@ components:
         - role
       title: InputMessage
       type: object
-      discriminator:
-        propertyName: role
     BetaInputSchema:
       additionalProperties: true
       properties:
@@ -46732,6 +46836,21 @@ components:
         - value
       title: InputTokensTrigger
       type: object
+    BetaInputTransformation:
+      description: |-
+        One entry of `input_transformations`: either a change the API made to the
+        request's input before showing it to the model, or a block that failed a
+        binding check and was still shown to the model unchanged. The `type` field
+        says which.
+      discriminator:
+        mapping:
+          thinking_dropped: '#/components/schemas/BetaThinkingDroppedInputTransformation'
+          thinking_mismatch_allowed: '#/components/schemas/BetaThinkingMismatchAllowedInputTransformation'
+        propertyName: type
+      oneOf:
+        - $ref: '#/components/schemas/BetaThinkingDroppedInputTransformation'
+        - $ref: '#/components/schemas/BetaThinkingMismatchAllowedInputTransformation'
+      title: InputTransformation
     BetaInvalidRequestError:
       properties:
         message:
@@ -47439,7 +47558,7 @@ components:
           allOf:
             - $ref: '#/components/schemas/BetaTimestamp'
         session_thread_id:
-          description: When set, this event was cross-posted from a subagent's thread to surface its custom tool use on the primary thread's stream. Empty on the thread's own events. Echo this on a `user.custom_tool_result` event to route the result back.
+          description: 'When set, this event was cross-posted from a subagent''s thread to surface its custom tool use on the primary thread''s stream. Empty on the thread''s own events. Informational only: the server routes the matching `user.custom_tool_result` by `custom_tool_use_id`, so clients do not send it back.'
           anyOf:
             - type: string
             - type: 'null'
@@ -47524,7 +47643,7 @@ components:
           allOf:
             - $ref: '#/components/schemas/BetaManagedAgentsAgentEvaluatedPermission'
         session_thread_id:
-          description: When set, this event was cross-posted from a subagent's thread to surface its permission request on the primary thread's stream. Empty on the thread's own events. Echo this on a `user.tool_confirmation` event to route the approval back.
+          description: 'When set, this event was cross-posted from a subagent''s thread to surface its permission request on the primary thread''s stream. Empty on the thread''s own events. Informational only: the server routes the matching `user.tool_confirmation` by `tool_use_id`, so clients do not send it back.'
           anyOf:
             - type: string
             - type: 'null'
@@ -47951,7 +48070,7 @@ components:
           allOf:
             - $ref: '#/components/schemas/BetaManagedAgentsAgentEvaluatedPermission'
         session_thread_id:
-          description: When set, this event was cross-posted from a subagent's thread to surface its permission request on the primary thread's stream. Empty on the thread's own events. Echo this on a `user.tool_confirmation` event to route the approval back.
+          description: 'When set, this event was cross-posted from a subagent''s thread to surface its permission request on the primary thread''s stream. Empty on the thread''s own events. Informational only: the server routes the matching `user.tool_confirmation` or `user.tool_result` by `tool_use_id`, so clients do not send it back.'
           anyOf:
             - type: string
             - type: 'null'
@@ -55667,7 +55786,7 @@ components:
             - $ref: '#/components/schemas/BetaTimestamp'
             - type: 'null'
         session_thread_id:
-          description: Routes this result to a subagent thread. Copy from the `agent.custom_tool_use` event's `session_thread_id`.
+          description: Set by the server to the subagent thread this result was routed to. Omitted when it was routed to the primary thread.
           anyOf:
             - type: string
             - type: 'null'
@@ -55994,7 +56113,7 @@ components:
             - $ref: '#/components/schemas/BetaTimestamp'
             - type: 'null'
         session_thread_id:
-          description: When set, the confirmation routes to this subagent's thread rather than the primary. Echo this from the `session_thread_id` on the `agent.tool_use` or `agent.mcp_tool_use` event that prompted the approval.
+          description: Set by the server to the subagent thread this confirmation was routed to. Omitted when it was routed to the primary thread.
           anyOf:
             - type: string
             - type: 'null'
@@ -56069,7 +56188,7 @@ components:
             - $ref: '#/components/schemas/BetaTimestamp'
             - type: 'null'
         session_thread_id:
-          description: Routes this result to a subagent thread. Copy from the `agent.tool_use` event's `session_thread_id`.
+          description: Set by the server to the subagent thread this result was routed to. Omitted when it was routed to the primary thread.
           anyOf:
             - type: string
             - type: 'null'
@@ -56615,25 +56734,31 @@ components:
         input_transformations:
           anyOf:
             - items:
-                $ref: '#/components/schemas/BetaThinkingDroppedInputTransformation'
+                $ref: '#/components/schemas/BetaInputTransformation'
               type: array
             - type: 'null'
           description: |-
-            Changes the API made to the request's input before showing it to the model:
-            one entry per change, in request order. Today the only entry type is
-            `thinking_dropped` — a `thinking`, `redacted_thinking` or `connector_text`
-            block from the request's `messages` that was removed from the prompt instead
-            of being shown to the model because it failed a binding check. More entry
-            types may be added over time; ignore types you do not recognize.
+            Changes the API made to the request's input before showing it to the model,
+            and blocks that failed a binding check but were left unchanged: one entry per
+            block, in request order. Two entry types today. `thinking_dropped` — a
+            `thinking`, `redacted_thinking` or `connector_text` block from the request's
+            `messages` that was removed from the prompt instead of being shown to the
+            model because it failed a binding check. `thinking_mismatch_allowed` — a
+            `thinking` or `redacted_thinking` block that failed the conversation check
+            (the conversation before it differs from the one it was created in, or it
+            carries no record of one on a model that requires it) and was shown to the
+            model all the same, because that check is not enforced for this request.
+            More entry types may be added over time; ignore types you do not recognize.
 
             Requires `anthropic-beta: thinking-binding-controls-2026-08-01`. Present on
             every such response from a model that supports extended thinking, as `[]`
-            when nothing was changed; without the beta, blocks are removed all the same
-            but nothing is reported. Removed blocks contribute nothing to
-            `usage.input_tokens`. When streaming, the array is final in `message_start`;
-            the final `message_delta` event carries it only when a server-side model
-            fallback happened mid-stream, in which case it holds the serving model's
-            entries and replaces the one in `message_start`.
+            when there is no entry to report; without the beta, blocks are removed or
+            left in place all the same but nothing is reported. Removed blocks contribute
+            nothing to `usage.input_tokens`; blocks left in place count as sent. When
+            streaming, the array is final in `message_start`; the final `message_delta`
+            event carries it only when a server-side model fallback happened mid-stream,
+            in which case it holds the serving model's entries and replaces the one in
+            `message_start`.
           title: Input Transformations
           x-anthropic-beta-required:
             - thinking-binding-controls-2026-08-01
@@ -56903,25 +57028,31 @@ components:
         input_transformations:
           anyOf:
             - items:
-                $ref: '#/components/schemas/BetaThinkingDroppedInputTransformation'
+                $ref: '#/components/schemas/BetaInputTransformation'
               type: array
             - type: 'null'
           description: |-
-            Changes the API made to the request's input before showing it to the model:
-            one entry per change, in request order. Today the only entry type is
-            `thinking_dropped` — a `thinking`, `redacted_thinking` or `connector_text`
-            block from the request's `messages` that was removed from the prompt instead
-            of being shown to the model because it failed a binding check. More entry
-            types may be added over time; ignore types you do not recognize.
+            Changes the API made to the request's input before showing it to the model,
+            and blocks that failed a binding check but were left unchanged: one entry per
+            block, in request order. Two entry types today. `thinking_dropped` — a
+            `thinking`, `redacted_thinking` or `connector_text` block from the request's
+            `messages` that was removed from the prompt instead of being shown to the
+            model because it failed a binding check. `thinking_mismatch_allowed` — a
+            `thinking` or `redacted_thinking` block that failed the conversation check
+            (the conversation before it differs from the one it was created in, or it
+            carries no record of one on a model that requires it) and was shown to the
+            model all the same, because that check is not enforced for this request.
+            More entry types may be added over time; ignore types you do not recognize.
 
             Requires `anthropic-beta: thinking-binding-controls-2026-08-01`. Present on
             every such response from a model that supports extended thinking, as `[]`
-            when nothing was changed; without the beta, blocks are removed all the same
-            but nothing is reported. Removed blocks contribute nothing to
-            `usage.input_tokens`. When streaming, the array is final in `message_start`;
-            the final `message_delta` event carries it only when a server-side model
-            fallback happened mid-stream, in which case it holds the serving model's
-            entries and replaces the one in `message_start`.
+            when there is no entry to report; without the beta, blocks are removed or
+            left in place all the same but nothing is reported. Removed blocks contribute
+            nothing to `usage.input_tokens`; blocks left in place count as sent. When
+            streaming, the array is final in `message_start`; the final `message_delta`
+            event carries it only when a server-side model fallback happened mid-stream,
+            in which case it holds the serving model's entries and replaces the one in
+            `message_start`.
           title: Input Transformations
           x-anthropic-beta-required:
             - thinking-binding-controls-2026-08-01
@@ -57060,7 +57191,9 @@ components:
           title: Input Tokens
           type: integer
         model:
-          $ref: '#/components/schemas/Model'
+          anyOf:
+            - $ref: '#/components/schemas/Model'
+            - type: 'null'
         output_tokens:
           description: The number of output tokens which were used.
           minimum: 0
@@ -57153,6 +57286,13 @@ components:
         code_execution:
           $ref: '#/components/schemas/BetaCapabilitySupport'
           description: Whether the model supports code execution tools.
+        compaction:
+          anyOf:
+            - $ref: '#/components/schemas/BetaCompactionCapability'
+            - type: 'null'
+          description: Server-side compaction support (the top-level `compaction` parameter) and the accepted `compaction.type` values.
+          x-anthropic-beta-required:
+            - compact-2026-09-04
         context_management:
           $ref: '#/components/schemas/BetaContextManagementCapability'
           description: Context management support and available strategies.
@@ -57176,6 +57316,7 @@ components:
         - batch
         - citations
         - code_execution
+        - compaction
         - context_management
         - effort
         - image_input
@@ -58249,6 +58390,14 @@ components:
           title: Encrypted Content
           x-anthropic-beta-required:
             - task-budgets-2026-03-13
+        signature:
+          anyOf:
+            - type: string
+            - type: 'null'
+          description: The block's signature as returned, to be sent back verbatim
+          title: Signature
+          x-anthropic-beta-required:
+            - compact-2026-09-04
         type:
           const: compaction
           title: Type
@@ -58639,8 +58788,8 @@ components:
             - items:
                 $ref: '#/components/schemas/BetaRequestTextBlock'
                 title: beta_mcp_tool_result_block_param_content_item
-              type: array
               title: beta_mcp_tool_result_block_param_content
+              type: array
           title: Content
         is_error:
           title: Is Error
@@ -60031,6 +60180,14 @@ components:
           title: Encrypted Content
           x-anthropic-beta-required:
             - task-budgets-2026-03-13
+        signature:
+          anyOf:
+            - type: string
+            - type: 'null'
+          description: Signature over the summary, to be sent back with the block verbatim
+          title: Signature
+          x-anthropic-beta-required:
+            - compact-2026-09-04
         type:
           const: compaction
           default: compaction
@@ -60255,8 +60412,8 @@ components:
             - items:
                 $ref: '#/components/schemas/BetaResponseTextBlock'
                 title: beta_mcp_tool_result_block_content_item
-              type: array
               title: beta_mcp_tool_result_block_content
+              type: array
           title: Content
         is_error:
           default: false
@@ -61566,6 +61723,33 @@ components:
         - type
       title: SucceededResult
       type: object
+    BetaSummarizeCompaction:
+      additionalProperties: false
+      description: |-
+        Compact the whole conversation and return a signed `compaction` block,
+        alone, that a later request sends back first in `messages`, in place of
+        the messages it summarizes. There is no trigger and no pause flag: sending
+        the parameter compacts, and nothing is sampled after the block.
+
+        The summarization prompt is the server's own unless `instructions` are
+        given, which then replace it for this request; a value that is empty or
+        only whitespace counts as absent.
+      properties:
+        instructions:
+          anyOf:
+            - maxLength: 16384
+              type: string
+            - type: 'null'
+          description: Replaces the server's default summarization prompt for this request. An empty or whitespace-only value counts as absent.
+          title: Instructions
+        type:
+          const: summarize
+          title: Type
+          type: string
+      required:
+        - type
+      title: SummarizeCompaction
+      type: object
     BetaSystemMessageOutputConfig:
       additionalProperties: false
       description: |-
@@ -62008,6 +62192,45 @@ components:
         - reason
         - type
       title: ThinkingDroppedInputTransformation
+      type: object
+    BetaThinkingMismatchAllowedInputTransformation:
+      properties:
+        path:
+          description: |-
+            Where the block is in your request, as `messages.{i}.content.{j}`:
+            `i` indexes the `messages` array you sent and `j` that message's `content`
+            array — the same form error messages use.
+          title: Path
+          type: string
+        reason:
+          description: |-
+            Which binding check the block failed; the block was shown to the model all
+            the same. Always `prefix_binding_mismatch` today — the conversation before
+            the block differs from the conversation it was created in, or the block
+            carries no record of one on a model that requires it. Were the check
+            enforced for this request, the block would have been removed or the request
+            rejected (`thinking.block_binding.prefix_mismatch_behavior`). A removal also
+            takes the rest of that turn's consecutive thinking blocks, whereas here each
+            block is checked on its own, so `thinking_mismatch_allowed` entries are a
+            lower bound on what enforcement would remove.
+          enum:
+            - model_binding_mismatch
+            - prefix_binding_mismatch
+            - organization_binding_mismatch
+            - end_user_binding_mismatch
+          title: Reason
+          type: string
+        type:
+          const: thinking_mismatch_allowed
+          default: thinking_mismatch_allowed
+          description: Always `thinking_mismatch_allowed` for this entry type.
+          title: Type
+          type: string
+      required:
+        - path
+        - reason
+        - type
+      title: ThinkingMismatchAllowedInputTransformation
       type: object
     BetaThinkingPrefixMismatchBehavior:
       description: |-
@@ -63131,6 +63354,11 @@ components:
           const: web_fetch_20250910
           title: Type
           type: string
+        url_sources:
+          anyOf:
+            - $ref: '#/components/schemas/BetaWebFetchUrlSources'
+            - type: 'null'
+          description: Which sources contribute to the set of URLs the tool may fetch. Omitted means every source.
       required:
         - name
         - type
@@ -63210,6 +63438,11 @@ components:
           const: web_fetch_20260209
           title: Type
           type: string
+        url_sources:
+          anyOf:
+            - $ref: '#/components/schemas/BetaWebFetchUrlSources'
+            - type: 'null'
+          description: Which sources contribute to the set of URLs the tool may fetch. Omitted means every source.
       required:
         - name
         - type
@@ -63290,6 +63523,11 @@ components:
           const: web_fetch_20260309
           title: Type
           type: string
+        url_sources:
+          anyOf:
+            - $ref: '#/components/schemas/BetaWebFetchUrlSources'
+            - type: 'null'
+          description: Which sources contribute to the set of URLs the tool may fetch. Omitted means every source.
         use_cache:
           description: Whether to use cached content. Set to false to bypass the cache and fetch fresh content. Only set to false when the user explicitly requests fresh content or when fetching rapidly-changing sources.
           title: Use Cache
@@ -63380,6 +63618,11 @@ components:
           const: web_fetch_20260318
           title: Type
           type: string
+        url_sources:
+          anyOf:
+            - $ref: '#/components/schemas/BetaWebFetchUrlSources'
+            - type: 'null'
+          description: Which sources contribute to the set of URLs the tool may fetch. Omitted means every source.
         use_cache:
           description: Whether to use cached content. Set to false to bypass the cache and fetch fresh content. Only set to false when the user explicitly requests fresh content or when fetching rapidly-changing sources.
           title: Use Cache
@@ -63388,6 +63631,145 @@ components:
         - name
         - type
       title: WebFetchTool_20260318
+      type: object
+    BetaWebFetchUrlSourceAll:
+      additionalProperties: false
+      description: |-
+        The ``url_sources`` variant under which a source contributes in
+        full: every result of the tool filter's source, or all user input.
+      properties:
+        type:
+          const: all
+          title: Type
+          type: string
+      required:
+        - type
+      title: WebFetchUrlSourceAll
+      type: object
+    BetaWebFetchUrlSourceExcept:
+      additionalProperties: false
+      description: |-
+        The tool filter variant under which every result but the named
+        tools' contributes.
+      properties:
+        tools:
+          items:
+            $ref: '#/components/schemas/BetaWebFetchUrlSourceToolReference'
+          title: Tools
+          type: array
+        type:
+          const: except
+          title: Type
+          type: string
+      required:
+        - tools
+        - type
+      title: WebFetchUrlSourceExcept
+      type: object
+    BetaWebFetchUrlSourceNone:
+      additionalProperties: false
+      description: |-
+        The ``url_sources`` variant under which a source contributes nothing:
+        no result of the tool filter's source, or no user input.
+      properties:
+        type:
+          const: none
+          title: Type
+          type: string
+      required:
+        - type
+      title: WebFetchUrlSourceNone
+      type: object
+    BetaWebFetchUrlSourceOnly:
+      additionalProperties: false
+      description: |-
+        The tool filter variant under which only the named tools' results
+        contribute.
+      properties:
+        tools:
+          items:
+            $ref: '#/components/schemas/BetaWebFetchUrlSourceToolReference'
+          title: Tools
+          type: array
+        type:
+          const: only
+          title: Type
+          type: string
+      required:
+        - tools
+        - type
+      title: WebFetchUrlSourceOnly
+      type: object
+    BetaWebFetchUrlSourceToolReference:
+      additionalProperties: false
+      description: |-
+        One entry of a tool filter's ``tools``: it must name a tool declared
+        in this request's ``tools[]``.
+      properties:
+        name:
+          title: Name
+          type: string
+        type:
+          const: tool_reference
+          title: Type
+          type: string
+      required:
+        - name
+        - type
+      title: WebFetchUrlSourceToolReference
+      type: object
+    BetaWebFetchUrlSources:
+      additionalProperties: false
+      description: |-
+        Which sources contribute to the set of URLs web fetch may fetch.
+
+        Each key is a tagged variant: ``user_input`` is ``all`` or ``none``; the
+        two tool filters are ``all``, ``none``, ``only`` (only the named tools'
+        results) or ``except`` (every result but the named tools'). A named tool
+        must be declared in this request's ``tools[]``.
+      properties:
+        client_tool_results:
+          description: 'Which client tools'' results contribute fetchable URLs: "all", "none", or an only or except list of client tool names from tools[].'
+          discriminator:
+            mapping:
+              all: '#/components/schemas/BetaWebFetchUrlSourceAll'
+              except: '#/components/schemas/BetaWebFetchUrlSourceExcept'
+              none: '#/components/schemas/BetaWebFetchUrlSourceNone'
+              only: '#/components/schemas/BetaWebFetchUrlSourceOnly'
+            propertyName: type
+          oneOf:
+            - $ref: '#/components/schemas/BetaWebFetchUrlSourceAll'
+            - $ref: '#/components/schemas/BetaWebFetchUrlSourceNone'
+            - $ref: '#/components/schemas/BetaWebFetchUrlSourceOnly'
+            - $ref: '#/components/schemas/BetaWebFetchUrlSourceExcept'
+          title: Client Tool Results
+        server_tool_results:
+          description: 'Which server tools'' results contribute fetchable URLs: "all", "none", or an only or except list of server tool names from tools[]; only web_search and web_fetch results ever contribute.'
+          discriminator:
+            mapping:
+              all: '#/components/schemas/BetaWebFetchUrlSourceAll'
+              except: '#/components/schemas/BetaWebFetchUrlSourceExcept'
+              none: '#/components/schemas/BetaWebFetchUrlSourceNone'
+              only: '#/components/schemas/BetaWebFetchUrlSourceOnly'
+            propertyName: type
+          oneOf:
+            - $ref: '#/components/schemas/BetaWebFetchUrlSourceAll'
+            - $ref: '#/components/schemas/BetaWebFetchUrlSourceNone'
+            - $ref: '#/components/schemas/BetaWebFetchUrlSourceOnly'
+            - $ref: '#/components/schemas/BetaWebFetchUrlSourceExcept'
+          title: Server Tool Results
+        user_input:
+          description: 'Whether URLs in user messages are fetchable: "all" or "none".'
+          discriminator:
+            mapping:
+              all: '#/components/schemas/BetaWebFetchUrlSourceAll'
+              none: '#/components/schemas/BetaWebFetchUrlSourceNone'
+            propertyName: type
+          oneOf:
+            - $ref: '#/components/schemas/BetaWebFetchUrlSourceAll'
+            - $ref: '#/components/schemas/BetaWebFetchUrlSourceNone'
+          title: User Input
+      title: WebFetchUrlSources
       type: object
     BetaWebSearchToolResultErrorCode:
       enum:
@@ -65968,7 +66350,7 @@ components:
           minimum: 0
           title: Temperature
           type: number
-          x-stainless-deprecation-message: Deprecated. Models released after Claude Opus 4.6 do not support setting temperature. A value of 1.0 of will be accepted for backwards compatibility, all other values will be rejected with a 400 error.
+          x-stainless-deprecation-message: Deprecated. Models released after Claude Opus 4.6 do not support setting temperature. A value of 1.0 will be accepted for backwards compatibility, all other values will be rejected with a 400 error.
           x-stainless-skip:
             - python
         top_p:
@@ -67112,9 +67494,9 @@ components:
             Whether to incrementally stream the response using server-sent events.
 
             See [streaming](https://platform.claude.com/docs/en/build-with-claude/streaming) for details.
+          example: false
           title: Stream
           type: boolean
-          example: false
         system:
           anyOf:
             - type: string
@@ -67146,7 +67528,7 @@ components:
           minimum: 0
           title: Temperature
           type: number
-          x-stainless-deprecation-message: Deprecated. Models released after Claude Opus 4.6 do not support setting temperature. A value of 1.0 of will be accepted for backwards compatibility, all other values will be rejected with a 400 error.
+          x-stainless-deprecation-message: Deprecated. Models released after Claude Opus 4.6 do not support setting temperature. A value of 1.0 will be accepted for backwards compatibility, all other values will be rejected with a 400 error.
           x-stainless-skip:
             - python
         thinking:
@@ -67676,6 +68058,8 @@ components:
       type: object
     InputMessage:
       additionalProperties: false
+      discriminator:
+        propertyName: role
       properties:
         content:
           anyOf:
@@ -67683,12 +68067,12 @@ components:
               x-stainless-skip:
                 - go
                 - cli
-            - items:
+            - example:
+                - text: What is a quaternion?
+                  type: text
+              items:
                 $ref: '#/components/schemas/InputContentBlock'
               type: array
-              example:
-                - type: text
-                  text: What is a quaternion?
           title: Content
         role:
           enum:
@@ -67702,8 +68086,6 @@ components:
         - role
       title: InputMessage
       type: object
-      discriminator:
-        propertyName: role
     InputSchema:
       additionalProperties: true
       properties:
@@ -72298,6 +72680,11 @@ components:
           const: web_fetch_20250910
           title: Type
           type: string
+        url_sources:
+          anyOf:
+            - $ref: '#/components/schemas/WebFetchUrlSources'
+            - type: 'null'
+          description: Which sources contribute to the set of URLs the tool may fetch. Omitted means every source.
       required:
         - name
         - type
@@ -72377,6 +72764,11 @@ components:
           const: web_fetch_20260209
           title: Type
           type: string
+        url_sources:
+          anyOf:
+            - $ref: '#/components/schemas/WebFetchUrlSources'
+            - type: 'null'
+          description: Which sources contribute to the set of URLs the tool may fetch. Omitted means every source.
       required:
         - name
         - type
@@ -72457,6 +72849,11 @@ components:
           const: web_fetch_20260309
           title: Type
           type: string
+        url_sources:
+          anyOf:
+            - $ref: '#/components/schemas/WebFetchUrlSources'
+            - type: 'null'
+          description: Which sources contribute to the set of URLs the tool may fetch. Omitted means every source.
         use_cache:
           description: Whether to use cached content. Set to false to bypass the cache and fetch fresh content. Only set to false when the user explicitly requests fresh content or when fetching rapidly-changing sources.
           title: Use Cache
@@ -72547,6 +72944,11 @@ components:
           const: web_fetch_20260318
           title: Type
           type: string
+        url_sources:
+          anyOf:
+            - $ref: '#/components/schemas/WebFetchUrlSources'
+            - type: 'null'
+          description: Which sources contribute to the set of URLs the tool may fetch. Omitted means every source.
         use_cache:
           description: Whether to use cached content. Set to false to bypass the cache and fetch fresh content. Only set to false when the user explicitly requests fresh content or when fetching rapidly-changing sources.
           title: Use Cache
@@ -72555,6 +72957,145 @@ components:
         - name
         - type
       title: WebFetchTool_20260318
+      type: object
+    WebFetchUrlSourceAll:
+      additionalProperties: false
+      description: |-
+        The ``url_sources`` variant under which a source contributes in
+        full: every result of the tool filter's source, or all user input.
+      properties:
+        type:
+          const: all
+          title: Type
+          type: string
+      required:
+        - type
+      title: WebFetchUrlSourceAll
+      type: object
+    WebFetchUrlSourceExcept:
+      additionalProperties: false
+      description: |-
+        The tool filter variant under which every result but the named
+        tools' contributes.
+      properties:
+        tools:
+          items:
+            $ref: '#/components/schemas/WebFetchUrlSourceToolReference'
+          title: Tools
+          type: array
+        type:
+          const: except
+          title: Type
+          type: string
+      required:
+        - tools
+        - type
+      title: WebFetchUrlSourceExcept
+      type: object
+    WebFetchUrlSourceNone:
+      additionalProperties: false
+      description: |-
+        The ``url_sources`` variant under which a source contributes nothing:
+        no result of the tool filter's source, or no user input.
+      properties:
+        type:
+          const: none
+          title: Type
+          type: string
+      required:
+        - type
+      title: WebFetchUrlSourceNone
+      type: object
+    WebFetchUrlSourceOnly:
+      additionalProperties: false
+      description: |-
+        The tool filter variant under which only the named tools' results
+        contribute.
+      properties:
+        tools:
+          items:
+            $ref: '#/components/schemas/WebFetchUrlSourceToolReference'
+          title: Tools
+          type: array
+        type:
+          const: only
+          title: Type
+          type: string
+      required:
+        - tools
+        - type
+      title: WebFetchUrlSourceOnly
+      type: object
+    WebFetchUrlSourceToolReference:
+      additionalProperties: false
+      description: |-
+        One entry of a tool filter's ``tools``: it must name a tool declared
+        in this request's ``tools[]``.
+      properties:
+        name:
+          title: Name
+          type: string
+        type:
+          const: tool_reference
+          title: Type
+          type: string
+      required:
+        - name
+        - type
+      title: WebFetchUrlSourceToolReference
+      type: object
+    WebFetchUrlSources:
+      additionalProperties: false
+      description: |-
+        Which sources contribute to the set of URLs web fetch may fetch.
+
+        Each key is a tagged variant: ``user_input`` is ``all`` or ``none``; the
+        two tool filters are ``all``, ``none``, ``only`` (only the named tools'
+        results) or ``except`` (every result but the named tools'). A named tool
+        must be declared in this request's ``tools[]``.
+      properties:
+        client_tool_results:
+          description: 'Which client tools'' results contribute fetchable URLs: "all", "none", or an only or except list of client tool names from tools[].'
+          discriminator:
+            mapping:
+              all: '#/components/schemas/WebFetchUrlSourceAll'
+              except: '#/components/schemas/WebFetchUrlSourceExcept'
+              none: '#/components/schemas/WebFetchUrlSourceNone'
+              only: '#/components/schemas/WebFetchUrlSourceOnly'
+            propertyName: type
+          oneOf:
+            - $ref: '#/components/schemas/WebFetchUrlSourceAll'
+            - $ref: '#/components/schemas/WebFetchUrlSourceNone'
+            - $ref: '#/components/schemas/WebFetchUrlSourceOnly'
+            - $ref: '#/components/schemas/WebFetchUrlSourceExcept'
+          title: Client Tool Results
+        server_tool_results:
+          description: 'Which server tools'' results contribute fetchable URLs: "all", "none", or an only or except list of server tool names from tools[]; only web_search and web_fetch results ever contribute.'
+          discriminator:
+            mapping:
+              all: '#/components/schemas/WebFetchUrlSourceAll'
+              except: '#/components/schemas/WebFetchUrlSourceExcept'
+              none: '#/components/schemas/WebFetchUrlSourceNone'
+              only: '#/components/schemas/WebFetchUrlSourceOnly'
+            propertyName: type
+          oneOf:
+            - $ref: '#/components/schemas/WebFetchUrlSourceAll'
+            - $ref: '#/components/schemas/WebFetchUrlSourceNone'
+            - $ref: '#/components/schemas/WebFetchUrlSourceOnly'
+            - $ref: '#/components/schemas/WebFetchUrlSourceExcept'
+          title: Server Tool Results
+        user_input:
+          description: 'Whether URLs in user messages are fetchable: "all" or "none".'
+          discriminator:
+            mapping:
+              all: '#/components/schemas/WebFetchUrlSourceAll'
+              none: '#/components/schemas/WebFetchUrlSourceNone'
+            propertyName: type
+          oneOf:
+            - $ref: '#/components/schemas/WebFetchUrlSourceAll'
+            - $ref: '#/components/schemas/WebFetchUrlSourceNone'
+          title: User Input
+      title: WebFetchUrlSources
       type: object
     WebSearchToolResultErrorCode:
       enum:
@@ -76172,7 +76713,7 @@ components:
         allowed_inference_geos:
           anyOf:
             - items:
-                type: string
+                $ref: '#/components/schemas/BetaAllowedInferenceGeo'
               type: array
               x-stainless-variantName: geos
             - type: string
@@ -76182,11 +76723,11 @@ components:
           title: Allowed Inference Geos
           description: Permitted inference geo values. 'unrestricted' means all geos are allowed.
         default_inference_geo:
-          type: string
+          $ref: '#/components/schemas/BetaInferenceGeo'
           title: Default Inference Geo
           description: Default inference geo applied when requests omit the parameter.
         workspace_geo:
-          type: string
+          $ref: '#/components/schemas/BetaWorkspaceGeo'
           title: Workspace Geo
           description: Geographic region for workspace data storage. Immutable after creation.
       type: object
@@ -80123,7 +80664,7 @@ components:
           minimum: 0
           title: Temperature
           type: number
-          x-stainless-deprecation-message: Deprecated. Models released after Claude Opus 4.6 do not support setting temperature. A value of 1.0 of will be accepted for backwards compatibility, all other values will be rejected with a 400 error.
+          x-stainless-deprecation-message: Deprecated. Models released after Claude Opus 4.6 do not support setting temperature. A value of 1.0 will be accepted for backwards compatibility, all other values will be rejected with a 400 error.
         thinking:
           $ref: '#/components/schemas/ThinkingConfigParam'
         tool_choice:
@@ -80315,6 +80856,7 @@ components:
             - mid-conversation-output-config-2026-07-01
             - thinking-binding-controls-2026-08-01
             - mid-conversation-system-clear-at-2026-08-21
+            - compact-2026-09-04
           x-stainless-nominal: false
     ThinkingConfigParam:
       description: |-
@@ -80514,6 +81056,7 @@ components:
         - $ref: '#/components/schemas/BetaResponseCompactionBlock'
           x-anthropic-beta-required:
             - compact-2026-01-12
+            - compact-2026-09-04
         - $ref: '#/components/schemas/BetaResponseFallbackBlock'
           x-anthropic-beta-required:
             - server-side-fallback-2026-06-01
@@ -80584,6 +81127,7 @@ components:
         - $ref: '#/components/schemas/BetaRequestCompactionBlock'
           x-anthropic-beta-required:
             - compact-2026-01-12
+            - compact-2026-09-04
         - $ref: '#/components/schemas/BetaRequestToolAdditionBlock'
           x-anthropic-beta-required:
             - mid-conversation-tool-changes-2026-07-01
@@ -81058,6 +81602,7 @@ components:
       title: Iterations
       x-anthropic-beta-required:
         - compact-2026-01-12
+        - compact-2026-09-04
         - advisor-tool-2026-03-01
         - task-budgets-2026-03-13
         - server-side-fallback-2026-06-01

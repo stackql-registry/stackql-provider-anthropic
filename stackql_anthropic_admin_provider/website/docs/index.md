@@ -58,7 +58,11 @@ On the Claude Platform on AWS only the workspace endpoints (create, get, list, u
 
 :::
 
-## Token usage and cost as rows
+## Example Queries
+
+Try the following queries using `stackql shell`, or run them from a script or CI pipeline with `stackql exec`.
+
+### Token usage and cost as rows
 
 Usage and cost reports are bucketed time series. Each row is one time bucket (`starting_at`, `ending_at`) whose `results` column holds the per-group breakdown, fanned out with `JSON_EACH` and read with `JSON_EXTRACT`.
 
@@ -98,7 +102,7 @@ WHERE starting_at = '2026-07-01T00:00:00Z'
 AND "group_by[]" = 'model';
 ```
 
-## Claude Code adoption
+### Claude Code adoption
 
 Who is using Claude Code, from where, and what it produced:
 
@@ -115,7 +119,7 @@ WHERE starting_at = '2026-07-01'
 ORDER BY date;
 ```
 
-## Governance
+### Governance
 
 Active workspaces and who is in them:
 
@@ -148,7 +152,7 @@ FROM anthropic_admin.api_keys.api_keys
 ORDER BY created_at;
 ```
 
-## Rate limits
+### Rate limits
 
 The organization's limits, one row per limit per model group:
 

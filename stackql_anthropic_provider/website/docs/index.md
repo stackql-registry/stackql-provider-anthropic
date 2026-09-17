@@ -63,7 +63,11 @@ WHERE "anthropic-workspace-id" = 'wrkspc_01';
 
 A key that belongs to one workspace can omit it.
 
-## Inference as a result set
+## Example Queries
+
+Try the following queries using `stackql shell`, or run them from a script or CI pipeline with `stackql exec`.
+
+### Inference as a result set
 
 Asking Claude a question is a `SELECT`. The reply comes back as a row, with the text in the `content` array and the token spend in `usage`:
 
@@ -89,7 +93,7 @@ WHERE model = 'claude-sonnet-5'
 AND messages = '[{"role": "user", "content": "Name the four Galilean moons of Jupiter, comma separated."}]';
 ```
 
-## Which model can do what
+### Which model can do what
 
 The `vw_model_capabilities` view fans each model's capability flags out into columns, so picking a model for a workload is a `WHERE` clause:
 
@@ -99,7 +103,7 @@ FROM anthropic.models.vw_model_capabilities
 ORDER BY created_at DESC;
 ```
 
-## Batch progress and triage
+### Batch progress and triage
 
 Message batches, newest first, with their per-request tallies:
 
@@ -116,7 +120,7 @@ FROM anthropic.messages.batches
 ORDER BY created_at DESC;
 ```
 
-## Files and skills
+### Files and skills
 
 Uploaded files, newest first (the list is cursor-paginated and walked automatically):
 
@@ -136,7 +140,7 @@ ORDER BY updated_at DESC;
 
 Uploading a file or creating a skill version is a multipart request, which SQL cannot express; those methods are documented as `EXEC` and the rest of each resource (list, get, delete) is plain SQL.
 
-## Agent inventory
+### Agent inventory
 
 What agents exist, on which models, and how much tooling they carry:
 
@@ -153,7 +157,7 @@ FROM anthropic.agents.agents
 ORDER BY updated_at DESC;
 ```
 
-## Agent lifecycle
+### Agent lifecycle
 
 Agents are created, read and archived with the corresponding SQL verbs:
 
@@ -172,7 +176,7 @@ WHERE agent_id = 'agent_01';
 EXEC anthropic.agents.agents.archive @agent_id = 'agent_01';
 ```
 
-## Dreams
+### Dreams
 
 Dreams are asynchronous memory-consolidation jobs over a memory store (a research preview: the endpoint returns 404 for keys that are not enrolled). Their status and inputs are rows:
 

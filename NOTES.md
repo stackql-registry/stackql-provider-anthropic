@@ -206,7 +206,32 @@ skipped only when both the last-built diff and the first-parent diff are empty; 
 error (exit 128) is non-zero and builds, the safe direction. Build-hook-triggered
 deploys bypass the ignore command entirely.
 
-## 7. Follow-ups
+## 7. Re-pin of 2026-09-17 (guard 5 drift)
+
+Two days after the 2026-09-15 pin the bundled spec moved again (sha256
+`e42831fc24e3...`), so guard 5 failed every CI run on the documentation branch.
+Re-pinned with `make refresh-spec`; `make check-mappings` reported the same 122 rows,
+all reviewed, no drift, so no new review rules were needed. The upstream diff is
+schema-only: 165 paths and 244 operations unchanged, 17 schemas added and 33 modified.
+
+- A new beta flag, `compact-2026-09-04`, joins the `anthropic-beta` enum on every
+  service (the `AnthropicBeta` schema change), which is the one-line change in nine
+  service documents.
+- The five `user_profiles` operations now declare the optional
+  `anthropic-workspace-id` header, so the header shows up on that resource page and in
+  its `WHERE` examples (the same header the other workspace-scoped resources already
+  carry).
+- `messages`: the web fetch tools gain `url_sources` (the `WebFetchUrlSource*` schemas)
+  and the compaction request/response blocks gain the `BetaCompaction*` schemas; a
+  temperature deprecation note and a few examples were reworded.
+- `sessions`: description wording on the subagent-thread routing fields.
+
+Every generated method, column and verb is unchanged, so `factory/csv-review.mjs`
+carries no 2026-09-17 block. Offline validation (30/30), the mock integration suites
+(both manifests), the meta-route walk (0 errors) and the docs-example check passed on
+stackql v0.11.669 under WSL.
+
+## 8. Follow-ups
 
 - Confirm the admin split decision (section 2). If the admin provider should take the
   spec's `admin_uncovered` ops (external keys, RBAC, org tunnels), they can enter the
