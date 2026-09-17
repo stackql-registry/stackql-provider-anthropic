@@ -259,35 +259,35 @@ The following methods are available for this resource:
     <td><a href="#get"><CopyableCode code="get" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-user_profile_id"><code>user_profile_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
-    <td><a href="#parameter-order"><code>order</code></a>, <a href="#parameter-order_by"><code>order_by</code></a></td>
+    <td><a href="#parameter-order"><code>order</code></a>, <a href="#parameter-order_by"><code>order_by</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#update"><CopyableCode code="update" /></a></td>
     <td><CopyableCode code="update" /></td>
     <td><a href="#parameter-user_profile_id"><code>user_profile_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 <tr>
     <td><a href="#create_enrollment_url"><CopyableCode code="create_enrollment_url" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-user_profile_id"><code>user_profile_id</code></a></td>
-    <td></td>
+    <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td></td>
 </tr>
 </tbody>
@@ -310,6 +310,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="user_profile_id" /></td>
     <td><code>string</code></td>
     <td>Path parameter user_profile_id (example: uprof_011CZkZCu8hGbp5mYRQgUmz9)</td>
+</tr>
+<tr id="parameter-anthropic-workspace-id">
+    <td><CopyableCode code="anthropic-workspace-id" /></td>
+    <td><code>string</code></td>
+    <td>Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)</td>
 </tr>
 <tr id="parameter-order">
     <td><CopyableCode code="order" /></td>
@@ -352,6 +357,7 @@ type,
 updated_at
 FROM anthropic.user_profiles.user_profiles
 WHERE user_profile_id = '{{ user_profile_id }}' -- required
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -375,6 +381,7 @@ updated_at
 FROM anthropic.user_profiles.user_profiles
 WHERE order = '{{ order }}'
 AND order_by = '{{ order_by }}'
+AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>
@@ -401,7 +408,8 @@ name,
 access_type,
 external_user_onboarded_at,
 external_user_details,
-metadata
+metadata,
+"anthropic-workspace-id"
 )
 SELECT 
 '{{ external_id }}',
@@ -409,7 +417,8 @@ SELECT
 '{{ access_type }}',
 '{{ external_user_onboarded_at }}',
 '{{ external_user_details }}',
-'{{ metadata }}'
+'{{ metadata }}',
+'{{ anthropic-workspace-id }}'
 RETURNING
 id,
 name,
@@ -462,6 +471,10 @@ updated_at
       value: "{{ metadata }}"
       description: |
         Free-form key-value data to attach to this user profile. Maximum 16 keys, with keys up to 64 characters and values up to 512 characters. Values must be non-empty strings.
+    - name: anthropic-workspace-id
+      value: "{{ anthropic-workspace-id }}"
+      description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)
+      description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)
 `}</CodeBlock>
 
 </TabItem>
@@ -491,6 +504,7 @@ external_user_onboarded_at = '{{ external_user_onboarded_at }}',
 external_user_details = '{{ external_user_details }}'
 WHERE 
 user_profile_id = '{{ user_profile_id }}' --required
+WHERE "anthropic-workspace-id" = '{{ anthropic-workspace-id}}'
 RETURNING
 id,
 name,
@@ -522,7 +536,8 @@ Successful response (OK)
 
 ```sql
 EXEC anthropic.user_profiles.user_profiles.create_enrollment_url 
-@user_profile_id='{{ user_profile_id }}' --required
+@user_profile_id='{{ user_profile_id }}' --required, 
+@anthropic-workspace-id='{{ anthropic-workspace-id }}'
 ;
 ```
 </TabItem>

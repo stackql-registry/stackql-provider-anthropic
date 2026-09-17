@@ -135,6 +135,17 @@ paths:
               items:
                 $ref: '#/components/schemas/AnthropicBeta'
             default: user-profiles-2026-08-18
+        - name: anthropic-workspace-id
+          in: header
+          required: false
+          schema:
+            type: string
+            x-stainless-param: workspace_id
+          description: |-
+            Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).
+
+            Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace.
+          example: wrkspc_011CZkZaBF1tNoB5wlCeusgy
     get:
       operationId: BetaListUserProfiles
       summary: List User Profiles
@@ -188,6 +199,17 @@ paths:
           schema:
             $ref: '#/components/schemas/BetaUserProfileListOrderBy'
           description: Query parameter for order_by
+        - name: anthropic-workspace-id
+          in: header
+          required: false
+          schema:
+            type: string
+            x-stainless-param: workspace_id
+          description: |-
+            Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).
+
+            Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace.
+          example: wrkspc_011CZkZaBF1tNoB5wlCeusgy
       responses:
         '200':
           description: Successful response (OK)
@@ -325,6 +347,17 @@ paths:
             type: string
           description: Path parameter user_profile_id
           example: uprof_011CZkZCu8hGbp5mYRQgUmz9
+        - name: anthropic-workspace-id
+          in: header
+          required: false
+          schema:
+            type: string
+            x-stainless-param: workspace_id
+          description: |-
+            Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).
+
+            Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace.
+          example: wrkspc_011CZkZaBF1tNoB5wlCeusgy
       responses:
         '200':
           description: Successful response (OK)
@@ -456,6 +489,17 @@ paths:
             type: string
           description: Path parameter user_profile_id
           example: uprof_011CZkZCu8hGbp5mYRQgUmz9
+        - name: anthropic-workspace-id
+          in: header
+          required: false
+          schema:
+            type: string
+            x-stainless-param: workspace_id
+          description: |-
+            Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).
+
+            Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace.
+          example: wrkspc_011CZkZaBF1tNoB5wlCeusgy
       requestBody:
         required: true
         content:
@@ -594,6 +638,17 @@ paths:
             type: string
           description: Path parameter user_profile_id
           example: uprof_011CZkZCu8hGbp5mYRQgUmz9
+        - name: anthropic-workspace-id
+          in: header
+          required: false
+          schema:
+            type: string
+            x-stainless-param: workspace_id
+          description: |-
+            Optional header to select the Workspace for this request. The value is a Workspace ID (for example, `wrkspc_011CZkZaBF1tNoB5wlCeusgy`).
+
+            Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace.
+          example: wrkspc_011CZkZaBF1tNoB5wlCeusgy
       responses:
         '200':
           description: Successful response (OK)
@@ -1033,6 +1088,7 @@ components:
         - mid-conversation-output-config-2026-07-01
         - thinking-binding-controls-2026-08-01
         - mid-conversation-system-clear-at-2026-08-21
+        - compact-2026-09-04
       x-stainless-nominal: false
     BetaUserProfileListOrder:
       type: string

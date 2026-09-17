@@ -1704,9 +1704,9 @@ components:
             Whether to incrementally stream the response using server-sent events.
 
             See [streaming](https://platform.claude.com/docs/en/build-with-claude/streaming) for details.
+          example: false
           title: Stream
           type: boolean
-          example: false
         system:
           description: |-
             System prompt.
@@ -1736,7 +1736,7 @@ components:
           minimum: 0
           title: Temperature
           type: number
-          x-stainless-deprecation-message: Deprecated. Models released after Claude Opus 4.6 do not support setting temperature. A value of 1.0 of will be accepted for backwards compatibility, all other values will be rejected with a 400 error.
+          x-stainless-deprecation-message: Deprecated. Models released after Claude Opus 4.6 do not support setting temperature. A value of 1.0 will be accepted for backwards compatibility, all other values will be rejected with a 400 error.
           x-stainless-skip:
             - python
         thinking:
@@ -2800,6 +2800,8 @@ components:
       title: OverloadedError
       type: object
     InputMessage:
+      discriminator:
+        propertyName: role
       properties:
         content:
           title: Content
@@ -2807,11 +2809,11 @@ components:
           x-stainless-skip:
             - go
             - cli
+          example:
+            - text: What is a quaternion?
+              type: text
           items:
             $ref: '#/components/schemas/InputContentBlock'
-          example:
-            - type: text
-              text: What is a quaternion?
         role:
           enum:
             - user
@@ -2824,8 +2826,6 @@ components:
         - role
       title: InputMessage
       type: object
-      discriminator:
-        propertyName: role
     CacheControlEphemeral:
       properties:
         ttl:
@@ -4485,6 +4485,79 @@ components:
           type: string
           enum:
             - web_fetch_20250910
+        url_sources:
+          description: Which sources contribute to the set of URLs the tool may fetch. Omitted means every source.
+          nullable: true
+          properties:
+            client_tool_results:
+              description: 'Which client tools'' results contribute fetchable URLs: "all", "none", or an only or except list of client tool names from tools[].'
+              discriminator:
+                mapping:
+                  all: '#/components/schemas/WebFetchUrlSourceAll'
+                  except: '#/components/schemas/WebFetchUrlSourceExcept'
+                  none: '#/components/schemas/WebFetchUrlSourceNone'
+                  only: '#/components/schemas/WebFetchUrlSourceOnly'
+                propertyName: type
+              title: Client Tool Results
+              properties:
+                type:
+                  title: Type
+                  type: string
+                  enum:
+                    - all
+                tools:
+                  items:
+                    $ref: '#/components/schemas/WebFetchUrlSourceToolReference'
+                  title: Tools
+                  type: array
+              required:
+                - type
+                - tools
+              type: object
+            server_tool_results:
+              description: 'Which server tools'' results contribute fetchable URLs: "all", "none", or an only or except list of server tool names from tools[]; only web_search and web_fetch results ever contribute.'
+              discriminator:
+                mapping:
+                  all: '#/components/schemas/WebFetchUrlSourceAll'
+                  except: '#/components/schemas/WebFetchUrlSourceExcept'
+                  none: '#/components/schemas/WebFetchUrlSourceNone'
+                  only: '#/components/schemas/WebFetchUrlSourceOnly'
+                propertyName: type
+              title: Server Tool Results
+              properties:
+                type:
+                  title: Type
+                  type: string
+                  enum:
+                    - all
+                tools:
+                  items:
+                    $ref: '#/components/schemas/WebFetchUrlSourceToolReference'
+                  title: Tools
+                  type: array
+              required:
+                - type
+                - tools
+              type: object
+            user_input:
+              description: 'Whether URLs in user messages are fetchable: "all" or "none".'
+              discriminator:
+                mapping:
+                  all: '#/components/schemas/WebFetchUrlSourceAll'
+                  none: '#/components/schemas/WebFetchUrlSourceNone'
+                propertyName: type
+              title: User Input
+              properties:
+                type:
+                  title: Type
+                  type: string
+                  enum:
+                    - all
+              required:
+                - type
+              type: object
+          title: WebFetchUrlSources
+          type: object
       required:
         - name
         - type
@@ -4673,6 +4746,79 @@ components:
           type: string
           enum:
             - web_fetch_20260209
+        url_sources:
+          description: Which sources contribute to the set of URLs the tool may fetch. Omitted means every source.
+          nullable: true
+          properties:
+            client_tool_results:
+              description: 'Which client tools'' results contribute fetchable URLs: "all", "none", or an only or except list of client tool names from tools[].'
+              discriminator:
+                mapping:
+                  all: '#/components/schemas/WebFetchUrlSourceAll'
+                  except: '#/components/schemas/WebFetchUrlSourceExcept'
+                  none: '#/components/schemas/WebFetchUrlSourceNone'
+                  only: '#/components/schemas/WebFetchUrlSourceOnly'
+                propertyName: type
+              title: Client Tool Results
+              properties:
+                type:
+                  title: Type
+                  type: string
+                  enum:
+                    - all
+                tools:
+                  items:
+                    $ref: '#/components/schemas/WebFetchUrlSourceToolReference'
+                  title: Tools
+                  type: array
+              required:
+                - type
+                - tools
+              type: object
+            server_tool_results:
+              description: 'Which server tools'' results contribute fetchable URLs: "all", "none", or an only or except list of server tool names from tools[]; only web_search and web_fetch results ever contribute.'
+              discriminator:
+                mapping:
+                  all: '#/components/schemas/WebFetchUrlSourceAll'
+                  except: '#/components/schemas/WebFetchUrlSourceExcept'
+                  none: '#/components/schemas/WebFetchUrlSourceNone'
+                  only: '#/components/schemas/WebFetchUrlSourceOnly'
+                propertyName: type
+              title: Server Tool Results
+              properties:
+                type:
+                  title: Type
+                  type: string
+                  enum:
+                    - all
+                tools:
+                  items:
+                    $ref: '#/components/schemas/WebFetchUrlSourceToolReference'
+                  title: Tools
+                  type: array
+              required:
+                - type
+                - tools
+              type: object
+            user_input:
+              description: 'Whether URLs in user messages are fetchable: "all" or "none".'
+              discriminator:
+                mapping:
+                  all: '#/components/schemas/WebFetchUrlSourceAll'
+                  none: '#/components/schemas/WebFetchUrlSourceNone'
+                propertyName: type
+              title: User Input
+              properties:
+                type:
+                  title: Type
+                  type: string
+                  enum:
+                    - all
+              required:
+                - type
+              type: object
+          title: WebFetchUrlSources
+          type: object
       required:
         - name
         - type
@@ -4747,6 +4893,79 @@ components:
           type: string
           enum:
             - web_fetch_20260309
+        url_sources:
+          description: Which sources contribute to the set of URLs the tool may fetch. Omitted means every source.
+          nullable: true
+          properties:
+            client_tool_results:
+              description: 'Which client tools'' results contribute fetchable URLs: "all", "none", or an only or except list of client tool names from tools[].'
+              discriminator:
+                mapping:
+                  all: '#/components/schemas/WebFetchUrlSourceAll'
+                  except: '#/components/schemas/WebFetchUrlSourceExcept'
+                  none: '#/components/schemas/WebFetchUrlSourceNone'
+                  only: '#/components/schemas/WebFetchUrlSourceOnly'
+                propertyName: type
+              title: Client Tool Results
+              properties:
+                type:
+                  title: Type
+                  type: string
+                  enum:
+                    - all
+                tools:
+                  items:
+                    $ref: '#/components/schemas/WebFetchUrlSourceToolReference'
+                  title: Tools
+                  type: array
+              required:
+                - type
+                - tools
+              type: object
+            server_tool_results:
+              description: 'Which server tools'' results contribute fetchable URLs: "all", "none", or an only or except list of server tool names from tools[]; only web_search and web_fetch results ever contribute.'
+              discriminator:
+                mapping:
+                  all: '#/components/schemas/WebFetchUrlSourceAll'
+                  except: '#/components/schemas/WebFetchUrlSourceExcept'
+                  none: '#/components/schemas/WebFetchUrlSourceNone'
+                  only: '#/components/schemas/WebFetchUrlSourceOnly'
+                propertyName: type
+              title: Server Tool Results
+              properties:
+                type:
+                  title: Type
+                  type: string
+                  enum:
+                    - all
+                tools:
+                  items:
+                    $ref: '#/components/schemas/WebFetchUrlSourceToolReference'
+                  title: Tools
+                  type: array
+              required:
+                - type
+                - tools
+              type: object
+            user_input:
+              description: 'Whether URLs in user messages are fetchable: "all" or "none".'
+              discriminator:
+                mapping:
+                  all: '#/components/schemas/WebFetchUrlSourceAll'
+                  none: '#/components/schemas/WebFetchUrlSourceNone'
+                propertyName: type
+              title: User Input
+              properties:
+                type:
+                  title: Type
+                  type: string
+                  enum:
+                    - all
+              required:
+                - type
+              type: object
+          title: WebFetchUrlSources
+          type: object
         use_cache:
           description: Whether to use cached content. Set to false to bypass the cache and fetch fresh content. Only set to false when the user explicitly requests fresh content or when fetching rapidly-changing sources.
           title: Use Cache
@@ -4953,6 +5172,79 @@ components:
           type: string
           enum:
             - web_fetch_20260318
+        url_sources:
+          description: Which sources contribute to the set of URLs the tool may fetch. Omitted means every source.
+          nullable: true
+          properties:
+            client_tool_results:
+              description: 'Which client tools'' results contribute fetchable URLs: "all", "none", or an only or except list of client tool names from tools[].'
+              discriminator:
+                mapping:
+                  all: '#/components/schemas/WebFetchUrlSourceAll'
+                  except: '#/components/schemas/WebFetchUrlSourceExcept'
+                  none: '#/components/schemas/WebFetchUrlSourceNone'
+                  only: '#/components/schemas/WebFetchUrlSourceOnly'
+                propertyName: type
+              title: Client Tool Results
+              properties:
+                type:
+                  title: Type
+                  type: string
+                  enum:
+                    - all
+                tools:
+                  items:
+                    $ref: '#/components/schemas/WebFetchUrlSourceToolReference'
+                  title: Tools
+                  type: array
+              required:
+                - type
+                - tools
+              type: object
+            server_tool_results:
+              description: 'Which server tools'' results contribute fetchable URLs: "all", "none", or an only or except list of server tool names from tools[]; only web_search and web_fetch results ever contribute.'
+              discriminator:
+                mapping:
+                  all: '#/components/schemas/WebFetchUrlSourceAll'
+                  except: '#/components/schemas/WebFetchUrlSourceExcept'
+                  none: '#/components/schemas/WebFetchUrlSourceNone'
+                  only: '#/components/schemas/WebFetchUrlSourceOnly'
+                propertyName: type
+              title: Server Tool Results
+              properties:
+                type:
+                  title: Type
+                  type: string
+                  enum:
+                    - all
+                tools:
+                  items:
+                    $ref: '#/components/schemas/WebFetchUrlSourceToolReference'
+                  title: Tools
+                  type: array
+              required:
+                - type
+                - tools
+              type: object
+            user_input:
+              description: 'Whether URLs in user messages are fetchable: "all" or "none".'
+              discriminator:
+                mapping:
+                  all: '#/components/schemas/WebFetchUrlSourceAll'
+                  none: '#/components/schemas/WebFetchUrlSourceNone'
+                propertyName: type
+              title: User Input
+              properties:
+                type:
+                  title: Type
+                  type: string
+                  enum:
+                    - all
+              required:
+                - type
+              type: object
+          title: WebFetchUrlSources
+          type: object
         use_cache:
           description: Whether to use cached content. Set to false to bypass the cache and fetch fresh content. Only set to false when the user explicitly requests fresh content or when fetching rapidly-changing sources.
           title: Use Cache
@@ -7396,6 +7688,84 @@ components:
           type: boolean
       title: RequestCitationsConfig
       type: object
+    WebFetchUrlSources:
+      description: |-
+        Which sources contribute to the set of URLs web fetch may fetch.
+
+        Each key is a tagged variant: ``user_input`` is ``all`` or ``none``; the
+        two tool filters are ``all``, ``none``, ``only`` (only the named tools'
+        results) or ``except`` (every result but the named tools'). A named tool
+        must be declared in this request's ``tools[]``.
+      properties:
+        client_tool_results:
+          description: 'Which client tools'' results contribute fetchable URLs: "all", "none", or an only or except list of client tool names from tools[].'
+          discriminator:
+            mapping:
+              all: '#/components/schemas/WebFetchUrlSourceAll'
+              except: '#/components/schemas/WebFetchUrlSourceExcept'
+              none: '#/components/schemas/WebFetchUrlSourceNone'
+              only: '#/components/schemas/WebFetchUrlSourceOnly'
+            propertyName: type
+          title: Client Tool Results
+          properties:
+            type:
+              title: Type
+              type: string
+              enum:
+                - all
+            tools:
+              items:
+                $ref: '#/components/schemas/WebFetchUrlSourceToolReference'
+              title: Tools
+              type: array
+          required:
+            - type
+            - tools
+          type: object
+        server_tool_results:
+          description: 'Which server tools'' results contribute fetchable URLs: "all", "none", or an only or except list of server tool names from tools[]; only web_search and web_fetch results ever contribute.'
+          discriminator:
+            mapping:
+              all: '#/components/schemas/WebFetchUrlSourceAll'
+              except: '#/components/schemas/WebFetchUrlSourceExcept'
+              none: '#/components/schemas/WebFetchUrlSourceNone'
+              only: '#/components/schemas/WebFetchUrlSourceOnly'
+            propertyName: type
+          title: Server Tool Results
+          properties:
+            type:
+              title: Type
+              type: string
+              enum:
+                - all
+            tools:
+              items:
+                $ref: '#/components/schemas/WebFetchUrlSourceToolReference'
+              title: Tools
+              type: array
+          required:
+            - type
+            - tools
+          type: object
+        user_input:
+          description: 'Whether URLs in user messages are fetchable: "all" or "none".'
+          discriminator:
+            mapping:
+              all: '#/components/schemas/WebFetchUrlSourceAll'
+              none: '#/components/schemas/WebFetchUrlSourceNone'
+            propertyName: type
+          title: User Input
+          properties:
+            type:
+              title: Type
+              type: string
+              enum:
+                - all
+          required:
+            - type
+          type: object
+      title: WebFetchUrlSources
+      type: object
     ResponseCharLocationCitation:
       properties:
         cited_text:
@@ -9555,6 +9925,74 @@ components:
           type: boolean
       title: ComputerZoomConfig
       type: object
+    WebFetchUrlSourceAll:
+      description: |-
+        The ``url_sources`` variant under which a source contributes in
+        full: every result of the tool filter's source, or all user input.
+      properties:
+        type:
+          title: Type
+          type: string
+          enum:
+            - all
+      required:
+        - type
+      title: WebFetchUrlSourceAll
+      type: object
+    WebFetchUrlSourceNone:
+      description: |-
+        The ``url_sources`` variant under which a source contributes nothing:
+        no result of the tool filter's source, or no user input.
+      properties:
+        type:
+          title: Type
+          type: string
+          enum:
+            - none
+      required:
+        - type
+      title: WebFetchUrlSourceNone
+      type: object
+    WebFetchUrlSourceOnly:
+      description: |-
+        The tool filter variant under which only the named tools' results
+        contribute.
+      properties:
+        tools:
+          items:
+            $ref: '#/components/schemas/WebFetchUrlSourceToolReference'
+          title: Tools
+          type: array
+        type:
+          title: Type
+          type: string
+          enum:
+            - only
+      required:
+        - tools
+        - type
+      title: WebFetchUrlSourceOnly
+      type: object
+    WebFetchUrlSourceExcept:
+      description: |-
+        The tool filter variant under which every result but the named
+        tools' contributes.
+      properties:
+        tools:
+          items:
+            $ref: '#/components/schemas/WebFetchUrlSourceToolReference'
+          title: Tools
+          type: array
+        type:
+          title: Type
+          type: string
+          enum:
+            - except
+      required:
+        - tools
+        - type
+      title: WebFetchUrlSourceExcept
+      type: object
     WebSearchToolResultErrorCode:
       enum:
         - invalid_tool_input
@@ -10275,6 +10713,24 @@ components:
         - tool_references
         - type
       title: RequestToolSearchToolSearchResultBlock
+      type: object
+    WebFetchUrlSourceToolReference:
+      description: |-
+        One entry of a tool filter's ``tools``: it must name a tool declared
+        in this request's ``tools[]``.
+      properties:
+        name:
+          title: Name
+          type: string
+        type:
+          title: Type
+          type: string
+          enum:
+            - tool_reference
+      required:
+        - name
+        - type
+      title: WebFetchUrlSourceToolReference
       type: object
     ResponseCitationsConfig:
       properties:

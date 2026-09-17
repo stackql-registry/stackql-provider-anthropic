@@ -1,12 +1,12 @@
 {
   "source": "anthropics/anthropic-sdk-python:scripts/mock-spec.json.gz",
   "bundled_spec_url": "https://raw.githubusercontent.com/anthropics/anthropic-sdk-python/main/scripts/mock-spec.json.gz",
-  "bundled_spec_sha256": "96aef986008eed86bafe3dfc2453342b8971075fb904ee00ff443c009055e866",
+  "bundled_spec_sha256": "e42831fc24e37bac999f7ca9933c4e9dd6fad28f655215d5c0883b7ff9f54f6a",
   "openapi": "3.1.0",
   "paths": 165,
   "operations": 244,
   "configured_endpoints": 201,
-  "pinned": "2026-09-15",
+  "pinned": "2026-09-17",
   "superseded": {
     "note": "Stainless-hosted spec that .stats.yml pointed at before anthropic-sdk-python f9b0cf2 (2026-09-03); historical provenance only",
     "openapi_spec_url": "https://storage.googleapis.com/stainless-sdk-openapi-specs/anthropic/anthropic-506a5ad71d522b4ae56ac3429380486647af1f92eddde80603480fb592d62b54.yml",
