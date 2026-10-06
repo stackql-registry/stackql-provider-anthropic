@@ -85,10 +85,10 @@
   dependencies:
     winston "^3.14.2"
 
-"@stackql/provider-utils@^0.7.11":
-  version "0.7.11"
-  resolved "https://registry.npmjs.org/@stackql/provider-utils/-/provider-utils-0.7.11.tgz"
-  integrity sha512-yRy0nbWzI8IkAZlN2WCMxz/9pdD11EXTx85U+e6pQzIq61CtUpVLklW70Z4fMTTGwLa9nzLqWCNPS5+LBBY0+g==
+"@stackql/provider-utils@^0.7.12":
+  version "0.7.12"
+  resolved "https://registry.npmjs.org/@stackql/provider-utils/-/provider-utils-0.7.12.tgz"
+  integrity sha512-cwlnLkW/AZ86YVthU/HmVDVlwLHsuJtiCx+w0peqO7t/NpsgLsUneH5vG2PPt+yPv3euZeQg1HeO7NOAgDQdBw==
   dependencies:
     "@apidevtools/swagger-parser" "^10.1.1"
     "@stackql/deno-openapi-dereferencer" "npm:@jsr/stackql__deno-openapi-dereferencer@^0.3.2"
