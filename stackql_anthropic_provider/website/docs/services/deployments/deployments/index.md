@@ -804,7 +804,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-deployment_id">
     <td><CopyableCode code="deployment_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter deployment_id (example: depl_011CZkZcDH3vPqd7xnEfwTai)</td>
+    <td>Unique identifier of the deployment to run. (example: depl_011CZkZcDH3vPqd7xnEfwTai)</td>
 </tr>
 <tr id="parameter-agent_id">
     <td><CopyableCode code="agent_id" /></td>

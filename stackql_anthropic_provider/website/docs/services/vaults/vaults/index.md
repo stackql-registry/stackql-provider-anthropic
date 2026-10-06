@@ -202,7 +202,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-vault_id">
     <td><CopyableCode code="vault_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter vault_id (example: vlt_011CZkZDLs7fYzm1hXNPeRjv)</td>
+    <td>Unique identifier of the vault to archive. (example: vlt_011CZkZDLs7fYzm1hXNPeRjv)</td>
 </tr>
 <tr id="parameter-anthropic-workspace-id">
     <td><CopyableCode code="anthropic-workspace-id" /></td>

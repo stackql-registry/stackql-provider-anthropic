@@ -171,6 +171,56 @@ admin_served_by_anthropic_admin:
     reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
   - op: GET /v1/organizations/workspaces/{workspace_id}/rate_limits?beta=true
     reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  # 2026-10-06 re-pin: the Admin API went GA upstream, so the spec now also
+  # lists these ops without the ?beta=true suffix. Same surface, same reason.
+  - op: DELETE /v1/organizations/invites/{invite_id}
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: DELETE /v1/organizations/users/{user_id}
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: DELETE /v1/organizations/workspaces/{workspace_id}/members/{user_id}
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: GET /v1/organizations/api_keys
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: GET /v1/organizations/api_keys/{api_key_id}
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: GET /v1/organizations/invites
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: GET /v1/organizations/invites/{invite_id}
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: GET /v1/organizations/me
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: GET /v1/organizations/rate_limits
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: GET /v1/organizations/users
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: GET /v1/organizations/users/{user_id}
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: GET /v1/organizations/workspaces
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: GET /v1/organizations/workspaces/{workspace_id}
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: GET /v1/organizations/workspaces/{workspace_id}/members
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: GET /v1/organizations/workspaces/{workspace_id}/members/{user_id}
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: GET /v1/organizations/workspaces/{workspace_id}/rate_limits
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: POST /v1/organizations/api_keys/{api_key_id}
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: POST /v1/organizations/invites
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: POST /v1/organizations/users/{user_id}
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: POST /v1/organizations/workspaces
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: POST /v1/organizations/workspaces/{workspace_id}
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: POST /v1/organizations/workspaces/{workspace_id}/archive
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: POST /v1/organizations/workspaces/{workspace_id}/members
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
+  - op: POST /v1/organizations/workspaces/{workspace_id}/members/{user_id}
+    reason: Admin API (org-scoped admin key); served by the anthropic_admin provider
 
 admin_wif_oauth_only:
   # Admin API WIF surface; rejects admin keys, needs org:admin OAuth (26 ops)
@@ -226,6 +276,59 @@ admin_wif_oauth_only:
     reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
   - op: DELETE /v1/organizations/federation_rules/{federation_rule_id}/workspaces/{workspace_id}?beta=true
     reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  # 2026-10-06 re-pin: GA (non-beta) twins of the ops above.
+  - op: DELETE /v1/organizations/federation_rules/{federation_rule_id}/workspaces/{workspace_id}
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: DELETE /v1/organizations/service_accounts/{service_account_id}/workspaces/{workspace_id}
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: DELETE /v1/organizations/workspaces/{workspace_id}/service_accounts/{service_account_id}
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: GET /v1/organizations/federation_issuers
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: GET /v1/organizations/federation_issuers/{federation_issuer_id}
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: GET /v1/organizations/federation_rules
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: GET /v1/organizations/federation_rules/{federation_rule_id}
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: GET /v1/organizations/federation_rules/{federation_rule_id}/workspaces
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: GET /v1/organizations/service_accounts
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: GET /v1/organizations/service_accounts/{service_account_id}
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: GET /v1/organizations/service_accounts/{service_account_id}/workspaces
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: GET /v1/organizations/workspaces/{workspace_id}/service_accounts
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: GET /v1/organizations/workspaces/{workspace_id}/service_accounts/{service_account_id}
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: POST /v1/organizations/federation_issuers
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: POST /v1/organizations/federation_issuers/{federation_issuer_id}
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: POST /v1/organizations/federation_issuers/{federation_issuer_id}/archive
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: POST /v1/organizations/federation_rules
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: POST /v1/organizations/federation_rules/{federation_rule_id}
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: POST /v1/organizations/federation_rules/{federation_rule_id}/archive
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: POST /v1/organizations/federation_rules/{federation_rule_id}/workspaces
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: POST /v1/organizations/service_accounts
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: POST /v1/organizations/service_accounts/{service_account_id}
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: POST /v1/organizations/service_accounts/{service_account_id}/archive
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: POST /v1/organizations/service_accounts/{service_account_id}/workspaces
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: POST /v1/organizations/workspaces/{workspace_id}/service_accounts
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
+  - op: POST /v1/organizations/workspaces/{workspace_id}/service_accounts/{service_account_id}
+    reason: Admin API WIF surface; rejects admin keys, needs org:admin OAuth
 
 admin_enterprise_key:
   # Admin API enterprise surface; third key type (sk-ant-api01-...), future anthropic_enterprise (21 ops)
@@ -271,6 +374,14 @@ admin_enterprise_key:
     reason: Admin API enterprise surface; third key type (sk-ant-api01-...), future anthropic_enterprise
   - op: GET /v1/organizations/analytics/artifacts?beta=true
     reason: Admin API enterprise surface; third key type (sk-ant-api01-...), future anthropic_enterprise
+  # 2026-10-06 re-pin: GA (non-beta) twins of the ops above, plus the new
+  # spend_limits list op.
+  - op: GET /v1/organizations/compliance_settings
+    reason: Admin API enterprise surface; third key type (sk-ant-api01-...), future anthropic_enterprise
+  - op: GET /v1/organizations/spend_limits?beta=true
+    reason: Admin API enterprise surface; third key type (sk-ant-api01-...), future anthropic_enterprise
+  - op: POST /v1/organizations/compliance_settings
+    reason: Admin API enterprise surface; third key type (sk-ant-api01-...), future anthropic_enterprise
 
 admin_uncovered:
   # Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider (26 ops)
@@ -308,21 +419,72 @@ admin_uncovered:
     reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
   - op: POST /v1/organizations/rbac_groups?beta=true
     reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
-  - op: GET /v1/organizations/rbac_groups/{group_id}?beta=true
+  - op: GET /v1/organizations/rbac_groups/{rbac_group_id}?beta=true
     reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
-  - op: POST /v1/organizations/rbac_groups/{group_id}?beta=true
+  - op: POST /v1/organizations/rbac_groups/{rbac_group_id}?beta=true
     reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
-  - op: DELETE /v1/organizations/rbac_groups/{group_id}?beta=true
+  - op: DELETE /v1/organizations/rbac_groups/{rbac_group_id}?beta=true
     reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
-  - op: DELETE /v1/organizations/rbac_groups/{group_id}/members/{user_id}?beta=true
+  - op: DELETE /v1/organizations/rbac_groups/{rbac_group_id}/members/{user_id}?beta=true
     reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
-  - op: GET /v1/organizations/rbac_groups/{group_id}/members?beta=true
+  - op: GET /v1/organizations/rbac_groups/{rbac_group_id}/members?beta=true
     reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
-  - op: POST /v1/organizations/rbac_groups/{group_id}/members?beta=true
+  - op: POST /v1/organizations/rbac_groups/{rbac_group_id}/members?beta=true
     reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
   - op: GET /v1/organizations/rbac_roles?beta=true
     reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
-  - op: GET /v1/organizations/rbac_roles/{role_id}?beta=true
+  - op: GET /v1/organizations/rbac_roles/{rbac_role_id}?beta=true
     reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
-  - op: GET /v1/organizations/rbac_roles/{role_id}/permissions?beta=true
+  - op: GET /v1/organizations/rbac_roles/{rbac_role_id}/permissions?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  # 2026-10-06 re-pin: GA (non-beta) twins of the external_keys and rbac ops
+  # above (the rbac path params were renamed upstream), and the new plugin
+  # and plugin marketplace surface.
+  - op: DELETE /v1/organizations/external_keys/{external_key_id}
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: DELETE /v1/organizations/plugins/{plugin_id}/installation_settings/{target}?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: DELETE /v1/organizations/plugins/{plugin_id}?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: GET /v1/organizations/external_keys
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: GET /v1/organizations/external_keys/{external_key_id}
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: GET /v1/organizations/plugin_marketplaces/{marketplace_id}?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: GET /v1/organizations/plugin_marketplaces?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: GET /v1/organizations/plugins/{plugin_id}/installation_settings?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: GET /v1/organizations/plugins/{plugin_id}/shares?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: GET /v1/organizations/plugins/{plugin_id}/versions/{version}/content?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: GET /v1/organizations/plugins/{plugin_id}/versions/{version}?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: GET /v1/organizations/plugins/{plugin_id}/versions?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: GET /v1/organizations/plugins/{plugin_id}?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: GET /v1/organizations/plugins?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: POST /v1/organizations/external_keys
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: POST /v1/organizations/external_keys/{external_key_id}
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: POST /v1/organizations/external_keys/{external_key_id}/validate
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: POST /v1/organizations/plugin_marketplaces/validate_archive?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: POST /v1/organizations/plugin_marketplaces/validate_repository?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: POST /v1/organizations/plugin_marketplaces/{marketplace_id}?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: POST /v1/organizations/plugins/{plugin_id}/installation_settings/{target}?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: POST /v1/organizations/plugins/{plugin_id}/versions?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: POST /v1/organizations/plugins/{plugin_id}?beta=true
+    reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider
+  - op: POST /v1/organizations/plugins?beta=true
     reason: Admin API (org-scoped admin key); not yet covered by the anthropic_admin provider

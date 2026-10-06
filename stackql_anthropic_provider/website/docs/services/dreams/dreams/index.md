@@ -48,49 +48,49 @@ Successful response (OK)
   {
     "name": "id",
     "type": "string",
-    "description": ""
+    "description": "The unique ID of the dream (`drm_...`)."
   },
   {
     "name": "session_id",
     "type": "string",
-    "description": ""
+    "description": "The ID of the session that runs the dream (`sesn_...`), or `null` if that session hasn't started.<br /><br />Stream that session's events to follow what the dream reads and writes.<br /><br />See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#watch-the-pipeline-run) for how to watch a running dream."
   },
   {
     "name": "archived_at",
     "type": "string (date-time)",
-    "description": "A timestamp in RFC 3339 format"
+    "description": "When the dream was archived, in RFC 3339, or `null` if it hasn't been archived."
   },
   {
     "name": "created_at",
     "type": "string (date-time)",
-    "description": "A timestamp in RFC 3339 format"
+    "description": "When the dream was created, in RFC 3339.<br /><br />Lists of dreams are sorted by this time, newest first."
   },
   {
     "name": "ended_at",
     "type": "string (date-time)",
-    "description": "A timestamp in RFC 3339 format"
+    "description": "When the dream reached `completed`, `failed`, or `canceled`, in RFC 3339, or `null` if it is still `pending` or `running`."
   },
   {
     "name": "error",
     "type": "object",
-    "description": "Failure detail for a Dream whose `status` is `failed`.",
+    "description": "Why the dream failed, or `null` if `status` isn't `failed`.",
     "children": [
       {
         "name": "type",
         "type": "string",
-        "description": ""
+        "description": "A code for why the dream failed, such as `timeout` or `internal_error`.<br /><br />The [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#errors) lists common error codes and when they occur."
       },
       {
         "name": "message",
         "type": "string",
-        "description": ""
+        "description": "A human-readable explanation of why the dream failed."
       }
     ]
   },
   {
     "name": "inputs",
     "type": "array",
-    "description": "",
+    "description": "The sources that the dream reads, from the request that created it.",
     "children": [
       {
         "name": "type",
@@ -100,41 +100,41 @@ Successful response (OK)
       {
         "name": "memory_store_id",
         "type": "string",
-        "description": ""
+        "description": "The ID of the memory store for the dream to read (`memstore_...`).<br /><br />The memory store must be in the same workspace as the dream and must not be archived."
       },
       {
         "name": "session_ids",
         "type": "array",
-        "description": ""
+        "description": "The IDs of the sessions whose transcripts the dream reads (`sesn_...`).<br /><br />Give 1 to 100 IDs, with no duplicates. Each session must be in the same workspace as the dream. Responses list the IDs in sorted order.<br /><br />The [limits table in the Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#limits) lists all the limits on a dream."
       }
     ]
   },
   {
     "name": "instructions",
     "type": "string",
-    "description": ""
+    "description": "The guidance given when the dream was created, or `null` if none was given."
   },
   {
     "name": "model",
     "type": "object",
-    "description": "Model identifier and configuration applied to every pipeline stage. Same wire shape as the Agents API ModelConfig.",
+    "description": "The model that runs a dream, from the request that created it.<br /><br />The dream uses this model for all of its work. The response always gives the model as an object, even if the request gave only a model ID.",
     "children": [
       {
         "name": "id",
         "type": "string",
-        "description": "Model identifier, e.g. \"claude-opus-5\". 1-256 characters."
+        "description": "The ID of the model that runs the dream, as given in the request that created it."
       },
       {
         "name": "speed",
         "type": "string",
-        "description": "Inference speed mode. Defaults to `standard`. (standard, fast)"
+        "description": "How fast the model generates output for the dream. Always `standard`. (standard, fast)"
       }
     ]
   },
   {
     "name": "output_behavior",
     "type": "object",
-    "description": "The default destination: the job creates a new output memory store as a clone of the memory_store input and writes the consolidated memories into it. The input store is never mutated.",
+    "description": "Where the dream writes its result, as set in the request that created the dream. If that request left out `output_behavior`, the dream used the `create_new` behavior.",
     "children": [
       {
         "name": "type",
@@ -144,14 +144,14 @@ Successful response (OK)
       {
         "name": "memory_store_id",
         "type": "string",
-        "description": ""
+        "description": "The ID of the memory store for the dream to write its result to (`memstore_...`). It must be the memory store in the `memory_store` entry of `inputs`."
       }
     ]
   },
   {
     "name": "outputs",
     "type": "array",
-    "description": "",
+    "description": "The memory store that holds the dream's result, as a one-item array, or an empty array until the dream records that memory store.<br /><br />The array is empty while the dream is `pending` and for a short time after it starts `running`. It can stay empty if the dream fails or is canceled before then. The memory store holds the complete result only once `status` is `completed`.<br /><br />See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#use-the-output) for how to review and use the result.",
     "children": [
       {
         "name": "type",
@@ -161,14 +161,14 @@ Successful response (OK)
       {
         "name": "memory_store_id",
         "type": "string",
-        "description": ""
+        "description": "The ID of the memory store that the dream writes its result to (`memstore_...`).<br /><br />With `output_behavior` set to `create_new`, this is a new memory store. With `update_existing`, it is the input memory store."
       }
     ]
   },
   {
     "name": "status",
     "type": "string",
-    "description": "Lifecycle status of a Dream. (pending, running, completed, failed, canceled)"
+    "description": "Where a dream is in its lifecycle.<br /><br />`completed`, `failed`, and `canceled` are final: once a dream has one of these statuses, its status doesn't change again.<br /><br />See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#lifecycle) for what each status means. (pending, running, completed, failed, canceled)"
   },
   {
     "name": "type",
@@ -178,27 +178,27 @@ Successful response (OK)
   {
     "name": "usage",
     "type": "object",
-    "description": "Cumulative token usage for the dream across every pipeline stage.",
+    "description": "The dream's token counts, which stop changing once its `status` is `completed` or `failed`. After a cancel, they can keep changing.",
     "children": [
       {
         "name": "input_tokens",
         "type": "integer (int32)",
-        "description": "Total uncached input tokens consumed across every pipeline stage."
+        "description": "The dream's input tokens that weren't read from or written to the prompt cache."
       },
       {
         "name": "output_tokens",
         "type": "integer (int32)",
-        "description": "Total output tokens generated across every pipeline stage."
+        "description": "The tokens that the model generated for the dream."
       },
       {
         "name": "cache_read_input_tokens",
         "type": "integer (int32)",
-        "description": "Total tokens read from prompt cache."
+        "description": "The dream's input tokens that were read from the prompt cache."
       },
       {
         "name": "cache_creation_input_tokens",
         "type": "integer (int32)",
-        "description": "Total tokens used to create prompt-cache entries (sum of all TTL tiers)."
+        "description": "The dream's input tokens that were written to the prompt cache, for both the 5-minute and 1-hour cache durations."
       }
     ]
   }
@@ -212,49 +212,49 @@ Successful response (OK)
   {
     "name": "id",
     "type": "string",
-    "description": ""
+    "description": "The unique ID of the dream (`drm_...`)."
   },
   {
     "name": "session_id",
     "type": "string",
-    "description": ""
+    "description": "The ID of the session that runs the dream (`sesn_...`), or `null` if that session hasn't started.<br /><br />Stream that session's events to follow what the dream reads and writes.<br /><br />See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#watch-the-pipeline-run) for how to watch a running dream."
   },
   {
     "name": "archived_at",
     "type": "string (date-time)",
-    "description": "A timestamp in RFC 3339 format"
+    "description": "When the dream was archived, in RFC 3339, or `null` if it hasn't been archived."
   },
   {
     "name": "created_at",
     "type": "string (date-time)",
-    "description": "A timestamp in RFC 3339 format"
+    "description": "When the dream was created, in RFC 3339.<br /><br />Lists of dreams are sorted by this time, newest first."
   },
   {
     "name": "ended_at",
     "type": "string (date-time)",
-    "description": "A timestamp in RFC 3339 format"
+    "description": "When the dream reached `completed`, `failed`, or `canceled`, in RFC 3339, or `null` if it is still `pending` or `running`."
   },
   {
     "name": "error",
     "type": "object",
-    "description": "Failure detail for a Dream whose `status` is `failed`.",
+    "description": "Why the dream failed, or `null` if `status` isn't `failed`.",
     "children": [
       {
         "name": "type",
         "type": "string",
-        "description": ""
+        "description": "A code for why the dream failed, such as `timeout` or `internal_error`.<br /><br />The [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#errors) lists common error codes and when they occur."
       },
       {
         "name": "message",
         "type": "string",
-        "description": ""
+        "description": "A human-readable explanation of why the dream failed."
       }
     ]
   },
   {
     "name": "inputs",
     "type": "array",
-    "description": "",
+    "description": "The sources that the dream reads, from the request that created it.",
     "children": [
       {
         "name": "type",
@@ -264,41 +264,41 @@ Successful response (OK)
       {
         "name": "memory_store_id",
         "type": "string",
-        "description": ""
+        "description": "The ID of the memory store for the dream to read (`memstore_...`).<br /><br />The memory store must be in the same workspace as the dream and must not be archived."
       },
       {
         "name": "session_ids",
         "type": "array",
-        "description": ""
+        "description": "The IDs of the sessions whose transcripts the dream reads (`sesn_...`).<br /><br />Give 1 to 100 IDs, with no duplicates. Each session must be in the same workspace as the dream. Responses list the IDs in sorted order.<br /><br />The [limits table in the Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#limits) lists all the limits on a dream."
       }
     ]
   },
   {
     "name": "instructions",
     "type": "string",
-    "description": ""
+    "description": "The guidance given when the dream was created, or `null` if none was given."
   },
   {
     "name": "model",
     "type": "object",
-    "description": "Model identifier and configuration applied to every pipeline stage. Same wire shape as the Agents API ModelConfig.",
+    "description": "The model that runs a dream, from the request that created it.<br /><br />The dream uses this model for all of its work. The response always gives the model as an object, even if the request gave only a model ID.",
     "children": [
       {
         "name": "id",
         "type": "string",
-        "description": "Model identifier, e.g. \"claude-opus-5\". 1-256 characters."
+        "description": "The ID of the model that runs the dream, as given in the request that created it."
       },
       {
         "name": "speed",
         "type": "string",
-        "description": "Inference speed mode. Defaults to `standard`. (standard, fast)"
+        "description": "How fast the model generates output for the dream. Always `standard`. (standard, fast)"
       }
     ]
   },
   {
     "name": "output_behavior",
     "type": "object",
-    "description": "The default destination: the job creates a new output memory store as a clone of the memory_store input and writes the consolidated memories into it. The input store is never mutated.",
+    "description": "Where the dream writes its result, as set in the request that created the dream. If that request left out `output_behavior`, the dream used the `create_new` behavior.",
     "children": [
       {
         "name": "type",
@@ -308,14 +308,14 @@ Successful response (OK)
       {
         "name": "memory_store_id",
         "type": "string",
-        "description": ""
+        "description": "The ID of the memory store for the dream to write its result to (`memstore_...`). It must be the memory store in the `memory_store` entry of `inputs`."
       }
     ]
   },
   {
     "name": "outputs",
     "type": "array",
-    "description": "",
+    "description": "The memory store that holds the dream's result, as a one-item array, or an empty array until the dream records that memory store.<br /><br />The array is empty while the dream is `pending` and for a short time after it starts `running`. It can stay empty if the dream fails or is canceled before then. The memory store holds the complete result only once `status` is `completed`.<br /><br />See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#use-the-output) for how to review and use the result.",
     "children": [
       {
         "name": "type",
@@ -325,14 +325,14 @@ Successful response (OK)
       {
         "name": "memory_store_id",
         "type": "string",
-        "description": ""
+        "description": "The ID of the memory store that the dream writes its result to (`memstore_...`).<br /><br />With `output_behavior` set to `create_new`, this is a new memory store. With `update_existing`, it is the input memory store."
       }
     ]
   },
   {
     "name": "status",
     "type": "string",
-    "description": "Lifecycle status of a Dream. (pending, running, completed, failed, canceled)"
+    "description": "Where a dream is in its lifecycle.<br /><br />`completed`, `failed`, and `canceled` are final: once a dream has one of these statuses, its status doesn't change again.<br /><br />See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#lifecycle) for what each status means. (pending, running, completed, failed, canceled)"
   },
   {
     "name": "type",
@@ -342,27 +342,27 @@ Successful response (OK)
   {
     "name": "usage",
     "type": "object",
-    "description": "Cumulative token usage for the dream across every pipeline stage.",
+    "description": "The dream's token counts, which stop changing once its `status` is `completed` or `failed`. After a cancel, they can keep changing.",
     "children": [
       {
         "name": "input_tokens",
         "type": "integer (int32)",
-        "description": "Total uncached input tokens consumed across every pipeline stage."
+        "description": "The dream's input tokens that weren't read from or written to the prompt cache."
       },
       {
         "name": "output_tokens",
         "type": "integer (int32)",
-        "description": "Total output tokens generated across every pipeline stage."
+        "description": "The tokens that the model generated for the dream."
       },
       {
         "name": "cache_read_input_tokens",
         "type": "integer (int32)",
-        "description": "Total tokens read from prompt cache."
+        "description": "The dream's input tokens that were read from the prompt cache."
       },
       {
         "name": "cache_creation_input_tokens",
         "type": "integer (int32)",
-        "description": "Total tokens used to create prompt-cache entries (sum of all TTL tiers)."
+        "description": "The dream's input tokens that were written to the prompt cache, for both the 5-minute and 1-hour cache durations."
       }
     ]
   }
@@ -390,35 +390,35 @@ The following methods are available for this resource:
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-dream_id"><code>dream_id</code></a></td>
     <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
-    <td></td>
+    <td>Get a dream by ID to check its status, output memory store, and token usage.<br /><br />Archived dreams are returned too.<br /><br />See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#track-progress) for how to poll a dream and what each status means.</td>
 </tr>
 <tr>
     <td><a href="#list"><CopyableCode code="list" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td></td>
     <td><a href="#parameter-include_archived"><code>include_archived</code></a>, <a href="#parameter-statuses[]"><code>statuses[]</code></a>, <a href="#parameter-created_at[gt]"><code>created_at[gt]</code></a>, <a href="#parameter-created_at[lt]"><code>created_at[lt]</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
-    <td></td>
+    <td>List the dreams in the workspace, newest first.<br /><br />Archived dreams are left out unless `include_archived` is `true`.<br /><br />See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#list-dreams) for how to page through dreams.</td>
 </tr>
 <tr>
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="insert" /></td>
     <td><a href="#parameter-inputs"><code>inputs</code></a>, <a href="#parameter-model"><code>model</code></a></td>
     <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
-    <td></td>
+    <td>Start an asynchronous job that uses past sessions to produce a reorganized version of a memory store and get back the dream to poll for the result.<br /><br />By default the dream writes its result to a new memory store and doesn't change the input memory store. The response has `status` set to `pending` and an empty `outputs` array. Poll the dream until `status` is `completed`, `failed`, or `canceled`.<br /><br />See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#create-a-dream) to learn more about creating dreams.</td>
 </tr>
 <tr>
     <td><a href="#cancel"><CopyableCode code="cancel" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-dream_id"><code>dream_id</code></a></td>
     <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
-    <td></td>
+    <td>Stop a `pending` or `running` dream.<br /><br />The response shows `status` as `canceled`, unless the dream reached `completed` or `failed` first. `usage` can keep changing after the response. Canceling a `canceled` dream returns it unchanged. Canceling a `completed` or `failed` dream returns a 400 error.<br /><br />See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#cancel-a-dream) to learn more about canceling dreams.</td>
 </tr>
 <tr>
     <td><a href="#archive"><CopyableCode code="archive" /></a></td>
     <td><CopyableCode code="exec" /></td>
     <td><a href="#parameter-dream_id"><code>dream_id</code></a></td>
     <td><a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
-    <td></td>
+    <td>Hide a `completed`, `failed`, or `canceled` dream from the default list of dreams.<br /><br />Archiving a `pending` or `running` dream returns a 400 error, so cancel it first. Archiving an archived dream returns it unchanged. An archived dream can still be fetched by ID. Archiving can't be undone.<br /><br />See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#archive-a-dream) to learn more about archiving dreams.</td>
 </tr>
 </tbody>
 </table>
@@ -439,7 +439,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-dream_id">
     <td><CopyableCode code="dream_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter dream_id</td>
+    <td>The ID of the dream to archive (`drm_...`).</td>
 </tr>
 <tr id="parameter-anthropic-workspace-id">
     <td><CopyableCode code="anthropic-workspace-id" /></td>
@@ -449,22 +449,22 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-created_at[gt]">
     <td><CopyableCode code="created_at[gt]" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Return dreams with `created_at` strictly after this timestamp (exclusive lower bound, RFC 3339). Unset applies no lower bound.</td>
+    <td>Return only dreams created after this time (exclusive), in RFC 3339.</td>
 </tr>
 <tr id="parameter-created_at[lt]">
     <td><CopyableCode code="created_at[lt]" /></td>
     <td><code>string (date-time)</code></td>
-    <td>Return dreams with `created_at` strictly before this timestamp (exclusive upper bound, RFC 3339). Unset applies no upper bound.</td>
+    <td>Return only dreams created before this time (exclusive), in RFC 3339.</td>
 </tr>
 <tr id="parameter-include_archived">
     <td><CopyableCode code="include_archived" /></td>
     <td><code>boolean</code></td>
-    <td>Query parameter for include_archived</td>
+    <td>Whether to include archived dreams. Defaults to `false`.</td>
 </tr>
 <tr id="parameter-statuses[]">
     <td><CopyableCode code="statuses[]" /></td>
     <td><code>array</code></td>
-    <td>Filter by lifecycle status. Repeat the parameter to match any of multiple statuses. Empty applies no status filter.</td>
+    <td>Return only dreams that have one of these statuses.  Repeat the parameter to give more than one status. Leave it out to return dreams of every status.</td>
 </tr>
 </tbody>
 </table>
@@ -480,7 +480,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 >
 <TabItem value="get">
 
-Successful response (OK)
+Get a dream by ID to check its status, output memory store, and token usage.<br /><br />Archived dreams are returned too.<br /><br />See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#track-progress) for how to poll a dream and what each status means.
 
 ```sql
 SELECT
@@ -506,7 +506,7 @@ AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 </TabItem>
 <TabItem value="list">
 
-Successful response (OK)
+List the dreams in the workspace, newest first.<br /><br />Archived dreams are left out unless `include_archived` is `true`.<br /><br />See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#list-dreams) for how to page through dreams.
 
 ```sql
 SELECT
@@ -547,7 +547,7 @@ AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 >
 <TabItem value="create">
 
-No description available.
+Start an asynchronous job that uses past sessions to produce a reorganized version of a memory store and get back the dream to poll for the result.<br /><br />By default the dream writes its result to a new memory store and doesn't change the input memory store. The response has `status` set to `pending` and an empty `outputs` array. Poll the dream until `status` is `completed`, `failed`, or `canceled`.<br /><br />See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#create-a-dream) to learn more about creating dreams.
 
 ```sql
 INSERT INTO anthropic.dreams.dreams (
@@ -587,6 +587,8 @@ usage
 - name: dreams
   props:
     - name: inputs
+      description: |
+        The memory store and sessions for the dream to read, as exactly one \`memory_store\` entry and exactly one \`sessions\` entry.
       value:
         - type: "{{ type }}"
           memory_store_id: "{{ memory_store_id }}"
@@ -594,12 +596,17 @@ usage
     - name: model
       value: "{{ model }}"
       description: |
-        Model identifier and configuration applied to every pipeline stage.
+        The model that runs a dream, given as a model ID or as an object with \`id\` and \`speed\`.
+        In the object form, \`speed\` can only be \`standard\`.
+        The [limits table in the Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#limits) lists the supported models.
     - name: instructions
       value: "{{ instructions }}"
+      description: |
+        Guidance that steers how the dream reads the sessions and organizes the output memory store, from 1 to 4,096 characters.
+        See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#steer-with-instructions) for what kinds of instructions work well.
     - name: output_behavior
       description: |
-        The default destination: the job creates a new output memory store as a clone of the memory_store input and writes the consolidated memories into it. The input store is never mutated.
+        Which memory store a dream writes its result to. Defaults to \`create_new\` when left out of a create request.
       value:
         type: "{{ type }}"
         memory_store_id: "{{ memory_store_id }}"
@@ -624,7 +631,7 @@ usage
 >
 <TabItem value="cancel">
 
-Successful response (OK)
+Stop a `pending` or `running` dream.<br /><br />The response shows `status` as `canceled`, unless the dream reached `completed` or `failed` first. `usage` can keep changing after the response. Canceling a `canceled` dream returns it unchanged. Canceling a `completed` or `failed` dream returns a 400 error.<br /><br />See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#cancel-a-dream) to learn more about canceling dreams.
 
 ```sql
 EXEC anthropic.dreams.dreams.cancel 
@@ -635,7 +642,7 @@ EXEC anthropic.dreams.dreams.cancel
 </TabItem>
 <TabItem value="archive">
 
-Successful response (OK)
+Hide a `completed`, `failed`, or `canceled` dream from the default list of dreams.<br /><br />Archiving a `pending` or `running` dream returns a 400 error, so cancel it first. Archiving an archived dream returns it unchanged. An archived dream can still be fetched by ID. Archiving can't be undone.<br /><br />See the [Dreams guide](https://platform.claude.com/docs/en/managed-agents/dreams#archive-a-dream) to learn more about archiving dreams.
 
 ```sql
 EXEC anthropic.dreams.dreams.archive 

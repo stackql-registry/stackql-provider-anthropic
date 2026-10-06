@@ -83,7 +83,7 @@ Successful response (OK)
   {
     "name": "created_by",
     "type": "object",
-    "description": "Who performed this write: one of `session_actor`, `api_actor`, `user_actor`, or `service_account_actor`; `null` when no writer is recorded. Captured at write time and preserved through redaction.",
+    "description": "Who performed this write: one of `session_actor`, `api_actor`, `user_actor`, or `service_account_actor`; `null` when no writer is recorded. Captured at write time and preserved through redaction. A `session_actor` is an agent writing through the store's mounted filesystem at `/mnt/memory/`. The API key that created that session is not recorded on agent writes, so attribution names who made the write, not who is ultimately responsible; look up session provenance via the [Sessions API](/en/api/beta/sessions/retrieve).",
     "children": [
       {
         "name": "type",
@@ -93,22 +93,22 @@ Successful response (OK)
       {
         "name": "session_id",
         "type": "string",
-        "description": "ID of the session that performed the write (a `sesn_...` value). Look up the session via [Retrieve a session](/en/api/beta/sessions/retrieve) for further provenance."
+        "description": "ID of the session (a `sesn_...` value). Look up the session via [Retrieve a session](/en/api/beta/sessions/retrieve) for further provenance."
       },
       {
         "name": "api_key_id",
         "type": "string",
-        "description": "ID of the API key that performed the write. This identifies the key, not the secret."
+        "description": "ID of the API key (an `apikey_...` value). This identifies the key, not the secret."
       },
       {
         "name": "user_id",
         "type": "string",
-        "description": "ID of the user who performed the write (a `user_...` value)."
+        "description": "ID of the user (a `user_...` value)."
       },
       {
         "name": "service_account_id",
         "type": "string",
-        "description": "ID of the service account that performed the write (a `svac_...` value)."
+        "description": "ID of the service account (a `svac_...` value)."
       }
     ]
   },
@@ -140,22 +140,22 @@ Successful response (OK)
       {
         "name": "session_id",
         "type": "string",
-        "description": "ID of the session that performed the write (a `sesn_...` value). Look up the session via [Retrieve a session](/en/api/beta/sessions/retrieve) for further provenance."
+        "description": "ID of the session (a `sesn_...` value). Look up the session via [Retrieve a session](/en/api/beta/sessions/retrieve) for further provenance."
       },
       {
         "name": "api_key_id",
         "type": "string",
-        "description": "ID of the API key that performed the write. This identifies the key, not the secret."
+        "description": "ID of the API key (an `apikey_...` value). This identifies the key, not the secret."
       },
       {
         "name": "user_id",
         "type": "string",
-        "description": "ID of the user who performed the write (a `user_...` value)."
+        "description": "ID of the user (a `user_...` value)."
       },
       {
         "name": "service_account_id",
         "type": "string",
-        "description": "ID of the service account that performed the write (a `svac_...` value)."
+        "description": "ID of the service account (a `svac_...` value)."
       }
     ]
   },
@@ -209,7 +209,7 @@ Successful response (OK)
   {
     "name": "created_by",
     "type": "object",
-    "description": "Who performed this write: one of `session_actor`, `api_actor`, `user_actor`, or `service_account_actor`; `null` when no writer is recorded. Captured at write time and preserved through redaction.",
+    "description": "Who performed this write: one of `session_actor`, `api_actor`, `user_actor`, or `service_account_actor`; `null` when no writer is recorded. Captured at write time and preserved through redaction. A `session_actor` is an agent writing through the store's mounted filesystem at `/mnt/memory/`. The API key that created that session is not recorded on agent writes, so attribution names who made the write, not who is ultimately responsible; look up session provenance via the [Sessions API](/en/api/beta/sessions/retrieve).",
     "children": [
       {
         "name": "type",
@@ -219,22 +219,22 @@ Successful response (OK)
       {
         "name": "session_id",
         "type": "string",
-        "description": "ID of the session that performed the write (a `sesn_...` value). Look up the session via [Retrieve a session](/en/api/beta/sessions/retrieve) for further provenance."
+        "description": "ID of the session (a `sesn_...` value). Look up the session via [Retrieve a session](/en/api/beta/sessions/retrieve) for further provenance."
       },
       {
         "name": "api_key_id",
         "type": "string",
-        "description": "ID of the API key that performed the write. This identifies the key, not the secret."
+        "description": "ID of the API key (an `apikey_...` value). This identifies the key, not the secret."
       },
       {
         "name": "user_id",
         "type": "string",
-        "description": "ID of the user who performed the write (a `user_...` value)."
+        "description": "ID of the user (a `user_...` value)."
       },
       {
         "name": "service_account_id",
         "type": "string",
-        "description": "ID of the service account that performed the write (a `svac_...` value)."
+        "description": "ID of the service account (a `svac_...` value)."
       }
     ]
   },
@@ -266,22 +266,22 @@ Successful response (OK)
       {
         "name": "session_id",
         "type": "string",
-        "description": "ID of the session that performed the write (a `sesn_...` value). Look up the session via [Retrieve a session](/en/api/beta/sessions/retrieve) for further provenance."
+        "description": "ID of the session (a `sesn_...` value). Look up the session via [Retrieve a session](/en/api/beta/sessions/retrieve) for further provenance."
       },
       {
         "name": "api_key_id",
         "type": "string",
-        "description": "ID of the API key that performed the write. This identifies the key, not the secret."
+        "description": "ID of the API key (an `apikey_...` value). This identifies the key, not the secret."
       },
       {
         "name": "user_id",
         "type": "string",
-        "description": "ID of the user who performed the write (a `user_...` value)."
+        "description": "ID of the user (a `user_...` value)."
       },
       {
         "name": "service_account_id",
         "type": "string",
-        "description": "ID of the service account that performed the write (a `svac_...` value)."
+        "description": "ID of the service account (a `svac_...` value)."
       }
     ]
   },
@@ -349,12 +349,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-memory_store_id">
     <td><CopyableCode code="memory_store_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter memory_store_id</td>
+    <td>The ID of the memory store that holds the version (`memstore_...`).</td>
 </tr>
 <tr id="parameter-memory_version_id">
     <td><CopyableCode code="memory_version_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter memory_version_id</td>
+    <td>The ID of the memory version to redact (`memver_...`).</td>
 </tr>
 <tr id="parameter-anthropic-workspace-id">
     <td><CopyableCode code="anthropic-workspace-id" /></td>
@@ -364,7 +364,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-api_key_id">
     <td><CopyableCode code="api_key_id" /></td>
     <td><code>string</code></td>
-    <td>Query parameter for api_key_id</td>
+    <td>Return only versions written with the API key that has this ID.</td>
 </tr>
 <tr id="parameter-created_at[gte]">
     <td><CopyableCode code="created_at[gte]" /></td>
@@ -379,27 +379,27 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-memory_id">
     <td><CopyableCode code="memory_id" /></td>
     <td><code>string</code></td>
-    <td>Query parameter for memory_id</td>
+    <td>Return only versions of the memory with this ID (`mem_...`).  The filter still works after the memory is deleted. The results then include the version whose `operation` is `deleted`.</td>
 </tr>
 <tr id="parameter-operation">
     <td><CopyableCode code="operation" /></td>
     <td><code>string</code></td>
-    <td>Query parameter for operation</td>
+    <td>Return only versions that record this kind of change.</td>
 </tr>
 <tr id="parameter-service_account_id">
     <td><CopyableCode code="service_account_id" /></td>
     <td><code>string</code></td>
-    <td>Query parameter for service_account_id</td>
+    <td>Return only versions written by the service account with this ID (`svac_...`).</td>
 </tr>
 <tr id="parameter-session_id">
     <td><CopyableCode code="session_id" /></td>
     <td><code>string</code></td>
-    <td>Query parameter for session_id</td>
+    <td>Return only versions written by the session with this ID.</td>
 </tr>
 <tr id="parameter-view">
     <td><CopyableCode code="view" /></td>
     <td><code>string</code></td>
-    <td>Query parameter for view</td>
+    <td></td>
 </tr>
 </tbody>
 </table>

@@ -98,7 +98,7 @@ Successful response (OK)
           {
             "name": "id",
             "type": "string",
-            "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-fable-5-1)"
+            "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-sonnet-5-5)"
           },
           {
             "name": "speed",
@@ -473,7 +473,7 @@ Successful response (OK)
           {
             "name": "id",
             "type": "string",
-            "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-fable-5-1)"
+            "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-sonnet-5-5)"
           },
           {
             "name": "speed",
@@ -847,12 +847,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-session_id">
     <td><CopyableCode code="session_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter session_id (example: sesn_011CZkZAtmR3yMPDzynEDxu7)</td>
+    <td> (example: sesn_011CZkZAtmR3yMPDzynEDxu7)</td>
 </tr>
 <tr id="parameter-thread_id">
     <td><CopyableCode code="thread_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter thread_id (example: sthr_011CZkZVWa6oIjw0rgXZpnBt)</td>
+    <td> (example: sthr_011CZkZVWa6oIjw0rgXZpnBt)</td>
 </tr>
 <tr id="parameter-anthropic-workspace-id">
     <td><CopyableCode code="anthropic-workspace-id" /></td>

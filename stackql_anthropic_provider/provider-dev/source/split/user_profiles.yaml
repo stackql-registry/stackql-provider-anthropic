@@ -126,14 +126,10 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: user-profiles-2026-08-18
         - name: anthropic-workspace-id
           in: header
@@ -165,14 +161,10 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: user-profiles-2026-08-18
         - name: limit
           in: query
@@ -180,25 +172,28 @@ paths:
           schema:
             type: integer
             format: int32
-          description: Query parameter for limit
+          description: The maximum number of user profiles to return, from 1 to 100. Defaults to 20.
         - name: page
           in: query
           required: false
           schema:
             type: string
-          description: Query parameter for page
+          description: |-
+            The cursor for the page to return, taken from `next_page` in a previous response.
+
+            Leave it out to get the first page.
         - name: order
           in: query
           required: false
           schema:
             $ref: '#/components/schemas/BetaUserProfileListOrder'
-          description: Query parameter for order
+          description: The sort direction, applied to the field that `order_by` selects. Defaults to `desc`.
         - name: order_by
           in: query
           required: false
           schema:
             $ref: '#/components/schemas/BetaUserProfileListOrderBy'
-          description: Query parameter for order_by
+          description: The field to sort user profiles by, in the direction that `order` sets. Defaults to `created_at`.
         - name: anthropic-workspace-id
           in: header
           required: false
@@ -331,21 +326,17 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: user-profiles-2026-08-18
         - name: user_profile_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter user_profile_id
+          description: The ID of the user profile to get (`uprof_...`).
           example: uprof_011CZkZCu8hGbp5mYRQgUmz9
         - name: anthropic-workspace-id
           in: header
@@ -473,21 +464,17 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: user-profiles-2026-08-18
         - name: user_profile_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter user_profile_id
+          description: The ID of the user profile to update (`uprof_...`).
           example: uprof_011CZkZCu8hGbp5mYRQgUmz9
         - name: anthropic-workspace-id
           in: header
@@ -622,21 +609,17 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: user-profiles-2026-08-18
         - name: user_profile_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter user_profile_id
+          description: The ID of the user profile to create an enrollment URL for (`uprof_...`).
           example: uprof_011CZkZCu8hGbp5mYRQgUmz9
         - name: anthropic-workspace-id
           in: header
@@ -753,6 +736,10 @@ paths:
 components:
   schemas:
     BetaCreateUserProfileRequest:
+      description: |-
+        The settings for a new user profile.
+
+        Each request creates a new profile, even when another profile already has the same values.
       type: object
       properties:
         external_id:
@@ -781,6 +768,9 @@ components:
           enum:
             - application
             - passthrough
+          x-enum-descriptions:
+            - The user profile represents an individual end-user of a product that the platform builds on the API. New profiles get this value by default.
+            - The user profile represents a company that the platform resells Claude access to.
         external_user_onboarded_at:
           description: 'When the entity this profile represents opened its account with the platform, in RFC 3339 format: for an `application` profile, when the end-user signed up; for a `passthrough` profile, when the company became the platform''s customer. Must be a complete timestamp no more than 1 minute in the future. Optional. Accepted under the `user-profiles-2026-08-18` beta header; under `user-profiles-2026-09-04` send `external_user_details.onboarded_at` instead.'
           x-anthropic-beta-required:
@@ -813,6 +803,10 @@ components:
                 - active
                 - suspended
                 - blocked
+              x-enum-descriptions:
+                - The platform has neither restricted nor barred the account of the entity that the user profile represents.
+                - The platform has restricted the account of the entity that the user profile represents and may restore it.
+                - The platform has barred the account of the entity that the user profile represents.
             entity_type:
               description: 'What kind of entity the profile represents: `individual`, `business`, `non_profit` or `government`.'
               nullable: true
@@ -848,6 +842,10 @@ components:
         external_user_onboarded_at: '2024-11-02T08:15:00Z'
         metadata: {}
     BetaUserProfile:
+      description: |-
+        A record of an entity that the platform serves through the API, such as an end-user of the platform's product or a company that the platform resells Claude access to.
+
+        A Messages, Message Batches or token counting request can send a profile's `id` in the `anthropic-user-profile-id` header to attribute the request to that entity.
       type: object
       required:
         - id
@@ -895,6 +893,9 @@ components:
           enum:
             - application
             - passthrough
+          x-enum-descriptions:
+            - The user profile represents an individual end-user of a product that the platform builds on the API. New profiles get this value by default.
+            - The user profile represents a company that the platform resells Claude access to.
         external_user_onboarded_at:
           description: When the entity this profile represents opened its account with the platform, as stated by the platform, in RFC 3339 format (UTC). `null` until the platform supplies one. Present under the `user-profiles-2026-08-18` beta header; under `user-profiles-2026-09-04` the value is `external_user_details.onboarded_at`.
           x-anthropic-beta-required:
@@ -935,6 +936,10 @@ components:
                 - active
                 - suspended
                 - blocked
+              x-enum-descriptions:
+                - The platform has neither restricted nor barred the account of the entity that the user profile represents.
+                - The platform has restricted the account of the entity that the user profile represents and may restore it.
+                - The platform has barred the account of the entity that the user profile represents.
             entity_type:
               description: 'What kind of entity the profile represents: `individual`, `business`, `non_profit` or `government`. `null` until the platform supplies one.'
               nullable: true
@@ -1040,69 +1045,26 @@ components:
         - type
       title: ErrorResponse
       type: object
-    AnthropicBeta:
-      type: string
-      enum:
-        - message-batches-2024-09-24
-        - prompt-caching-2024-07-31
-        - computer-use-2024-10-22
-        - computer-use-2025-01-24
-        - pdfs-2024-09-25
-        - token-counting-2024-11-01
-        - token-efficient-tools-2025-02-19
-        - output-128k-2025-02-19
-        - files-api-2025-04-14
-        - mcp-client-2025-04-04
-        - mcp-client-2025-11-20
-        - dev-full-thinking-2025-05-14
-        - interleaved-thinking-2025-05-14
-        - code-execution-2025-05-22
-        - extended-cache-ttl-2025-04-11
-        - context-1m-2025-08-07
-        - context-management-2025-06-27
-        - model-context-window-exceeded-2025-08-26
-        - skills-2025-10-02
-        - fast-mode-2026-02-01
-        - output-300k-2026-03-24
-        - user-profiles-2026-03-24
-        - user-profiles-2026-08-18
-        - user-profiles-2026-09-04
-        - advisor-tool-2026-03-01
-        - managed-agents-2026-04-01
-        - cache-diagnosis-2026-04-07
-        - dreaming-2026-04-21
-        - thinking-token-count-2026-05-13
-        - server-side-fallback-2026-06-01
-        - server-side-fallback-2026-07-01
-        - fallback-credit-2026-06-01
-        - fallback-credit-2026-07-01
-        - agent-memory-2026-07-22
-        - mid-conversation-tool-changes-2026-07-01
-        - compact-2026-01-12
-        - computer-use-2025-11-24
-        - mcp-tunnels-2026-06-22
-        - structured-outputs-2025-11-13
-        - task-budgets-2026-03-13
-        - thinking-display-updates-2026-08-18
-        - ce-user-management-2026-07-13
-        - mid-conversation-output-config-2026-07-01
-        - thinking-binding-controls-2026-08-01
-        - mid-conversation-system-clear-at-2026-08-21
-        - compact-2026-09-04
-      x-stainless-nominal: false
     BetaUserProfileListOrder:
       type: string
-      description: ListOrder enum
+      description: The direction that a list of user profiles is sorted in.
       enum:
         - asc
         - desc
+      x-enum-descriptions:
+        - Oldest first when `order_by` is `created_at`, or names in ascending order when `order_by` is `name`.
+        - Newest first when `order_by` is `created_at`, or names in descending order when `order_by` is `name`. This is the default.
     BetaUserProfileListOrderBy:
       type: string
       description: 'Sort field for listing user profiles: `created_at` (default) or `name` (case-insensitive; profiles without a name sort last).'
       enum:
         - created_at
         - name
+      x-enum-descriptions:
+        - Sort by when each user profile was created. This is the default.
+        - Sort by `name`, ignoring the case of ASCII letters. Profiles without a name come last in either direction.
     BetaListUserProfilesResponse:
+      description: A page of user profiles, sorted by the request's `order_by` and `order`.
       type: object
       required:
         - data
@@ -1180,6 +1142,9 @@ components:
           enum:
             - application
             - passthrough
+          x-enum-descriptions:
+            - The user profile represents an individual end-user of a product that the platform builds on the API. New profiles get this value by default.
+            - The user profile represents a company that the platform resells Claude access to.
         external_user_onboarded_at:
           description: If present, replaces the stored account creation time. Omit to leave unchanged; once set, the value cannot be cleared and `null` is rejected. Must be a complete RFC 3339 timestamp no more than 1 minute in the future. Accepted under the `user-profiles-2026-08-18` beta header; under `user-profiles-2026-09-04` send `external_user_details.onboarded_at` instead.
           x-anthropic-beta-required:
@@ -1210,6 +1175,10 @@ components:
                 - active
                 - suspended
                 - blocked
+              x-enum-descriptions:
+                - The platform has neither restricted nor barred the account of the entity that the user profile represents.
+                - The platform has restricted the account of the entity that the user profile represents and may restore it.
+                - The platform has barred the account of the entity that the user profile represents.
             entity_type:
               description: 'What kind of entity the profile represents: `individual`, `business`, `non_profit` or `government`.'
               nullable: true
@@ -1238,6 +1207,7 @@ components:
       example:
         external_id: user_12345
     BetaEnrollmentUrl:
+      description: A URL to give to the entity that a user profile represents, so that the entity can enroll for a trust grant.
       type: object
       required:
         - url
@@ -1272,6 +1242,9 @@ components:
       enum:
         - application
         - passthrough
+      x-enum-descriptions:
+        - The user profile represents an individual end-user of a product that the platform builds on the API. New profiles get this value by default.
+        - The user profile represents a company that the platform resells Claude access to.
     BetaTimestamp:
       description: A timestamp in RFC 3339 format
       type: string
@@ -1297,6 +1270,10 @@ components:
             - active
             - suspended
             - blocked
+          x-enum-descriptions:
+            - The platform has neither restricted nor barred the account of the entity that the user profile represents.
+            - The platform has restricted the account of the entity that the user profile represents and may restore it.
+            - The platform has barred the account of the entity that the user profile represents.
         entity_type:
           description: 'What kind of entity the profile represents: `individual`, `business`, `non_profit` or `government`.'
           nullable: true
@@ -1351,6 +1328,10 @@ components:
             - active
             - suspended
             - blocked
+          x-enum-descriptions:
+            - The platform has neither restricted nor barred the account of the entity that the user profile represents.
+            - The platform has restricted the account of the entity that the user profile represents and may restore it.
+            - The platform has barred the account of the entity that the user profile represents.
         entity_type:
           description: 'What kind of entity the profile represents: `individual`, `business`, `non_profit` or `government`. `null` until the platform supplies one.'
           nullable: true
@@ -1373,6 +1354,7 @@ components:
           nullable: true
           type: string
     BetaUserProfileTrustGrant:
+      description: The status of one trust grant on a user profile, listed in the profile's `trust_grants` map under the grant's name.
       type: object
       required:
         - status
@@ -1548,6 +1530,10 @@ components:
         - active
         - suspended
         - blocked
+      x-enum-descriptions:
+        - The platform has neither restricted nor barred the account of the entity that the user profile represents.
+        - The platform has restricted the account of the entity that the user profile represents and may restore it.
+        - The platform has barred the account of the entity that the user profile represents.
     BetaUserProfileExternalUserEntityType:
       type: string
       description: 'What kind of entity the profile represents, as the platform states it: `individual`, `business`, `non_profit` or `government`.'

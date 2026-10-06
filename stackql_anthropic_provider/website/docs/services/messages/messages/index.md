@@ -190,9 +190,33 @@ Message object.
     ]
   },
   {
+    "name": "diagnostics",
+    "type": "object",
+    "description": "Request-level diagnostics. `null` when the request did not supply `diagnostics`, or when it did and no prompt-cache divergence was detected.",
+    "children": [
+      {
+        "name": "cache_miss_reason",
+        "type": "object",
+        "description": "Explains why the prompt cache could not fully reuse the prefix from the request identified by `diagnostics.previous_message_id`. `null` means diagnosis is still pending — the response was serialized before the background comparison completed.",
+        "children": [
+          {
+            "name": "cache_missed_input_tokens",
+            "type": "integer",
+            "description": "Approximate number of input tokens that would have been read from cache had the prefix matched the previous request."
+          },
+          {
+            "name": "type",
+            "type": "string",
+            "description": " (model_changed)"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "name": "model",
     "type": "string",
-    "description": "The model that will complete your prompt.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-fable-5-1)"
+    "description": "The model that will complete your prompt.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-sonnet-5-5)"
   },
   {
     "name": "role",
@@ -207,7 +231,7 @@ Message object.
       {
         "name": "category",
         "type": "string",
-        "description": "The policy category that triggered the refusal.<br /><br />`null` when the refusal doesn't map to a named category. (cyber, bio, frontier_llm, reasoning_extraction, general_harms)"
+        "description": "The policy category that triggered the refusal.<br /><br />`null` when the refusal doesn't map to a named category. (cyber)"
       },
       {
         "name": "explanation",
@@ -342,7 +366,7 @@ The following methods are available for this resource:
     <td><a href="#create"><CopyableCode code="create" /></a></td>
     <td><CopyableCode code="select" /></td>
     <td><a href="#parameter-model"><code>model</code></a>, <a href="#parameter-messages"><code>messages</code></a>, <a href="#parameter-max_tokens"><code>max_tokens</code></a></td>
-    <td><a href="#parameter-cache_control"><code>cache_control</code></a>, <a href="#parameter-container"><code>container</code></a>, <a href="#parameter-inference_geo"><code>inference_geo</code></a>, <a href="#parameter-metadata"><code>metadata</code></a>, <a href="#parameter-output_config"><code>output_config</code></a>, <a href="#parameter-service_tier"><code>service_tier</code></a>, <a href="#parameter-stop_sequences"><code>stop_sequences</code></a>, <a href="#parameter-system"><code>system</code></a>, <a href="#parameter-temperature"><code>temperature</code></a>, <a href="#parameter-thinking"><code>thinking</code></a>, <a href="#parameter-tool_choice"><code>tool_choice</code></a>, <a href="#parameter-tools"><code>tools</code></a>, <a href="#parameter-top_k"><code>top_k</code></a>, <a href="#parameter-top_p"><code>top_p</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
+    <td><a href="#parameter-cache_control"><code>cache_control</code></a>, <a href="#parameter-container"><code>container</code></a>, <a href="#parameter-diagnostics"><code>diagnostics</code></a>, <a href="#parameter-inference_geo"><code>inference_geo</code></a>, <a href="#parameter-metadata"><code>metadata</code></a>, <a href="#parameter-output_config"><code>output_config</code></a>, <a href="#parameter-service_tier"><code>service_tier</code></a>, <a href="#parameter-stop_sequences"><code>stop_sequences</code></a>, <a href="#parameter-system"><code>system</code></a>, <a href="#parameter-temperature"><code>temperature</code></a>, <a href="#parameter-thinking"><code>thinking</code></a>, <a href="#parameter-tool_choice"><code>tool_choice</code></a>, <a href="#parameter-tools"><code>tools</code></a>, <a href="#parameter-top_k"><code>top_k</code></a>, <a href="#parameter-top_p"><code>top_p</code></a>, <a href="#parameter-anthropic-workspace-id"><code>anthropic-workspace-id</code></a></td>
     <td>Send a structured list of input messages with text and/or image content, and the model will generate the next message in the conversation.<br /><br />The Messages API can be used for either single queries or stateless multi-turn conversations.<br /><br />Learn more about the Messages API in our [user guide](https://platform.claude.com/docs/en/get-started)</td>
 </tr>
 </tbody>
@@ -375,6 +399,11 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
     <td><CopyableCode code="container" /></td>
     <td><code>object</code></td>
     <td>Container identifier for reuse across requests.</td>
+</tr>
+<tr id="parameter-diagnostics">
+    <td><CopyableCode code="diagnostics" /></td>
+    <td><code>object</code></td>
+    <td>Request-level diagnostics. Supply `previous_message_id` to have the response include `diagnostics.cache_miss_reason` explaining any prompt-cache divergence from that prior request.</td>
 </tr>
 <tr id="parameter-inference_geo">
     <td><CopyableCode code="inference_geo" /></td>
@@ -480,6 +509,7 @@ SELECT
 id,
 container,
 content,
+diagnostics,
 model,
 role,
 stop_details,
@@ -494,6 +524,7 @@ AND max_tokens = '{{ max_tokens }}' -- required
 AND "anthropic-workspace-id" = '{{ anthropic-workspace-id }}'
 AND cache_control = '{{ cache_control }}'
 AND container = '{{ container }}'
+AND diagnostics = '{{ diagnostics }}'
 AND inference_geo = '{{ inference_geo }}'
 AND metadata = '{{ metadata }}'
 AND output_config = '{{ output_config }}'

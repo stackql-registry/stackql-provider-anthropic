@@ -416,6 +416,8 @@ type
                 - skill_id: "{{ skill_id }}"
                   type: "{{ type }}"
                   version: "{{ version }}"
+            diagnostics:
+              previous_message_id: "{{ previous_message_id }}"
             inference_geo: "{{ inference_geo }}"
             max_tokens: {{ max_tokens }}
             metadata:

@@ -124,14 +124,10 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: "#/components/schemas/AnthropicBeta"
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: anthropic-workspace-id
           in: header
@@ -163,14 +159,10 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: "#/components/schemas/AnthropicBeta"
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: limit
           in: query
@@ -321,21 +313,17 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: "#/components/schemas/AnthropicBeta"
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: vault_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter vault_id
+          description: Unique identifier of the vault to retrieve.
           example: vlt_011CZkZDLs7fYzm1hXNPeRjv
         - name: anthropic-workspace-id
           in: header
@@ -461,14 +449,10 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: "#/components/schemas/AnthropicBeta"
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: vault_id
           in: path
@@ -476,7 +460,7 @@ paths:
           schema:
             type: string
             x-stainless-cli-data-alias: id
-          description: Path parameter vault_id
+          description: Unique identifier of the vault to update.
           example: vlt_011CZkZDLs7fYzm1hXNPeRjv
         - name: anthropic-workspace-id
           in: header
@@ -613,21 +597,17 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: "#/components/schemas/AnthropicBeta"
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: vault_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter vault_id
+          description: Unique identifier of the vault to delete.
           example: vlt_011CZkZDLs7fYzm1hXNPeRjv
         - name: anthropic-workspace-id
           in: header
@@ -754,21 +734,17 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: "#/components/schemas/AnthropicBeta"
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: vault_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter vault_id
+          description: Unique identifier of the vault to archive.
           example: vlt_011CZkZDLs7fYzm1hXNPeRjv
         - name: anthropic-workspace-id
           in: header
@@ -895,21 +871,17 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: "#/components/schemas/AnthropicBeta"
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: vault_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter vault_id
+          description: Identifier of the vault to create the credential in.
           example: vlt_011CZkZDLs7fYzm1hXNPeRjv
         - name: anthropic-workspace-id
           in: header
@@ -1046,21 +1018,17 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: "#/components/schemas/AnthropicBeta"
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: vault_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter vault_id
+          description: Identifier of the vault to list credentials for.
           example: vlt_011CZkZDLs7fYzm1hXNPeRjv
         - name: limit
           in: query
@@ -1211,28 +1179,24 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: "#/components/schemas/AnthropicBeta"
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: vault_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter vault_id
+          description: Identifier of the vault containing the credential.
           example: vlt_011CZkZDLs7fYzm1hXNPeRjv
         - name: credential_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter credential_id
+          description: Unique identifier of the credential to retrieve.
           example: vcrd_011CZkZEMt8gZan2iYOQfSkw
         - name: anthropic-workspace-id
           in: header
@@ -1358,21 +1322,17 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: "#/components/schemas/AnthropicBeta"
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: vault_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter vault_id
+          description: Identifier of the vault containing the credential.
           example: vlt_011CZkZDLs7fYzm1hXNPeRjv
         - name: credential_id
           in: path
@@ -1380,7 +1340,7 @@ paths:
           schema:
             type: string
             x-stainless-cli-data-alias: id
-          description: Path parameter credential_id
+          description: Unique identifier of the credential to update.
           example: vcrd_011CZkZEMt8gZan2iYOQfSkw
         - name: anthropic-workspace-id
           in: header
@@ -1517,28 +1477,24 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: "#/components/schemas/AnthropicBeta"
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: vault_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter vault_id
+          description: Identifier of the vault containing the credential.
           example: vlt_011CZkZDLs7fYzm1hXNPeRjv
         - name: credential_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter credential_id
+          description: Unique identifier of the credential to delete.
           example: vcrd_011CZkZEMt8gZan2iYOQfSkw
         - name: anthropic-workspace-id
           in: header
@@ -1665,28 +1621,24 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: "#/components/schemas/AnthropicBeta"
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: vault_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter vault_id
+          description: Identifier of the vault containing the credential.
           example: vlt_011CZkZDLs7fYzm1hXNPeRjv
         - name: credential_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter credential_id
+          description: Unique identifier of the credential to archive.
           example: vcrd_011CZkZEMt8gZan2iYOQfSkw
         - name: anthropic-workspace-id
           in: header
@@ -1813,28 +1765,24 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: "#/components/schemas/AnthropicBeta"
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: vault_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter vault_id
+          description: Identifier of the vault containing the credential.
           example: vlt_011CZkZDLs7fYzm1hXNPeRjv
         - name: credential_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter credential_id
+          description: Unique identifier of the credential to validate.
           example: vcrd_011CZkZEMt8gZan2iYOQfSkw
         - name: anthropic-workspace-id
           in: header
@@ -2075,56 +2023,6 @@ components:
         - type
       title: ErrorResponse
       type: object
-    AnthropicBeta:
-      type: string
-      enum:
-        - message-batches-2024-09-24
-        - prompt-caching-2024-07-31
-        - computer-use-2024-10-22
-        - computer-use-2025-01-24
-        - pdfs-2024-09-25
-        - token-counting-2024-11-01
-        - token-efficient-tools-2025-02-19
-        - output-128k-2025-02-19
-        - files-api-2025-04-14
-        - mcp-client-2025-04-04
-        - mcp-client-2025-11-20
-        - dev-full-thinking-2025-05-14
-        - interleaved-thinking-2025-05-14
-        - code-execution-2025-05-22
-        - extended-cache-ttl-2025-04-11
-        - context-1m-2025-08-07
-        - context-management-2025-06-27
-        - model-context-window-exceeded-2025-08-26
-        - skills-2025-10-02
-        - fast-mode-2026-02-01
-        - output-300k-2026-03-24
-        - user-profiles-2026-03-24
-        - user-profiles-2026-08-18
-        - user-profiles-2026-09-04
-        - advisor-tool-2026-03-01
-        - managed-agents-2026-04-01
-        - cache-diagnosis-2026-04-07
-        - dreaming-2026-04-21
-        - thinking-token-count-2026-05-13
-        - server-side-fallback-2026-06-01
-        - server-side-fallback-2026-07-01
-        - fallback-credit-2026-06-01
-        - fallback-credit-2026-07-01
-        - agent-memory-2026-07-22
-        - mid-conversation-tool-changes-2026-07-01
-        - compact-2026-01-12
-        - computer-use-2025-11-24
-        - mcp-tunnels-2026-06-22
-        - structured-outputs-2025-11-13
-        - task-budgets-2026-03-13
-        - thinking-display-updates-2026-08-18
-        - ce-user-management-2026-07-13
-        - mid-conversation-output-config-2026-07-01
-        - thinking-binding-controls-2026-08-01
-        - mid-conversation-system-clear-at-2026-08-21
-        - compact-2026-09-04
-      x-stainless-nominal: false
     BetaManagedAgentsListVaultsResponse:
       description: Response containing a paginated list of vaults.
       type: object
@@ -2794,6 +2692,10 @@ components:
             - valid
             - invalid
             - unknown
+          x-enum-descriptions:
+            - The credential successfully authenticated against its MCP server.
+            - The probe reached the MCP server and was rejected, and a refresh (if attempted) did not recover it.
+            - The probe could not determine validity — for example, a transport error or a successful refresh that was not re-probed.
         validated_at:
           description: When the validation probe was performed.
           examples:
@@ -2859,6 +2761,11 @@ components:
                 - failed
                 - connect_error
                 - no_refresh_token
+              x-enum-descriptions:
+                - The token endpoint returned a new access token.
+                - The token endpoint returned an error response. See `http_response` for detail.
+                - The token endpoint could not be reached (DNS, TLS, or connection error).
+                - No refresh token is stored for the credential, so no exchange was attempted.
             http_response:
               description: The captured HTTP error response from the token endpoint. Populated only when `status` is `failed`.
               nullable: true
@@ -3424,6 +3331,10 @@ components:
         - valid
         - invalid
         - unknown
+      x-enum-descriptions:
+        - The credential successfully authenticated against its MCP server.
+        - The probe reached the MCP server and was rejected, and a refresh (if attempted) did not recover it.
+        - The probe could not determine validity — for example, a transport error or a successful refresh that was not re-probed.
     BetaManagedAgentsMcpProbe:
       description: The failing step of an MCP validation probe.
       type: object
@@ -3472,6 +3383,11 @@ components:
             - failed
             - connect_error
             - no_refresh_token
+          x-enum-descriptions:
+            - The token endpoint returned a new access token.
+            - The token endpoint returned an error response. See `http_response` for detail.
+            - The token endpoint could not be reached (DNS, TLS, or connection error).
+            - No refresh token is stored for the credential, so no exchange was attempted.
         http_response:
           description: The captured HTTP error response from the token endpoint. Populated only when `status` is `failed`.
           nullable: true
@@ -3954,6 +3870,11 @@ components:
         - failed
         - connect_error
         - no_refresh_token
+      x-enum-descriptions:
+        - The token endpoint returned a new access token.
+        - The token endpoint returned an error response. See `http_response` for detail.
+        - The token endpoint could not be reached (DNS, TLS, or connection error).
+        - No refresh token is stored for the credential, so no exchange was attempted.
     BetaManagedAgentsMcpOauthRefreshParams:
       description: OAuth refresh token parameters for creating a credential with refresh support.
       type: object

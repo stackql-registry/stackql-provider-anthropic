@@ -231,7 +231,48 @@ carries no 2026-09-17 block. Offline validation (30/30), the mock integration su
 (both manifests), the meta-route walk (0 errors) and the docs-example check passed on
 stackql v0.11.669 under WSL.
 
-## 8. Follow-ups
+## 8. Re-pin of 2026-10-06 (guard 5 drift)
+
+The bundled spec moved again (sha256 `d721a6487a16...`, 210 paths and 321 operations,
+308 SDK endpoints; the 2026-09-17 pin had 165 / 244 / 201), so guard 5 failed the CI
+run of the sidebar-link commit. Re-pinned with `make refresh-spec`; `make
+check-mappings` reported the same 122 rows, all reviewed, no drift, so
+`factory/csv-review.mjs` carries no 2026-10-06 block.
+
+The 85 added and 8 removed operations are all Admin API (`/v1/organizations/...`):
+
+- The Admin API went GA upstream, so the spec now lists the admin ops without the
+  `?beta=true` suffix as well as with it (api_keys, invites, me, rate_limits, users,
+  workspaces and workspace members, service_accounts, federation_issuers,
+  federation_rules, external_keys, compliance_settings), plus a `spend_limits` list op.
+- The RBAC path parameters were renamed (`{group_id}` -> `{rbac_group_id}`,
+  `{role_id}` -> `{rbac_role_id}`): the 8 removed operations are the old spellings.
+- A plugin surface appeared: `plugins` (versions, content, shares, installation
+  settings) and `plugin_marketplaces` (validate_archive, validate_repository).
+
+`factory/exclusions.yaml` grew from 136 to 213 entries: the 8 renamed entries were
+rewritten in place and every new op joined the group its family already lives in, with
+that group's reason (served by `anthropic_admin`, WIF OAuth-only, enterprise key, or
+not yet covered - the plugin surface is in the last group). Guard 1 holds:
+321 spec ops - 108 provider ops == 213 exclusions. The anthropic provider's methods,
+columns and verbs are unchanged; the hand-authored `anthropic_admin` provider is
+untouched.
+
+Schema changes regenerated 11 service documents: four beta flags join the
+`anthropic-beta` enum (`ce-plugins-2026-09-01`, `inline-tools-2026-09-15`,
+`mcp-client-2026-09-15`, `spend-limit-reads-2026-09-26`), which the generator now
+inlines instead of the shared `AnthropicBeta` schema; `messages` gains the
+`Diagnostics` / `CacheMiss*` reason schemas and `ThinkingConfigBetweenTools`;
+`sessions` gains the managed-agents stop-detail schemas. 18 docs pages changed with
+them (dreams, memory_versions, messages, session events and thread events carry most
+of it).
+
+Offline validation (54/54 and 30/30), the mock integration suites (38 and 26), the
+meta-route walk (0 errors on both providers) and the docs-example check passed on
+stackql v0.12.732 under WSL. A second `make build` plus `make docs docs-admin` left the
+tree unchanged.
+
+## 9. Follow-ups
 
 - Confirm the admin split decision (section 2). If the admin provider should take the
   spec's `admin_uncovered` ops (external keys, RBAC, org tunnels), they can enter the
