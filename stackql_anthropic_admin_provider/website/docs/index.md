@@ -31,6 +31,7 @@ For the user/inference surface (messages, models, batches, files, skills, agents
 
 total services: __6__
 total resources: __17__
+source project: __[stackql-provider-anthropic](https://github.com/stackql-registry/stackql-provider-anthropic)__
 
 :::
 

@@ -30,6 +30,7 @@ For organization administration (users, invites, workspaces, API keys, usage/cos
 
 total services: __12__
 total resources: __39__
+source project: __[stackql-provider-anthropic](https://github.com/stackql-registry/stackql-provider-anthropic)__
 
 :::
 
