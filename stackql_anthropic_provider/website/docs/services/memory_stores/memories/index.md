@@ -225,12 +225,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-memory_id">
     <td><CopyableCode code="memory_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter memory_id</td>
+    <td>The ID of the memory to delete (`mem_...`).</td>
 </tr>
 <tr id="parameter-memory_store_id">
     <td><CopyableCode code="memory_store_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter memory_store_id</td>
+    <td>The ID of the memory store that holds the memory (`memstore_...`).</td>
 </tr>
 <tr id="parameter-anthropic-workspace-id">
     <td><CopyableCode code="anthropic-workspace-id" /></td>
@@ -245,7 +245,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-expected_content_sha256">
     <td><CopyableCode code="expected_content_sha256" /></td>
     <td><code>string</code></td>
-    <td>Query parameter for expected_content_sha256</td>
+    <td>Delete the memory only if its current `content_sha256` equals this value, given as 64 lowercase hexadecimal characters. Omit it to delete unconditionally.  If the hashes differ, the request fails with HTTP status 409 and nothing is deleted.</td>
 </tr>
 <tr id="parameter-path_prefix">
     <td><CopyableCode code="path_prefix" /></td>
@@ -255,7 +255,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-view">
     <td><CopyableCode code="view" /></td>
     <td><code>string</code></td>
-    <td>Query parameter for view</td>
+    <td></td>
 </tr>
 </tbody>
 </table>
@@ -380,8 +380,6 @@ updated_at
         UTF-8 text content for the new memory. Maximum 100 kB (102,400 bytes). Required; pass \`""\` explicitly to create an empty memory.
     - name: view
       value: "{{ view }}"
-      description: Query parameter for view
-      description: Query parameter for view
     - name: anthropic-workspace-id
       value: "{{ anthropic-workspace-id }}"
       description: Optional header to select the Workspace for this request. The value is a Workspace ID (for example, \`wrkspc_011CZkZaBF1tNoB5wlCeusgy\`).  Only needed for credentials that can act on more than one Workspace. A credential that belongs to a specific Workspace may omit it; if sent, it must match that Workspace. (example: wrkspc_011CZkZaBF1tNoB5wlCeusgy)

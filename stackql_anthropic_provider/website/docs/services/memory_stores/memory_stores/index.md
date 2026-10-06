@@ -212,7 +212,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-memory_store_id">
     <td><CopyableCode code="memory_store_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter memory_store_id</td>
+    <td>ID of the memory store to archive (a `memstore_...` identifier). Required. Archiving is one-way and idempotent; archived stores cannot be unarchived. Enumerate IDs via `GET /v1/memory_stores`.</td>
 </tr>
 <tr id="parameter-anthropic-workspace-id">
     <td><CopyableCode code="anthropic-workspace-id" /></td>

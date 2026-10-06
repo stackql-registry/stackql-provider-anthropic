@@ -104,7 +104,7 @@ Successful response (OK)
       {
         "name": "id",
         "type": "string",
-        "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-fable-5-1)"
+        "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-sonnet-5-5)"
       },
       {
         "name": "speed",
@@ -410,7 +410,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-agent_id">
     <td><CopyableCode code="agent_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter agent_id (example: agent_011CZkYpogX7uDKUyvBTophP)</td>
+    <td>Agent ID to list versions for. (example: agent_011CZkYpogX7uDKUyvBTophP)</td>
 </tr>
 <tr id="parameter-anthropic-workspace-id">
     <td><CopyableCode code="anthropic-workspace-id" /></td>

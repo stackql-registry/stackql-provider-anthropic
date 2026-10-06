@@ -309,7 +309,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-user_profile_id">
     <td><CopyableCode code="user_profile_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter user_profile_id (example: uprof_011CZkZCu8hGbp5mYRQgUmz9)</td>
+    <td>The ID of the user profile to create an enrollment URL for (`uprof_...`). (example: uprof_011CZkZCu8hGbp5mYRQgUmz9)</td>
 </tr>
 <tr id="parameter-anthropic-workspace-id">
     <td><CopyableCode code="anthropic-workspace-id" /></td>
@@ -319,12 +319,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-order">
     <td><CopyableCode code="order" /></td>
     <td><code>string</code></td>
-    <td>Query parameter for order</td>
+    <td>The sort direction, applied to the field that `order_by` selects. Defaults to `desc`.</td>
 </tr>
 <tr id="parameter-order_by">
     <td><CopyableCode code="order_by" /></td>
     <td><code>string</code></td>
-    <td>Query parameter for order_by</td>
+    <td>The field to sort user profiles by, in the direction that `order` sets. Defaults to `created_at`.</td>
 </tr>
 </tbody>
 </table>

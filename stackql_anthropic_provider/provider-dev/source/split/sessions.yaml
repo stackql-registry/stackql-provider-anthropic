@@ -124,14 +124,10 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: anthropic-workspace-id
           in: header
@@ -163,14 +159,10 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: limit
           in: query
@@ -386,21 +378,16 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: session_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter session_id
           example: sesn_011CZkZAtmR3yMPDzynEDxu7
         - name: anthropic-workspace-id
           in: header
@@ -526,14 +513,10 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: session_id
           in: path
@@ -541,7 +524,6 @@ paths:
           schema:
             type: string
             x-stainless-cli-data-alias: id
-          description: Path parameter session_id
           example: sesn_011CZkZAtmR3yMPDzynEDxu7
         - name: anthropic-workspace-id
           in: header
@@ -678,21 +660,16 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: session_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter session_id
           example: sesn_011CZkZAtmR3yMPDzynEDxu7
         - name: anthropic-workspace-id
           in: header
@@ -824,21 +801,16 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: session_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter session_id
           example: sesn_011CZkZAtmR3yMPDzynEDxu7
         - name: limit
           in: query
@@ -846,7 +818,6 @@ paths:
           schema:
             type: integer
             format: int32
-          description: Query parameter for limit
         - name: page
           in: query
           required: false
@@ -867,7 +838,7 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              $ref: '#/components/schemas/BetaManagedAgentsSessionEventType'
           description: Filter by event type. Values match the `type` field on returned events (for example, `user.message` or `agent.tool_use`). Omit to return all event types.
         - name: created_at[gte]
           in: query
@@ -1017,21 +988,16 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: session_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter session_id
           example: sesn_011CZkZAtmR3yMPDzynEDxu7
         - name: anthropic-workspace-id
           in: header
@@ -1164,21 +1130,16 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: session_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter session_id
           example: sesn_011CZkZAtmR3yMPDzynEDxu7
         - name: anthropic-workspace-id
           in: header
@@ -1310,21 +1271,16 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: session_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter session_id
           example: sesn_011CZkZAtmR3yMPDzynEDxu7
         - name: limit
           in: query
@@ -1469,28 +1425,22 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: session_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter session_id
           example: sesn_011CZkZAtmR3yMPDzynEDxu7
         - name: thread_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter thread_id
           example: sthr_011CZkZVWa6oIjw0rgXZpnBt
         - name: anthropic-workspace-id
           in: header
@@ -1622,28 +1572,22 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: session_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter session_id
           example: sesn_011CZkZAtmR3yMPDzynEDxu7
         - name: thread_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter thread_id
           example: sthr_011CZkZVWa6oIjw0rgXZpnBt
         - name: limit
           in: query
@@ -1651,13 +1595,11 @@ paths:
           schema:
             type: integer
             format: int32
-          description: Query parameter for limit
         - name: page
           in: query
           required: false
           schema:
             type: string
-          description: Query parameter for page
         - name: anthropic-workspace-id
           in: header
           required: false
@@ -1783,28 +1725,22 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: session_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter session_id
           example: sesn_011CZkZAtmR3yMPDzynEDxu7
         - name: thread_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter thread_id
           example: sthr_011CZkZVWa6oIjw0rgXZpnBt
         - name: anthropic-workspace-id
           in: header
@@ -1936,21 +1872,16 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: session_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter session_id
           example: sesn_011CZkZAtmR3yMPDzynEDxu7
         - name: limit
           in: query
@@ -2089,21 +2020,16 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: session_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter session_id
           example: sesn_011CZkZAtmR3yMPDzynEDxu7
         - name: anthropic-workspace-id
           in: header
@@ -2241,28 +2167,22 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: session_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter session_id
           example: sesn_011CZkZAtmR3yMPDzynEDxu7
         - name: resource_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter resource_id
           example: sesrsc_011CZkZBJq5dWxk9fVLNcPht
         - name: anthropic-workspace-id
           in: header
@@ -2393,28 +2313,22 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: session_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter session_id
           example: sesn_011CZkZAtmR3yMPDzynEDxu7
         - name: resource_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter resource_id
           example: sesrsc_011CZkZBJq5dWxk9fVLNcPht
         - name: anthropic-workspace-id
           in: header
@@ -2540,21 +2454,16 @@ paths:
           in: header
           required: false
           schema:
-            type: string
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
+            type: array
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+            description: Optional header to specify the beta version(s) you want to use.
             default: managed-agents-2026-04-01
         - name: session_id
           in: path
           required: true
           schema:
             type: string
-          description: Path parameter session_id
           example: sesn_011CZkZAtmR3yMPDzynEDxu7
         - name: resource_id
           in: path
@@ -2562,7 +2471,6 @@ paths:
           schema:
             type: string
             x-stainless-cli-data-alias: id
-          description: Path parameter resource_id
           example: sesrsc_011CZkZBJq5dWxk9fVLNcPht
         - name: anthropic-workspace-id
           in: header
@@ -3174,74 +3082,27 @@ components:
         - type
       title: ErrorResponse
       type: object
-    AnthropicBeta:
-      type: string
-      enum:
-        - message-batches-2024-09-24
-        - prompt-caching-2024-07-31
-        - computer-use-2024-10-22
-        - computer-use-2025-01-24
-        - pdfs-2024-09-25
-        - token-counting-2024-11-01
-        - token-efficient-tools-2025-02-19
-        - output-128k-2025-02-19
-        - files-api-2025-04-14
-        - mcp-client-2025-04-04
-        - mcp-client-2025-11-20
-        - dev-full-thinking-2025-05-14
-        - interleaved-thinking-2025-05-14
-        - code-execution-2025-05-22
-        - extended-cache-ttl-2025-04-11
-        - context-1m-2025-08-07
-        - context-management-2025-06-27
-        - model-context-window-exceeded-2025-08-26
-        - skills-2025-10-02
-        - fast-mode-2026-02-01
-        - output-300k-2026-03-24
-        - user-profiles-2026-03-24
-        - user-profiles-2026-08-18
-        - user-profiles-2026-09-04
-        - advisor-tool-2026-03-01
-        - managed-agents-2026-04-01
-        - cache-diagnosis-2026-04-07
-        - dreaming-2026-04-21
-        - thinking-token-count-2026-05-13
-        - server-side-fallback-2026-06-01
-        - server-side-fallback-2026-07-01
-        - fallback-credit-2026-06-01
-        - fallback-credit-2026-07-01
-        - agent-memory-2026-07-22
-        - mid-conversation-tool-changes-2026-07-01
-        - compact-2026-01-12
-        - computer-use-2025-11-24
-        - mcp-tunnels-2026-06-22
-        - structured-outputs-2025-11-13
-        - task-budgets-2026-03-13
-        - thinking-display-updates-2026-08-18
-        - ce-user-management-2026-07-13
-        - mid-conversation-output-config-2026-07-01
-        - thinking-binding-controls-2026-08-01
-        - mid-conversation-system-clear-at-2026-08-21
-        - compact-2026-09-04
-      x-stainless-nominal: false
     BetaTimestamp:
       description: A timestamp in RFC 3339 format
       type: string
       format: date-time
     BetaManagedAgentsListOrder:
       type: string
-      description: ListOrder enum
       enum:
         - asc
         - desc
     BetaManagedAgentsSessionStatus:
       type: string
-      description: SessionStatus enum
       enum:
         - rescheduling
         - running
         - idle
         - terminated
+      x-enum-descriptions:
+        - Transient error occurred, retrying automatically.
+        - Agent is actively executing.
+        - Agent is waiting for input, including user messages or tool confirmations. Sessions start in idle.
+        - Session has ended, either due to an error or completion.
     BetaManagedAgentsListSessions:
       description: Paginated list of sessions.
       type: object
@@ -3374,6 +3235,45 @@ components:
       example:
         type: session_deleted
         id: sesn_011CZkZAtmR3yMPDzynEDxu7
+    BetaManagedAgentsSessionEventType:
+      title: BetaManagedAgentsSessionEventType
+      description: The `type` of a session event.
+      type: string
+      enum:
+        - user.message
+        - user.interrupt
+        - user.tool_confirmation
+        - user.custom_tool_result
+        - agent.custom_tool_use
+        - agent.message
+        - agent.thinking
+        - agent.mcp_tool_use
+        - agent.mcp_tool_result
+        - agent.tool_use
+        - agent.tool_result
+        - agent.thread_message_received
+        - agent.thread_message_sent
+        - agent.thread_context_compacted
+        - session.error
+        - session.status_rescheduled
+        - session.status_running
+        - session.status_idle
+        - session.status_terminated
+        - session.thread_created
+        - span.outcome_evaluation_start
+        - span.outcome_evaluation_end
+        - span.model_request_start
+        - span.model_request_end
+        - span.outcome_evaluation_ongoing
+        - user.define_outcome
+        - session.thread_status_running
+        - session.thread_status_idle
+        - session.thread_status_terminated
+        - user.tool_result
+        - session.thread_status_rescheduled
+        - session.updated
+        - system.message
+        - session.usage
     BetaManagedAgentsListSessionEvents:
       description: Paginated list of events for a `session`.
       type: object
@@ -5201,6 +5101,7 @@ components:
         - from_session_thread_id
         - to_session_thread_id
         - error
+        - stop_details
         - stop_reason
         - agent_name
         - session_thread_id
@@ -5359,6 +5260,11 @@ components:
               mcp_authentication_failed_error: '#/components/schemas/BetaManagedAgentsMcpAuthenticationFailedError'
               billing_error: '#/components/schemas/BetaManagedAgentsBillingError'
               credential_host_unreachable_error: '#/components/schemas/BetaManagedAgentsCredentialHostUnreachableError'
+              repository_authentication_error: '#/components/schemas/BetaManagedAgentsRepositoryAuthenticationError'
+              repository_forbidden_error: '#/components/schemas/BetaManagedAgentsRepositoryForbiddenError'
+              repository_not_found_error: '#/components/schemas/BetaManagedAgentsRepositoryNotFoundError'
+              repository_checkout_error: '#/components/schemas/BetaManagedAgentsRepositoryCheckoutError'
+              repository_clone_error: '#/components/schemas/BetaManagedAgentsRepositoryCloneError'
           description: An unknown or unexpected error occurred during session execution. A fallback variant; clients that don't recognize a new error code can match on `retry_status` and `message` alone.
           required:
             - type
@@ -5367,6 +5273,7 @@ components:
             - mcp_server_name
             - vault_id
             - credential_id
+            - repository_url
           properties:
             type:
               type: string
@@ -5400,6 +5307,49 @@ components:
             credential_id:
               description: ID of the affected credential.
               type: string
+            repository_url:
+              description: URL of the repository that could not be cloned. Null when it could not be identified.
+              examples:
+                - https://github.com/example-org/example-repo
+              nullable: true
+              type: string
+          example:
+            type: repository_authentication_error
+            message: The repository host rejected the credentials for the repository, or required credentials and received none.
+            retry_status:
+              type: retrying
+            repository_url: https://github.com/example-org/example-repo
+        stop_details:
+          description: Structured information about why the session stopped. `null` when there is nothing more to report.
+          nullable: true
+          discriminator:
+            propertyName: type
+            mapping:
+              refusal: '#/components/schemas/BetaManagedAgentsSessionRefusalStopDetails'
+          type: object
+          required:
+            - type
+            - category
+            - explanation
+          properties:
+            type:
+              type: string
+              enum:
+                - refusal
+            category:
+              description: The policy category that triggered the refusal, or `null` when there is no named category. New values can be added over time.
+              nullable: true
+              type: string
+              enum:
+                - cyber
+                - bio
+                - frontier_llm
+                - reasoning_extraction
+                - general_harms
+            explanation:
+              description: Human-readable explanation of the refusal, or `null` when none is available. The wording can change, so do not parse it.
+              nullable: true
+              type: string
         stop_reason:
           type: object
           discriminator:
@@ -5409,6 +5359,7 @@ components:
               requires_action: '#/components/schemas/BetaManagedAgentsSessionRequiresAction'
               retries_exhausted: '#/components/schemas/BetaManagedAgentsSessionRetriesExhausted'
               budget_reached: '#/components/schemas/BetaManagedAgentsSessionBudgetReached'
+              refusal: '#/components/schemas/BetaManagedAgentsSessionRefusal'
           description: The agent completed its turn naturally and is ready for the next user message.
           required:
             - type
@@ -5773,6 +5724,7 @@ components:
           content: Must cover all five sections; cite sources inline.
         stop_reason:
           type: end_turn
+        stop_details: null
     BetaManagedAgentsEventParams:
       description: Union type for event parameters that can be sent to a session.
       type: object
@@ -6036,14 +5988,13 @@ components:
           content: Must cover all five sections; cite sources inline.
     BetaManagedAgentsSessionThreadStatus:
       type: string
-      description: SessionThreadStatus enum
       enum:
         - running
         - idle
         - rescheduling
         - terminated
     BetaManagedAgentsSessionThreadAgentEntry:
-      description: 'The resolved agent a session thread runs: a saved-agent snapshot, the platform advisor entry, or an inline-defined (ephemeral) agent snapshot.'
+      description: The resolved agent a `session_thread` runs.
       discriminator:
         propertyName: type
         mapping:
@@ -6488,10 +6439,12 @@ components:
           x-stainless-skip:
             - go
             - cli
-          type: string
           x-stainless-nominal: false
           enum:
-            - claude-fable-5-1
+            - claude-sonnet-5-5
+          deprecated: true
+          x-stainless-deprecation-message: Will reach end-of-life on November 30, 2026. Please migrate to claude-sonnet-5-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.
+          type: string
           required:
             - id
           properties:
@@ -6505,32 +6458,9 @@ components:
                 - standard
                 - fast
             effort:
-              description: 'How hard Claude works on each inference call. Accepts a bare level string (`"high"`) or `{"type": "high"}`. On create, omitting it resolves the per-model default; on update, omitting it leaves the stored value unchanged.'
-              x-anthropic-beta-required:
-                - managed-agents-2026-04-01
-              nullable: true
               type: string
-              enum:
-                - low
-                - medium
-                - high
-                - xhigh
-                - max
-              discriminator:
-                propertyName: type
-                mapping:
-                  low: '#/components/schemas/BetaManagedAgentsEffortLow'
-                  medium: '#/components/schemas/BetaManagedAgentsEffortMedium'
-                  high: '#/components/schemas/BetaManagedAgentsEffortHigh'
-                  xhigh: '#/components/schemas/BetaManagedAgentsEffortXhigh'
-                  max: '#/components/schemas/BetaManagedAgentsEffortMax'
-              required:
-                - type
-              properties:
-                type:
-                  type: string
-                  enum:
-                    - low
+              description: 'How hard Claude works on each inference call. Accepts a bare level string (`"high"`) or `{"type": "high"}`. On create, omitting it resolves the per-model default; on update, omitting it leaves the stored value unchanged.'
+              nullable: true
             inference_geo:
               description: Geographic region for model inference. When unset, requests fall through to the workspace's default_inference_geo. On update, `model` is whole-object replacement — omitting inference_geo clears it.
               x-anthropic-beta-required:
@@ -7718,6 +7648,11 @@ components:
               mcp_authentication_failed_error: '#/components/schemas/BetaManagedAgentsMcpAuthenticationFailedError'
               billing_error: '#/components/schemas/BetaManagedAgentsBillingError'
               credential_host_unreachable_error: '#/components/schemas/BetaManagedAgentsCredentialHostUnreachableError'
+              repository_authentication_error: '#/components/schemas/BetaManagedAgentsRepositoryAuthenticationError'
+              repository_forbidden_error: '#/components/schemas/BetaManagedAgentsRepositoryForbiddenError'
+              repository_not_found_error: '#/components/schemas/BetaManagedAgentsRepositoryNotFoundError'
+              repository_checkout_error: '#/components/schemas/BetaManagedAgentsRepositoryCheckoutError'
+              repository_clone_error: '#/components/schemas/BetaManagedAgentsRepositoryCloneError'
           description: An unknown or unexpected error occurred during session execution. A fallback variant; clients that don't recognize a new error code can match on `retry_status` and `message` alone.
           required:
             - type
@@ -7726,6 +7661,7 @@ components:
             - mcp_server_name
             - vault_id
             - credential_id
+            - repository_url
           properties:
             type:
               type: string
@@ -7759,6 +7695,18 @@ components:
             credential_id:
               description: ID of the affected credential.
               type: string
+            repository_url:
+              description: URL of the repository that could not be cloned. Null when it could not be identified.
+              examples:
+                - https://github.com/example-org/example-repo
+              nullable: true
+              type: string
+          example:
+            type: repository_authentication_error
+            message: The repository host rejected the credentials for the repository, or required credentials and received none.
+            retry_status:
+              type: retrying
+            repository_url: https://github.com/example-org/example-repo
     BetaManagedAgentsSessionStatusRescheduledEvent:
       description: Indicates the session is recovering from an error state and is rescheduled for execution.
       type: object
@@ -7804,6 +7752,7 @@ components:
         - type
         - id
         - processed_at
+        - stop_details
         - stop_reason
       properties:
         type:
@@ -7817,6 +7766,37 @@ components:
           description: Timestamp of status change.
           type: string
           format: date-time
+        stop_details:
+          description: Structured information about why the session stopped. `null` when there is nothing more to report.
+          nullable: true
+          discriminator:
+            propertyName: type
+            mapping:
+              refusal: '#/components/schemas/BetaManagedAgentsSessionRefusalStopDetails'
+          type: object
+          required:
+            - type
+            - category
+            - explanation
+          properties:
+            type:
+              type: string
+              enum:
+                - refusal
+            category:
+              description: The policy category that triggered the refusal, or `null` when there is no named category. New values can be added over time.
+              nullable: true
+              type: string
+              enum:
+                - cyber
+                - bio
+                - frontier_llm
+                - reasoning_extraction
+                - general_harms
+            explanation:
+              description: Human-readable explanation of the refusal, or `null` when none is available. The wording can change, so do not parse it.
+              nullable: true
+              type: string
         stop_reason:
           type: object
           discriminator:
@@ -7826,6 +7806,7 @@ components:
               requires_action: '#/components/schemas/BetaManagedAgentsSessionRequiresAction'
               retries_exhausted: '#/components/schemas/BetaManagedAgentsSessionRetriesExhausted'
               budget_reached: '#/components/schemas/BetaManagedAgentsSessionBudgetReached'
+              refusal: '#/components/schemas/BetaManagedAgentsSessionRefusal'
           description: The agent completed its turn naturally and is ready for the next user message.
           required:
             - type
@@ -8323,6 +8304,7 @@ components:
         - session_thread_id
         - processed_at
         - agent_name
+        - stop_details
         - stop_reason
       properties:
         type:
@@ -8352,6 +8334,39 @@ components:
           type: string
           examples:
             - Researcher
+        stop_details:
+          description: Structured information about why the thread stopped. `null` when there is nothing more to report.
+          examples:
+            - null
+          nullable: true
+          discriminator:
+            propertyName: type
+            mapping:
+              refusal: '#/components/schemas/BetaManagedAgentsSessionRefusalStopDetails'
+          type: object
+          required:
+            - type
+            - category
+            - explanation
+          properties:
+            type:
+              type: string
+              enum:
+                - refusal
+            category:
+              description: The policy category that triggered the refusal, or `null` when there is no named category. New values can be added over time.
+              nullable: true
+              type: string
+              enum:
+                - cyber
+                - bio
+                - frontier_llm
+                - reasoning_extraction
+                - general_harms
+            explanation:
+              description: Human-readable explanation of the refusal, or `null` when none is available. The wording can change, so do not parse it.
+              nullable: true
+              type: string
         stop_reason:
           type: object
           discriminator:
@@ -8361,6 +8376,7 @@ components:
               requires_action: '#/components/schemas/BetaManagedAgentsSessionRequiresAction'
               retries_exhausted: '#/components/schemas/BetaManagedAgentsSessionRetriesExhausted'
               budget_reached: '#/components/schemas/BetaManagedAgentsSessionBudgetReached'
+              refusal: '#/components/schemas/BetaManagedAgentsSessionRefusal'
           examples:
             - type: end_turn
           description: The agent completed its turn naturally and is ready for the next user message.
@@ -8385,6 +8401,7 @@ components:
         agent_name: Researcher
         stop_reason:
           type: end_turn
+        stop_details: null
     BetaManagedAgentsSessionThreadStatusTerminatedEvent:
       description: A session thread has terminated and will accept no further input. Emitted on the thread's own stream and cross-posted to the primary stream for child threads.
       type: object
@@ -9097,10 +9114,12 @@ components:
         The model that will power your agent.
 
         See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.
-      type: string
       x-stainless-nominal: false
       enum:
-        - claude-fable-5-1
+        - claude-sonnet-5-5
+      deprecated: true
+      x-stainless-deprecation-message: Will reach end-of-life on November 30, 2026. Please migrate to claude-sonnet-5-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.
+      type: string
       required:
         - id
       properties:
@@ -9114,32 +9133,9 @@ components:
             - standard
             - fast
         effort:
-          description: 'How hard Claude works on each inference call. Accepts a bare level string (`"high"`) or `{"type": "high"}`. On create, omitting it resolves the per-model default; on update, omitting it leaves the stored value unchanged.'
-          x-anthropic-beta-required:
-            - managed-agents-2026-04-01
-          nullable: true
           type: string
-          enum:
-            - low
-            - medium
-            - high
-            - xhigh
-            - max
-          discriminator:
-            propertyName: type
-            mapping:
-              low: '#/components/schemas/BetaManagedAgentsEffortLow'
-              medium: '#/components/schemas/BetaManagedAgentsEffortMedium'
-              high: '#/components/schemas/BetaManagedAgentsEffortHigh'
-              xhigh: '#/components/schemas/BetaManagedAgentsEffortXhigh'
-              max: '#/components/schemas/BetaManagedAgentsEffortMax'
-          required:
-            - type
-          properties:
-            type:
-              type: string
-              enum:
-                - low
+          description: 'How hard Claude works on each inference call. Accepts a bare level string (`"high"`) or `{"type": "high"}`. On create, omitting it resolves the per-model default; on update, omitting it leaves the stored value unchanged.'
+          nullable: true
         inference_geo:
           description: Geographic region for model inference. When unset, requests fall through to the workspace's default_inference_geo. On update, `model` is whole-object replacement — omitting inference_geo clears it.
           x-anthropic-beta-required:
@@ -9299,10 +9295,12 @@ components:
         The model that will power your agent.
 
         See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.
-      type: string
       x-stainless-nominal: false
       enum:
-        - claude-fable-5-1
+        - claude-sonnet-5-5
+      deprecated: true
+      x-stainless-deprecation-message: Will reach end-of-life on November 30, 2026. Please migrate to claude-sonnet-5-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.
+      type: string
     BetaManagedAgentsSpeed:
       type: string
       description: Inference speed mode. `fast` provides significantly faster output token generation at premium pricing. Not all models support `fast`; invalid combinations are rejected at create time.
@@ -9647,7 +9645,6 @@ components:
         url: https://example-server.modelcontextprotocol.io/sse
     BetaManagedAgentsUserToolConfirmationResult:
       type: string
-      description: UserToolConfirmationResult enum
       enum:
         - allow
         - deny
@@ -9773,7 +9770,6 @@ components:
         text: 'Where is my order #1234?'
     BetaManagedAgentsAgentEvaluatedPermission:
       type: string
-      description: AgentEvaluatedPermission enum
       enum:
         - allow
         - ask
@@ -10080,6 +10076,286 @@ components:
         credential_id:
           description: ID of the affected credential.
           type: string
+    BetaManagedAgentsRepositoryAuthenticationError:
+      description: The repository host rejected the credentials, or required credentials and received none.
+      type: object
+      required:
+        - type
+        - message
+        - retry_status
+        - repository_url
+      properties:
+        type:
+          type: string
+          examples:
+            - repository_authentication_error
+          enum:
+            - repository_authentication_error
+        message:
+          description: Human-readable error description.
+          type: string
+          examples:
+            - The repository host rejected the credentials for the repository, or required credentials and received none.
+        retry_status:
+          description: 'What the client should do next. Always `retrying`: the session keeps running without the repository.'
+          examples:
+            - type: retrying
+          type: object
+          discriminator:
+            propertyName: type
+            mapping:
+              retrying: '#/components/schemas/BetaManagedAgentsRetryStatusRetrying'
+              exhausted: '#/components/schemas/BetaManagedAgentsRetryStatusExhausted'
+              terminal: '#/components/schemas/BetaManagedAgentsRetryStatusTerminal'
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - retrying
+        repository_url:
+          description: URL of the repository that could not be cloned. Null when it could not be identified.
+          examples:
+            - https://github.com/example-org/example-repo
+          nullable: true
+          type: string
+      example:
+        type: repository_authentication_error
+        message: The repository host rejected the credentials for the repository, or required credentials and received none.
+        retry_status:
+          type: retrying
+        repository_url: https://github.com/example-org/example-repo
+    BetaManagedAgentsRepositoryForbiddenError:
+      description: The repository host refused access to the repository.
+      type: object
+      required:
+        - type
+        - message
+        - retry_status
+        - repository_url
+      properties:
+        type:
+          type: string
+          examples:
+            - repository_forbidden_error
+          enum:
+            - repository_forbidden_error
+        message:
+          description: Human-readable error description.
+          type: string
+          examples:
+            - The repository host refused access to the repository.
+        retry_status:
+          description: 'What the client should do next. Always `retrying`: the session keeps running without the repository.'
+          examples:
+            - type: retrying
+          type: object
+          discriminator:
+            propertyName: type
+            mapping:
+              retrying: '#/components/schemas/BetaManagedAgentsRetryStatusRetrying'
+              exhausted: '#/components/schemas/BetaManagedAgentsRetryStatusExhausted'
+              terminal: '#/components/schemas/BetaManagedAgentsRetryStatusTerminal'
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - retrying
+        repository_url:
+          description: URL of the repository that could not be cloned. Null when it could not be identified.
+          examples:
+            - https://github.com/example-org/example-repo
+          nullable: true
+          type: string
+      example:
+        type: repository_forbidden_error
+        message: The repository host refused access to the repository.
+        retry_status:
+          type: retrying
+        repository_url: https://github.com/example-org/example-repo
+    BetaManagedAgentsRepositoryNotFoundError:
+      description: The repository host reported the repository as not found.
+      type: object
+      required:
+        - type
+        - message
+        - retry_status
+        - repository_url
+      properties:
+        type:
+          type: string
+          examples:
+            - repository_not_found_error
+          enum:
+            - repository_not_found_error
+        message:
+          description: Human-readable error description.
+          type: string
+          examples:
+            - The repository host reported the repository as not found.
+        retry_status:
+          description: 'What the client should do next. Always `retrying`: the session keeps running without the repository.'
+          examples:
+            - type: retrying
+          type: object
+          discriminator:
+            propertyName: type
+            mapping:
+              retrying: '#/components/schemas/BetaManagedAgentsRetryStatusRetrying'
+              exhausted: '#/components/schemas/BetaManagedAgentsRetryStatusExhausted'
+              terminal: '#/components/schemas/BetaManagedAgentsRetryStatusTerminal'
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - retrying
+        repository_url:
+          description: URL of the repository that could not be cloned. Null when it could not be identified.
+          examples:
+            - https://github.com/example-org/example-repo
+          nullable: true
+          type: string
+      example:
+        type: repository_not_found_error
+        message: The repository host reported the repository as not found.
+        retry_status:
+          type: retrying
+        repository_url: https://github.com/example-org/example-repo
+    BetaManagedAgentsRepositoryCheckoutError:
+      description: The requested branch or commit does not exist in the repository.
+      type: object
+      required:
+        - type
+        - message
+        - retry_status
+        - repository_url
+      properties:
+        type:
+          type: string
+          examples:
+            - repository_checkout_error
+          enum:
+            - repository_checkout_error
+        message:
+          description: Human-readable error description.
+          type: string
+          examples:
+            - The requested branch or commit does not exist in the repository.
+        retry_status:
+          description: 'What the client should do next. Always `retrying`: the session keeps running without the repository.'
+          examples:
+            - type: retrying
+          type: object
+          discriminator:
+            propertyName: type
+            mapping:
+              retrying: '#/components/schemas/BetaManagedAgentsRetryStatusRetrying'
+              exhausted: '#/components/schemas/BetaManagedAgentsRetryStatusExhausted'
+              terminal: '#/components/schemas/BetaManagedAgentsRetryStatusTerminal'
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - retrying
+        repository_url:
+          description: URL of the repository that could not be cloned. Null when it could not be identified.
+          examples:
+            - https://github.com/example-org/example-repo
+          nullable: true
+          type: string
+      example:
+        type: repository_checkout_error
+        message: The requested branch or commit does not exist in the repository.
+        retry_status:
+          type: retrying
+        repository_url: https://github.com/example-org/example-repo
+    BetaManagedAgentsRepositoryCloneError:
+      description: The repository could not be cloned.
+      type: object
+      required:
+        - type
+        - message
+        - retry_status
+        - repository_url
+      properties:
+        type:
+          type: string
+          examples:
+            - repository_clone_error
+          enum:
+            - repository_clone_error
+        message:
+          description: Human-readable error description.
+          type: string
+          examples:
+            - The repository could not be cloned.
+        retry_status:
+          description: 'What the client should do next. Always `retrying`: the session keeps running without the repository.'
+          examples:
+            - type: retrying
+          type: object
+          discriminator:
+            propertyName: type
+            mapping:
+              retrying: '#/components/schemas/BetaManagedAgentsRetryStatusRetrying'
+              exhausted: '#/components/schemas/BetaManagedAgentsRetryStatusExhausted'
+              terminal: '#/components/schemas/BetaManagedAgentsRetryStatusTerminal'
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - retrying
+        repository_url:
+          description: URL of the repository that could not be cloned. Null when it could not be identified.
+          examples:
+            - https://github.com/example-org/example-repo
+          nullable: true
+          type: string
+      example:
+        type: repository_clone_error
+        message: The repository could not be cloned.
+        retry_status:
+          type: retrying
+        repository_url: https://github.com/example-org/example-repo
+    BetaManagedAgentsSessionStopDetails:
+      description: 'Structured information about why a session or thread stopped. Open union: clients must tolerate unknown variants.'
+      discriminator:
+        propertyName: type
+        mapping:
+          refusal: '#/components/schemas/BetaManagedAgentsSessionRefusalStopDetails'
+      type: object
+      required:
+        - type
+        - category
+        - explanation
+      properties:
+        type:
+          type: string
+          enum:
+            - refusal
+        category:
+          description: The policy category that triggered the refusal, or `null` when there is no named category. New values can be added over time.
+          nullable: true
+          type: string
+          enum:
+            - cyber
+            - bio
+            - frontier_llm
+            - reasoning_extraction
+            - general_harms
+        explanation:
+          description: Human-readable explanation of the refusal, or `null` when none is available. The wording can change, so do not parse it.
+          nullable: true
+          type: string
     BetaManagedAgentsSessionEndTurn:
       description: The agent completed its turn naturally and is ready for the next user message.
       type: object
@@ -10126,6 +10402,16 @@ components:
           type: string
           enum:
             - budget_reached
+    BetaManagedAgentsSessionRefusal:
+      description: The turn ended because the model's response was refused, for example by a safety classifier.
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - refusal
     BetaManagedAgentsSpanModelUsage:
       description: Token usage for a single model request.
       type: object
@@ -10336,32 +10622,9 @@ components:
             - standard
             - fast
         effort:
-          description: 'How hard Claude works on each inference call. Accepts a bare level string (`"high"`) or `{"type": "high"}`. On create, omitting it resolves the per-model default; on update, omitting it leaves the stored value unchanged.'
-          x-anthropic-beta-required:
-            - managed-agents-2026-04-01
-          nullable: true
           type: string
-          enum:
-            - low
-            - medium
-            - high
-            - xhigh
-            - max
-          discriminator:
-            propertyName: type
-            mapping:
-              low: '#/components/schemas/BetaManagedAgentsEffortLow'
-              medium: '#/components/schemas/BetaManagedAgentsEffortMedium'
-              high: '#/components/schemas/BetaManagedAgentsEffortHigh'
-              xhigh: '#/components/schemas/BetaManagedAgentsEffortXhigh'
-              max: '#/components/schemas/BetaManagedAgentsEffortMax'
-          required:
-            - type
-          properties:
-            type:
-              type: string
-              enum:
-                - low
+          description: 'How hard Claude works on each inference call. Accepts a bare level string (`"high"`) or `{"type": "high"}`. On create, omitting it resolves the per-model default; on update, omitting it leaves the stored value unchanged.'
+          nullable: true
         inference_geo:
           description: Geographic region for model inference. When unset, requests fall through to the workspace's default_inference_geo. On update, `model` is whole-object replacement — omitting inference_geo clears it.
           x-anthropic-beta-required:
@@ -11177,6 +11440,32 @@ components:
           type: string
           enum:
             - retrying
+    BetaManagedAgentsSessionRefusalStopDetails:
+      description: Structured information about a refusal.
+      type: object
+      required:
+        - type
+        - category
+        - explanation
+      properties:
+        type:
+          type: string
+          enum:
+            - refusal
+        category:
+          description: The policy category that triggered the refusal, or `null` when there is no named category. New values can be added over time.
+          nullable: true
+          type: string
+          enum:
+            - cyber
+            - bio
+            - frontier_llm
+            - reasoning_extraction
+            - general_harms
+        explanation:
+          description: Human-readable explanation of the refusal, or `null` when none is available. The wording can change, so do not parse it.
+          nullable: true
+          type: string
     BetaManagedAgentsFileRubric:
       description: Rubric referenced by a file uploaded via the Files API.
       type: object
@@ -11208,27 +11497,6 @@ components:
     BetaManagedAgentsEffortParams:
       type: string
       description: How hard Claude works on each turn. Higher levels favor reasoning depth over latency. Not all models accept every level; invalid combinations are rejected at create time.
-      enum:
-        - low
-        - medium
-        - high
-        - xhigh
-        - max
-      discriminator:
-        propertyName: type
-        mapping:
-          low: '#/components/schemas/BetaManagedAgentsEffortLow'
-          medium: '#/components/schemas/BetaManagedAgentsEffortMedium'
-          high: '#/components/schemas/BetaManagedAgentsEffortHigh'
-          xhigh: '#/components/schemas/BetaManagedAgentsEffortXhigh'
-          max: '#/components/schemas/BetaManagedAgentsEffortMax'
-      required:
-        - type
-      properties:
-        type:
-          type: string
-          enum:
-            - low
     BetaManagedAgentsImageSource:
       description: Union type for image source variants.
       type: object
@@ -11971,6 +12239,12 @@ components:
         - high
         - xhigh
         - max
+      x-enum-descriptions:
+        - Low effort. Favors latency over reasoning depth.
+        - Medium effort. Balances latency and reasoning depth.
+        - High effort. Favors reasoning depth.
+        - Extra-high effort. Not all models accept this level.
+        - Maximum effort. Favors reasoning depth over latency.
     BetaManagedAgentsBase64ImageSource:
       description: Base64-encoded image data.
       type: object

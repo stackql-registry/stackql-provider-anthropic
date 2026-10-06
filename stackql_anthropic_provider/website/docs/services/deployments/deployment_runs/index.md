@@ -266,7 +266,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-deployment_run_id">
     <td><CopyableCode code="deployment_run_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter deployment_run_id</td>
+    <td>Unique identifier of the deployment run.</td>
 </tr>
 <tr id="parameter-anthropic-workspace-id">
     <td><CopyableCode code="anthropic-workspace-id" /></td>

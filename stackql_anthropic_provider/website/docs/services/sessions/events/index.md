@@ -157,7 +157,7 @@ Successful response (OK)
           {
             "name": "id",
             "type": "string",
-            "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-fable-5-1)"
+            "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-sonnet-5-5)"
           },
           {
             "name": "speed",
@@ -555,6 +555,11 @@ Successful response (OK)
         "name": "credential_id",
         "type": "string",
         "description": "ID of the affected credential."
+      },
+      {
+        "name": "repository_url",
+        "type": "string",
+        "description": "URL of the repository that could not be cloned. Null when it could not be identified."
       }
     ]
   },
@@ -687,6 +692,28 @@ Successful response (OK)
     ]
   },
   {
+    "name": "stop_details",
+    "type": "object",
+    "description": "Structured information about why the session stopped. `null` when there is nothing more to report.",
+    "children": [
+      {
+        "name": "type",
+        "type": "string",
+        "description": " (refusal)"
+      },
+      {
+        "name": "category",
+        "type": "string",
+        "description": "The policy category that triggered the refusal, or `null` when there is no named category. New values can be added over time. (cyber, bio, frontier_llm, reasoning_extraction, general_harms)"
+      },
+      {
+        "name": "explanation",
+        "type": "string",
+        "description": "Human-readable explanation of the refusal, or `null` when none is available. The wording can change, so do not parse it."
+      }
+    ]
+  },
+  {
     "name": "stop_reason",
     "type": "object",
     "description": "The agent completed its turn naturally and is ready for the next user message.",
@@ -797,7 +824,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-session_id">
     <td><CopyableCode code="session_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter session_id (example: sesn_011CZkZAtmR3yMPDzynEDxu7)</td>
+    <td> (example: sesn_011CZkZAtmR3yMPDzynEDxu7)</td>
 </tr>
 <tr id="parameter-anthropic-workspace-id">
     <td><CopyableCode code="anthropic-workspace-id" /></td>
@@ -884,6 +911,7 @@ model_usage,
 processed_at,
 result,
 rubric,
+stop_details,
 stop_reason,
 title,
 type,

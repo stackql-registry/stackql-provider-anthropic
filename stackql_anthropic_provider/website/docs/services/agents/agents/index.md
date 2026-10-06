@@ -105,7 +105,7 @@ Successful response (OK)
       {
         "name": "id",
         "type": "string",
-        "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-fable-5-1)"
+        "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-sonnet-5-5)"
       },
       {
         "name": "speed",
@@ -433,7 +433,7 @@ Successful response (OK)
       {
         "name": "id",
         "type": "string",
-        "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-fable-5-1)"
+        "description": "The model that will power your agent.<br /><br />See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options. (claude-sonnet-5-5)"
       },
       {
         "name": "speed",
@@ -767,7 +767,7 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-agent_id">
     <td><CopyableCode code="agent_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter agent_id (example: agent_011CZkYpogX7uDKUyvBTophP)</td>
+    <td>Unique identifier of the agent to archive. (example: agent_011CZkYpogX7uDKUyvBTophP)</td>
 </tr>
 <tr id="parameter-anthropic-workspace-id">
     <td><CopyableCode code="anthropic-workspace-id" /></td>
@@ -935,7 +935,7 @@ version
       value: "{{ model }}"
       description: |
         Model identifier. Accepts the [model string](https://platform.claude.com/docs/en/about-claude/models/overview#latest-models-comparison), e.g. \`claude-opus-5\`, or a \`model_config\` object for additional configuration control
-      valid_values: ['claude-fable-5-1']
+      valid_values: ['claude-sonnet-5-5']
     - name: description
       value: "{{ description }}"
       description: |

@@ -65,25 +65,17 @@ paths:
           in: header
           required: false
           schema:
-            type: string
+            type: array
             items:
-              type: string
-            description: |-
-              Optional header to specify the beta version(s) you want to use.
-
-              To use multiple betas, use a comma separated list like `beta1,beta2` or specify the header multiple times for each beta.
+              $ref: '#/components/schemas/AnthropicBeta'
+            description: Optional header to specify the beta version(s) you want to use.
             title: Anthropic-Beta
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
-          description: |-
-            Optional header to specify the beta version(s) you want to use.
-
-            To use multiple betas, use a comma separated list like `beta1,beta2` or specify the header multiple times for each beta.
+            deprecated: true
+            x-stainless-deprecation-message: Deprecated. This parameter will be removed from this method in a future release. To use beta features, call the beta models methods (`client.beta.models`) instead.
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+          description: Optional header to specify the beta version(s) you want to use.
+          deprecated: true
         - name: x-api-key
           in: header
           required: false
@@ -248,25 +240,17 @@ paths:
           in: header
           required: false
           schema:
-            type: string
+            type: array
             items:
-              type: string
-            description: |-
-              Optional header to specify the beta version(s) you want to use.
-
-              To use multiple betas, use a comma separated list like `beta1,beta2` or specify the header multiple times for each beta.
+              $ref: '#/components/schemas/AnthropicBeta'
+            description: Optional header to specify the beta version(s) you want to use.
             title: Anthropic-Beta
-            x-stainless-override-schema:
-              x-stainless-param: betas
-              x-stainless-extend-default: true
-              type: array
-              description: Optional header to specify the beta version(s) you want to use.
-              items:
-                $ref: '#/components/schemas/AnthropicBeta'
-          description: |-
-            Optional header to specify the beta version(s) you want to use.
-
-            To use multiple betas, use a comma separated list like `beta1,beta2` or specify the header multiple times for each beta.
+            deprecated: true
+            x-stainless-deprecation-message: Deprecated. This parameter will be removed from this method in a future release. To use beta features, call the beta models methods (`client.beta.models`) instead.
+            x-stainless-param: betas
+            x-stainless-extend-default: true
+          description: Optional header to specify the beta version(s) you want to use.
+          deprecated: true
         - name: x-api-key
           in: header
           required: false
@@ -446,6 +430,10 @@ components:
         - thinking-binding-controls-2026-08-01
         - mid-conversation-system-clear-at-2026-08-21
         - compact-2026-09-04
+        - inline-tools-2026-09-15
+        - mcp-client-2026-09-15
+        - ce-plugins-2026-09-01
+        - spend-limit-reads-2026-09-26
       x-stainless-nominal: false
     ListResponse_ModelInfo_:
       properties:

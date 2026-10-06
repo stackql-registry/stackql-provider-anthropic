@@ -289,12 +289,12 @@ Parameters can be passed in the `WHERE` clause of a query. Check the [Methods](#
 <tr id="parameter-resource_id">
     <td><CopyableCode code="resource_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter resource_id (example: sesrsc_011CZkZBJq5dWxk9fVLNcPht)</td>
+    <td> (example: sesrsc_011CZkZBJq5dWxk9fVLNcPht)</td>
 </tr>
 <tr id="parameter-session_id">
     <td><CopyableCode code="session_id" /></td>
     <td><code>string</code></td>
-    <td>Path parameter session_id (example: sesn_011CZkZAtmR3yMPDzynEDxu7)</td>
+    <td> (example: sesn_011CZkZAtmR3yMPDzynEDxu7)</td>
 </tr>
 <tr id="parameter-anthropic-workspace-id">
     <td><CopyableCode code="anthropic-workspace-id" /></td>
